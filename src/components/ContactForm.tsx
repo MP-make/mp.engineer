@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import emailjs from '@emailjs/browser';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -24,22 +25,25 @@ const ContactForm = () => {
     setSubmitMessage('');
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Configurar EmailJS - Reemplazar con tus IDs reales de https://www.emailjs.com/
+      await emailjs.send(
+        'YOUR_SERVICE_ID',      // ← Obtener de EmailJS
+        'YOUR_TEMPLATE_ID',     // ← Obtener de EmailJS
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          message: formData.message,
+          to_email: 'marlonpecho264@gmail.com'  // ← TU EMAIL
         },
-        body: JSON.stringify(formData),
-      });
+        'YOUR_PUBLIC_KEY'       // ← Obtener de EmailJS
+      );
 
-      if (response.ok) {
-        setSubmitMessage('Message sent successfully!');
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        setSubmitMessage('Failed to send message. Please try again.');
-      }
+      setSubmitMessage('✅ Mensaje enviado correctamente. Te responderé pronto!');
+      setFormData({ name: '', email: '', message: '' });
+      
     } catch (error) {
-      setSubmitMessage('An error occurred. Please try again.');
+      console.error('Error:', error);
+      setSubmitMessage('❌ Error al enviar. Por favor intenta nuevamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -49,14 +53,14 @@ const ContactForm = () => {
     <div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
+          <label htmlFor="name" className="block text-sm font-medium mb-1">Nombre</label>
           <input
             type="text"
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            className="w-full px-3 py-2 bg-secondary border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
         </div>
@@ -68,31 +72,31 @@ const ContactForm = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            className="w-full px-3 py-2 bg-secondary border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-medium mb-1">Message</label>
+          <label htmlFor="message" className="block text-sm font-medium mb-1">Mensaje</label>
           <textarea
             id="message"
             name="message"
             rows={4}
             value={formData.message}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            className="w-full px-3 py-2 bg-secondary border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             required
           ></textarea>
         </div>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-700 text-white px-4 py-2 rounded-md font-semibold transition-colors"
+          className="w-full bg-gradient-to-r from-primary to-secondary disabled:bg-secondary text-accent px-4 py-2 rounded-md font-semibold transition-colors"
         >
-          {isSubmitting ? 'Sending...' : 'Send Message'}
+          {isSubmitting ? 'Enviando...' : 'Enviar Mensaje'}
         </button>
         {submitMessage && (
-          <p className={`text-sm ${submitMessage.includes('successfully') ? 'text-green-400' : 'text-red-400'}`}>
+          <p className={`text-sm ${submitMessage.includes('✅') ? 'text-green-400' : 'text-red-400'}`}>
             {submitMessage}
           </p>
         )}

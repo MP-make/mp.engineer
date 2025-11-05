@@ -1,26 +1,52 @@
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #01c38e;        /* Verde principal */
+  --secondary: #13c4a6;      /* Verde azulado */
+  --accent: #1a1e29;         /* Azul oscuro */
+  --dark: #1a1e29;           /* Fondo principal */
+  --darker: #13141a;         /* Fondo más oscuro */
+  --card: #132d46;           /* Azul marino oscuro para tarjetas */
+  --background: #1a1e29;
+  --foreground: #ffffff;
+  --color-primary: #01c38e;
+  --color-secondary: #13c4a6;
+  --color-accent: #1a1e29;
+  --color-white: #ffffff;
+  --neon-purple: #a855f7;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Inter', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a1e29;
+    --foreground: #ffffff;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+}
+
+.glow {
+  transition: all 0.3s ease;
+}
+
+.glow:hover {
+  box-shadow: 0 0 20px rgba(1, 195, 142, 0.6), 0 0 40px rgba(1, 195, 142, 0.3);
+}
+
+.permanent-glow {
+  box-shadow: 0 0 15px rgba(1, 195, 142, 0.5);
 }
