@@ -180,45 +180,127 @@ export default function Home() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-20 px-4 bg-card" data-aos="fade-up">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 text-white" data-aos="fade-up" style={{ textShadow: '0 0 10px rgba(1, 195, 142, 0.5)' }}>Proyectos</h2>
+      <section id="projects" className="py-20 px-4 bg-gradient-to-b from-accent to-card relative overflow-hidden" data-aos="fade-up">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `linear-gradient(rgba(1, 195, 142, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(1, 195, 142, 0.1) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-bold mb-4 text-white" data-aos="fade-up" style={{ textShadow: '0 0 20px rgba(1, 195, 142, 0.5)' }}>
+              Proyectos <span className="text-primary">Destacados</span>
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+              Soluciones innovadoras construidas con las últimas tecnologías
+            </p>
+          </div>
+          
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
             {projects.map((project, index) => (
-              <div key={project.id} className="bg-card rounded-lg p-6 border border-primary hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 glow" data-aos="fade-up" data-aos-delay={`${200 + index * 200}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
-                  <span className={`bg-primary text-accent px-2 py-1 rounded text-xs font-semibold flex items-center glow permanent-glow`}>
+              <div 
+                key={project.id} 
+                className="group bg-[#1e2432] rounded-2xl overflow-hidden border-2 border-primary/30 hover:border-primary transition-all duration-500 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2" 
+                data-aos="fade-up" 
+                data-aos-delay={`${200 + index * 200}`}
+              >
+                {/* Badge de estado */}
+                <div className="p-4 pb-0 flex justify-end">
+                  <div className={`${project.status === 'completed' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-yellow-400 to-orange-500'} text-white px-6 py-3 rounded-full text-sm font-black flex items-center gap-2 shadow-2xl border-4 border-white/90`}>
                     {project.status === 'completed' ? (
                       <>
-                        <CheckCircle size={12} className="mr-1" />
-                        COMPLETADO
+                        <CheckCircle size={18} className="animate-pulse drop-shadow-lg" strokeWidth={3} />
+                        <span className="drop-shadow-lg">COMPLETADO</span>
                       </>
                     ) : (
                       <>
-                        <Clock size={12} className="mr-1" />
-                        EN DESARROLLO
+                        <Clock size={18} className="animate-pulse drop-shadow-lg" strokeWidth={3} />
+                        <span className="drop-shadow-lg">EN DESARROLLO</span>
                       </>
                     )}
-                  </span>
+                  </div>
                 </div>
-                <Carousel images={project.images.map(img => `http://localhost:8000${img}`)} />
-                <p className="text-gray-300 mb-4">{project.description}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.technologies.map((tech, techIndex) => (
-                    <span key={techIndex} className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">{tech}</span>
-                  ))}
+
+                {/* Carrusel */}
+                <div className="p-4 pt-3">
+                  <div className="transform group-hover:scale-105 transition-transform duration-500">
+                    <Carousel images={project.images.map(img => `http://localhost:8000${img}`)} />
+                  </div>
                 </div>
-                <div className="flex space-x-4 mb-3">
-                  {project.link && (
-                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-secondary transition-colors glow">
-                      <ExternalLink size={16} className="mr-1" />
-                      Live Demo
-                    </a>
-                  )}
+                
+                {/* Content */}
+                <div className="p-8 pt-4 space-y-5 bg-gradient-to-b from-[#1e2432] to-[#181d28]">
+                  <h3 className="text-3xl font-bold text-white group-hover:text-primary transition-colors duration-300">
+                    {project.title}
+                  </h3>
+                  
+                  <p className="text-gray-300 leading-relaxed text-base">
+                    {project.description}
+                  </p>
+                  
+                  {/* Technologies */}
+                  <div className="pt-5 border-t-2 border-primary/20">
+                    <p className="text-xs text-gray-400 mb-4 font-bold uppercase tracking-widest flex items-center gap-2">
+                      <Code size={14} className="text-primary" />
+                      Stack Tecnológico
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      {project.technologies.map((tech, techIndex) => (
+                        <span 
+                          key={techIndex} 
+                          className="bg-primary/15 text-primary border-2 border-primary/40 text-sm px-4 py-2 rounded-full hover:bg-primary/25 hover:border-primary hover:scale-105 transition-all duration-300 font-semibold"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Actions */}
+                  <div className="flex gap-4 pt-5">
+                    {project.link && (
+                      <>
+                        <a 
+                          href={project.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 hover:shadow-xl hover:shadow-primary/50 transform hover:-translate-y-1 text-base"
+                        >
+                          <ExternalLink size={20} />
+                          Ver Demo
+                        </a>
+                        <a 
+                          href={project.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-primary border-2 border-primary/50 hover:border-primary px-6 py-4 rounded-xl font-bold transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-1"
+                        >
+                          <Github size={20} />
+                        </a>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* CTA adicional */}
+          <div className="mt-16 text-center" data-aos="fade-up" data-aos-delay="400">
+            <p className="text-gray-300 mb-4 text-lg">¿Quieres ver más de mi trabajo?</p>
+            <a 
+              href="https://github.com/MP-make" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors font-bold text-lg group"
+            >
+              <Github size={24} />
+              Visita mi GitHub
+              <ExternalLink size={18} className="group-hover:translate-x-1 transition-transform" />
+            </a>
           </div>
         </div>
       </section>
