@@ -1,10 +1,23 @@
+'use client';
+
 import Navbar from '@/components/Navbar';
 import ContactForm from '@/components/ContactForm';
+import Carousel from '@/components/Carousel';
 import { Code, Database, Smartphone, Mail, Github, ExternalLink, CheckCircle, Clock, Palette, Atom, Server, Zap } from 'lucide-react';
 import Typewriter from 'typewriter-effect';
 import { GitBranch, Cloud, Linkedin } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/projects/')
+      .then(res => res.json())
+      .then(data => setProjects(data))
+      .catch(err => console.error('Error fetching projects:', err));
+  }, []);
+
   return (
     <div className="min-h-screen bg-accent text-customWhite">
       <Navbar />
@@ -27,7 +40,7 @@ export default function Home() {
         </div>
         <div className="text-center relative z-10">
           <h1 className="text-5xl md:text-7xl font-bold mb-4 text-shadow-lg" data-aos="fade-up" data-aos-delay="200" style={{ textShadow: '0 0 10px rgba(1, 195, 142, 0.5)' }}>
-            Marlon <span className="bg-gradient-to-r from-primary via-customWhite to-neonPurple bg-clip-text text-transparent font-black text-6xl md:text-8xl">Pecho</span>
+            Marlon <span style={{color: 'var(--primary)'}}>Pecho</span>
           </h1>
           <p className="text-xl md:text-2xl text-primary mb-4 leading-loose" data-aos="fade-up" data-aos-delay="400">
             Ingeniero de Sistemas & Desarrollador Full Stack
@@ -36,15 +49,15 @@ export default function Home() {
             Ingeniero de sistemas Marlon Pecho. Transformando ideas en soluciones digitales que impulsan negocios y cerrando brechas tecnológicas en Perú.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8" data-aos="fade-up" data-aos-delay="800">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-black mb-6 hover:bg-primary/90 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/30 hover:brightness-110 glow" data-aos="fade-up" data-aos-delay="800">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary to-secondary text-white mb-6 hover:from-secondary hover:to-primary transition-all duration-500 hover:scale-110 hover:shadow-xl hover:shadow-primary/50 hover:brightness-110 glow permanent-glow animate-pulse" data-aos="fade-up" data-aos-delay="800">
+              <span className="relative flex h-4 w-4">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-white"></span>
               </span>
-              <span className="text-primary font-medium hover:text-secondary transition-colors">Disponible para proyectos</span>
+              <span className="font-bold text-lg">Disponible para proyectos</span>
             </div>
           </div>
-          <div className="mt-8" data-aos="fade-up" data-aos-delay="1000">
+          <div className="mt-16" data-aos="fade-up" data-aos-delay="1000">
             <a href="#contact" className="bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-accent px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/50 transform hover:-translate-y-1 glow">
               Conectemos
             </a>
@@ -171,64 +184,41 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12 text-white" data-aos="fade-up" style={{ textShadow: '0 0 10px rgba(1, 195, 142, 0.5)' }}>Proyectos</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {/* Project 1: Ventify */}
-            <div className="bg-card rounded-lg p-6 border border-primary hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 glow" data-aos="fade-up" data-aos-delay="200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xl font-semibold">Ventify</h3>
-                <span className="bg-primary text-accent px-2 py-1 rounded text-xs font-semibold flex items-center glow permanent-glow">
-                  <CheckCircle size={12} className="mr-1" />
-                  COMPLETADO
-                </span>
+            {projects.map((project, index) => (
+              <div key={project.id} className="bg-card rounded-lg p-6 border border-primary hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 glow" data-aos="fade-up" data-aos-delay={`${200 + index * 200}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-semibold">{project.title}</h3>
+                  <span className={`bg-primary text-accent px-2 py-1 rounded text-xs font-semibold flex items-center glow permanent-glow`}>
+                    {project.status === 'completed' ? (
+                      <>
+                        <CheckCircle size={12} className="mr-1" />
+                        COMPLETADO
+                      </>
+                    ) : (
+                      <>
+                        <Clock size={12} className="mr-1" />
+                        EN DESARROLLO
+                      </>
+                    )}
+                  </span>
+                </div>
+                <Carousel images={project.images.map(img => `http://localhost:8000${img}`)} />
+                <p className="text-gray-300 mb-4">{project.description}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {project.technologies.map((tech, techIndex) => (
+                    <span key={techIndex} className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">{tech}</span>
+                  ))}
+                </div>
+                <div className="flex space-x-4 mb-3">
+                  {project.link && (
+                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-secondary transition-colors glow">
+                      <ExternalLink size={16} className="mr-1" />
+                      Live Demo
+                    </a>
+                  )}
+                </div>
               </div>
-              <p className="text-gray-300 mb-4">Plataforma web completa para la venta de tickets de eventos. Sistema multi-rol (admin, proveedor, cliente) con dashboard de métricas, integración con Google Maps para ubicación de eventos y sistema de pago simulado seguro.</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">🐍 Python</span>
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">Django</span>
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">PostgreSQL</span>
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">JavaScript</span>
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">HTML/CSS</span>
-              </div>
-              <div className="flex space-x-4 mb-3">
-                <a href="https://ventify-one.vercel.app" target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-secondary transition-colors glow">
-                  <ExternalLink size={16} className="mr-1" />
-                  Live Demo
-                </a>
-                <a href="https://github.com/Arcay322/Ventify" target="_blank" rel="noopener noreferrer" className="flex items-center text-primary hover:text-secondary transition-colors glow">
-                  <Github size={16} className="mr-1" />
-                  Código
-                </a>
-              </div>
-              <p className="text-sm text-gray-400">
-                💼 Colaborador activo en el desarrollo
-              </p>
-            </div>
-
-            {/* Project 2: Hotel-MP */}
-            <div className="bg-card rounded-lg p-6 border border-primary hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 glow" data-aos="fade-up" data-aos-delay="400">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xl font-semibold">Hotel-MP</h3>
-                <span className="bg-primary text-accent px-2 py-1 rounded text-xs font-semibold flex items-center glow permanent-glow">
-                  <Clock size={12} className="mr-1" />
-                  EN DESARROLLO
-                </span>
-              </div>
-              <p className="text-gray-300 mb-4">Renovación digital del Hotel JW Marriott Lima. Sistema centralizado de gestión de reservas, panel de cliente con dashboard interactivo, gestión de servicios y notificaciones en tiempo real. Diseño elegante que refuerza la imagen de lujo del hotel.</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">HTML5</span>
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">CSS3</span>
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">JavaScript</span>
-                <span className="bg-primary/40 text-primary border-2 border-primary text-xs px-2 py-1 rounded hover:bg-primary/30 transition-colors glow">Supabase</span>
-              </div>
-              <div className="flex space-x-4 mb-3">
-                <span className="px-4 py-2 rounded-lg border-2 border-primary text-primary font-semibold text-sm inline-flex items-center gap-2 glow">
-                  🚧 Próximamente
-                </span>
-                <a href="https://github.com/MP-make/hotel-mp" target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-lg border-2 border-primary text-white font-semibold text-sm hover:border-primary transition-all inline-flex items-center gap-2 glow">
-                  <Github size={16} />
-                  Código
-                </a>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

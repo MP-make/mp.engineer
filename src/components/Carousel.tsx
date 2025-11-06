@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface CarouselProps {
   images: string[];
@@ -9,23 +9,31 @@ interface CarouselProps {
 const Carousel: React.FC<CarouselProps> = ({ images }) => {
   const [current, setCurrent] = useState(0);
 
-  if (images.length === 0) return <div className="w-full h-48 bg-gray-700 rounded flex items-center justify-center text-white">No images available</div>;
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, 3000); // Change image every 3 seconds
+    return () => clearInterval(interval);
+  }, [images.length]);
 
-  const next = () => setCurrent((current + 1) % images.length);
-  const prev = () => setCurrent((current - 1 + images.length) % images.length);
+  if (images.length === 0) return <div className="w-full h-64 bg-gray-700 rounded flex items-center justify-center text-white">No images available</div>;
 
   return (
-    <div className="relative w-full h-48 overflow-hidden rounded">
-      <img src={images[current]} alt="Project" className="w-full h-full object-cover" />
+    <div className="relative w-full h-64 overflow-hidden rounded">
+      <img src={images[current]} alt="Project" className="w-full h-full object-contain" />
       {images.length > 1 && (
-        <>
-          <button onClick={prev} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded hover:bg-opacity-75 transition">
-            ‹
-          </button>
-          <button onClick={next} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded hover:bg-opacity-75 transition">
-            ›
-          </button>
-        </>
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrent(index)}
+              className={`w-3 h-3 rounded-full transition border border-white ${
+                index === current ? 'bg-primary' : 'bg-black bg-opacity-50'
+              }`}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
