@@ -2,69 +2,175 @@
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
+@import "@fontsource/inter/800.css";
 @import "tailwindcss";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================
+   1. VARIABLES DE COLOR (PALETA SUAVE)
+   ========================================= */
 :root {
-  --primary: #01c38e;
-  --secondary: #00a876;
-  --accent: #0f1419;
-  --card: #1e2432;
-  --custom-white: #e6e6e6;
-  --background: #0f1419;
-  --foreground: #ffffff;
+  /* --- MODO CLARO (Optimizado para la vista) --- */
+  /* Fondo: Gris azulado muy pálido (evita el brillo del blanco puro) */
+  --background: #f8fafc; 
+  /* Texto: Gris oscuro (Slate 800), más suave que el negro */
+  --foreground: #1e293b; 
+  /* Texto secundario: Gris medio */
+  --muted-foreground: #64748b; 
+  
+  /* Color Principal: Verde Esmeralda (Sólido y Profesional) */
+  --primary: #059669; 
+  --primary-hover: #047857; 
+  --on-primary: #ffffff; 
+  
+  /* Elementos UI */
+  --border: #cbd5e1; /* Bordes suaves */
+  --input: #e2e8f0;
+  --card: #ffffff; /* Las tarjetas sí son blancas para resaltar sobre el fondo gris */
+  --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.06);
 }
 
-.light {
-  --primary: #01c38e;
-  --secondary: #00a876;
-  --accent: #ffffff;
-  --card: #f8f9fa;
-  --custom-white: #1a1a1a;
-  --background: #ffffff;
-  --foreground: #1a1a1a;
+.dark {
+  /* --- MODO OSCURO (Profundo) --- */
+  --background: #0B1120; /* Azul noche profundo */
+  --foreground: #f1f5f9; /* Blanco hueso */
+  --muted-foreground: #94a3b8;
+  
+  /* Verde Menta (Para contraste en oscuro) */
+  --primary: #10b981; 
+  --primary-hover: #059669;
+  --on-primary: #020617;
+  
+  --border: #1e293b;
+  --input: #1e293b;
+  --card: #111827; /* Tarjetas oscuras */
+  --card-shadow: none;
 }
 
-html.dark {
-  background: #0f1419;
-  color: #e6e6e6;
-}
-
-html.light {
-  background: #ffffff;
-  color: #1a1a1a;
-}
-
+/* Configuración de Tailwind v4 (Theme Inline) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-card: var(--card);
   --font-sans: 'Inter', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1e29;
-    --foreground: #ffffff;
+/* =========================================
+   2. ESTILOS BASE
+   ========================================= */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased; /* Suaviza las fuentes */
+}
+
+/* --- LIMPIEZA DE INPUTS (Para que sean neutros) --- */
+@layer base {
+  input, textarea, select {
+    background-color: var(--card) !important; /* Fondo de tarjeta */
+    border: 1px solid var(--input) !important;
+    color: var(--foreground) !important;
+    border-radius: 0.5rem;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--primary) !important;
+    border-color: transparent !important;
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1) !important; /* Anillo suave verde */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', sans-serif;
+/* =========================================
+   3. UTILIDADES DE TEXTO
+   ========================================= */
+.text-gradient-primary {
+  /* Título "Marlon Pecho" */
+  background: linear-gradient(to right, #059669, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dark .text-gradient-primary {
+  background: linear-gradient(to right, #ffffff, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+.text-balance {
+  text-wrap: balance;
+}
+
+/* =========================================
+   4. LA SOLUCIÓN BRUTA (ELIMINADOR DE DEGRADADOS)
+   ========================================= */
+
+/* A. BOTONES PRINCIPALES ("Disponible", "Ver Demo", "Enviar") */
+/* Esta regla es agresiva para sobreescribir cualquier clase de degradado en el HTML */
+.btn-primary,
+button[class*="from-"],
+a[class*="from-"],
+div[class*="from-green-500"],
+.bg-gradient-to-r { 
+  background-image: none !important; /* ADIÓS DEGRADADO */
+  background-color: var(--primary) !important; /* HOLA VERDE SÓLIDO */
+  color: var(--on-primary) !important;
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+/* Estado Hover */
+.btn-primary:hover,
+button[class*="from-"]:hover,
+a[class*="from-"]:hover,
+.bg-gradient-to-r:hover {
+  background-image: none !important;
+  background-color: var(--primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+/* B. BOTONES SECUNDARIOS ("Conectemos") */
+.btn-outline,
+button[class*="border-"], 
+button.group {
+  background-image: none !important;
+  background-color: transparent !important;
+  border: 2px solid var(--border) !important; /* Borde gris suave por defecto */
+  color: var(--foreground) !important;
+  box-shadow: none !important;
+}
+
+.btn-outline:hover,
+button[class*="border-"]:hover,
+button.group:hover {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  background-color: rgba(5, 150, 105, 0.05) !important; /* Fondo verde MUY sutil */
+}
+
+/* C. CORRECCIONES PARA BADGES (Etiquetas pequeñas de tecnologías) */
+/* Evita que los badges se vean sólidos, los hace sutiles */
+span[class*="bg-emerald"], 
+span[class*="bg-green"] {
+  background-color: rgba(16, 185, 129, 0.15) !important; /* Verde transparente */
+  color: var(--primary) !important; /* Texto verde */
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  background-image: none !important;
+}
+
+/* D. GLOW EFFECTS (Opcional, suave) */
 .glow {
-  transition: all 0.3s ease;
-}
-
-.glow:hover {
-  box-shadow: 0 0 20px rgba(1, 195, 142, 0.6), 0 0 40px rgba(1, 195, 142, 0.3);
-}
-
-.permanent-glow {
-  box-shadow: 0 0 15px rgba(1, 195, 142, 0.5);
+  filter: drop-shadow(0 0 8px rgba(5, 150, 105, 0.3));
 }

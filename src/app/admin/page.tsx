@@ -3,17 +3,45 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award } from 'lucide-react';
+import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function AdminPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
+
+  // Redirigir a login si no está autenticado
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/admin/login');
+    }
+  }, [status, router]);
+
+  // Mostrar loading mientras verifica la sesión
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
+          <p className="text-white text-xl font-semibold">Verificando autenticación...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no está autenticado, no mostrar nada (ya se redirigió)
+  if (!session) {
+    return null;
+  }
+
+  // ...existing state declarations...
   const [projects, setProjects] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills'>('projects');
-  const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
 
   // Form states
   const [formData, setFormData] = useState({
@@ -36,6 +64,7 @@ export default function AdminPage() {
   });
   const [editingSkillId, setEditingSkillId] = useState<number | null>(null);
 
+  // ...existing handlers...
   useEffect(() => {
     loadData();
   }, []);
@@ -43,19 +72,16 @@ export default function AdminPage() {
   const loadData = async () => {
     setLoading(true);
     
-    // Cargar proyectos
     const { data: projectsData } = await supabase
       .from('portfolio_project')
       .select('*')
       .order('created_at', { ascending: false });
     
-    // Cargar mensajes de contacto
     const { data: contactsData } = await supabase
       .from('portfolio_contact')
       .select('*')
       .order('created_at', { ascending: false });
 
-    // Cargar habilidades
     const { data: skillsData } = await supabase
       .from('portfolio_skill')
       .select('*')
@@ -75,40 +101,33 @@ export default function AdminPage() {
       : [];
     
     try {
-      // Subir archivos a Supabase Storage
       const uploadedUrls: string[] = [];
       
       if (selectedFiles.length > 0) {
         for (const file of selectedFiles) {
-          // Validar tamaño del archivo (máximo 5MB)
           if (file.size > 5 * 1024 * 1024) {
             alert(`El archivo ${file.name} es demasiado grande. Máximo 5MB por archivo.`);
             return;
           }
           
-          // Validar tipo de archivo
           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
           if (!allowedTypes.includes(file.type)) {
-            alert(`El archivo ${file.name} no es un tipo de imagen válido. Solo se permiten: JPG, PNG, GIF, WebP.`);
+            alert(`El archivo ${file.name} no es un tipo de imagen válido.`);
             return;
           }
           
-          // Generar nombre único para el archivo
           const fileExt = file.name.split('.').pop();
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
           
-          // Subir archivo a Supabase Storage
           const { data, error } = await supabase.storage
             .from('portfolio-images')
             .upload(fileName, file);
           
           if (error) {
-            console.error('Error al subir archivo:', error);
             alert(`Error al subir ${file.name}: ${error.message}`);
             return;
           }
           
-          // Obtener URL pública del archivo subido
           const { data: { publicUrl } } = supabase.storage
             .from('portfolio-images')
             .getPublicUrl(fileName);
@@ -117,13 +136,10 @@ export default function AdminPage() {
         }
       }
       
-      // Combinar URLs de archivos subidos con URLs manuales
       const allImageUrls = [...uploadedUrls, ...imageUrls];
-      
       let projectId = editingId;
 
       if (editingId) {
-        // Actualizar proyecto existente
         const { error } = await supabase
           .from('portfolio_project')
           .update({
@@ -137,7 +153,6 @@ export default function AdminPage() {
         
         if (error) throw error;
       } else {
-        // Crear nuevo proyecto
         const { data, error } = await supabase
           .from('portfolio_project')
           .insert([{
@@ -154,9 +169,7 @@ export default function AdminPage() {
         projectId = data[0].id;
       }
 
-      // Guardar imágenes
       if (allImageUrls.length > 0 && projectId) {
-        // Eliminar imágenes antiguas si estamos editando
         if (editingId) {
           await supabase
             .from('portfolio_projectimage')
@@ -164,30 +177,26 @@ export default function AdminPage() {
             .eq('project_id', editingId);
         }
 
-        // Insertar nuevas imágenes
         const imageData = allImageUrls.map(url => ({
           project_id: projectId,
           image: url
         }));
 
-        const { error } = await supabase
+        await supabase
           .from('portfolio_projectimage')
           .insert(imageData);
-        
-        if (error) throw error;
       }
 
-      // Reset form
       setFormData({ title: '', description: '', link: '', technologies: '', status: 'completed' });
       setImageUrls([]);
       setSelectedFiles([]);
       setEditingId(null);
       loadData();
       
-      alert('Proyecto guardado exitosamente!');
+      alert('✅ Proyecto guardado exitosamente!');
     } catch (error) {
-      console.error('Error al guardar proyecto:', error);
-      alert('Error al guardar el proyecto. Revisa la consola para más detalles.');
+      console.error('Error:', error);
+      alert('❌ Error al guardar el proyecto.');
     }
   };
 
@@ -201,7 +210,6 @@ export default function AdminPage() {
     });
     setEditingId(project.id);
 
-    // Cargar imágenes del proyecto
     const { data: images } = await supabase
       .from('portfolio_projectimage')
       .select('image')
@@ -211,26 +219,27 @@ export default function AdminPage() {
       setImageUrls(images.map(img => img.image));
     }
 
+    setActiveTab('projects');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: number) => {
     if (confirm('¿Estás seguro de eliminar este proyecto?')) {
-      await supabase
-        .from('portfolio_project')
-        .delete()
-        .eq('id', id);
+      await supabase.from('portfolio_project').delete().eq('id', id);
       loadData();
     }
   };
 
   const handleDeleteContact = async (id: number) => {
     if (confirm('¿Estás seguro de eliminar este mensaje?')) {
-      await supabase
-        .from('portfolio_contact')
-        .delete()
-        .eq('id', id);
+      await supabase.from('portfolio_contact').delete().eq('id', id);
       loadData();
+    }
+  };
+
+  const handleLogout = async () => {
+    if (confirm('¿Estás seguro de cerrar sesión?')) {
+      await signOut({ redirect: true, callbackUrl: '/' });
     }
   };
 
@@ -247,8 +256,7 @@ export default function AdminPage() {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      setSelectedFiles([...selectedFiles, ...filesArray]);
+      setSelectedFiles(Array.from(e.target.files));
     }
   };
 
@@ -256,31 +264,20 @@ export default function AdminPage() {
     setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
 
-  // Skill handlers
   const handleSkillSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       if (editingSkillId) {
-        const { error } = await supabase
-          .from('portfolio_skill')
-          .update(skillFormData)
-          .eq('id', editingSkillId);
-        
-        if (error) throw error;
+        await supabase.from('portfolio_skill').update(skillFormData).eq('id', editingSkillId);
       } else {
-        const { error } = await supabase
-          .from('portfolio_skill')
-          .insert([skillFormData]);
-        
-        if (error) throw error;
+        await supabase.from('portfolio_skill').insert([skillFormData]);
       }
 
       setSkillFormData({ name: '', category: '', proficiency: 50 });
       setEditingSkillId(null);
       loadData();
     } catch (error) {
-      console.error('Error al guardar habilidad:', error);
       alert('Error al guardar la habilidad.');
     }
   };
@@ -292,154 +289,166 @@ export default function AdminPage() {
       proficiency: skill.proficiency
     });
     setEditingSkillId(skill.id);
+    setActiveTab('skills');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDeleteSkill = async (id: number) => {
     if (confirm('¿Estás seguro de eliminar esta habilidad?')) {
-      await supabase
-        .from('portfolio_skill')
-        .delete()
-        .eq('id', id);
+      await supabase.from('portfolio_skill').delete().eq('id', id);
       loadData();
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e] flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
-          <p className="text-white text-xl font-semibold">Cargando panel de administración...</p>
+          <div className="relative">
+            <div className="inline-block animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-primary"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <FolderOpen className="text-primary animate-pulse" size={32} />
+            </div>
+          </div>
+          <p className="text-white text-xl font-semibold mt-6">Cargando panel...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] dark:from-[#0f1419] dark:via-[#1a1f2e] dark:to-[#0f1419] light:from-gray-50 light:via-gray-100 light:to-gray-50 text-white dark:text-white light:text-gray-900">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#1e2432] to-[#252b3d] dark:from-[#1e2432] dark:to-[#252b3d] light:from-white light:to-gray-50 border-b-2 border-primary/30 shadow-2xl sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/50">
-                  <FolderOpen size={24} className="text-white" />
-                </div>
-                Panel de Administración
-              </h1>
-              <p className="text-gray-400 dark:text-gray-400 light:text-gray-600 mt-1 ml-13">Gestiona tu portafolio profesional</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={toggleTheme}
-                className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover:scale-110"
-                aria-label="Toggle theme"
-              >
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
-              <button 
-                onClick={() => router.push('/')}
-                className="group bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 flex items-center gap-2"
-              >
-                <ExternalLink size={18} className="group-hover:rotate-45 transition-transform duration-300" />
-                Ver Sitio Web
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e]">
+      {/* Animated Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] dark:from-[#1e2432] dark:to-[#252b3d] light:from-white light:to-gray-50 light:border-gray-200 rounded-2xl p-6 border border-primary/30 hover:border-primary/60 transition-all duration-300 hover:shadow-xl hover:shadow-primary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 dark:text-gray-400 light:text-gray-600 text-sm font-medium mb-1">Total de Proyectos</p>
-                <p className="text-4xl font-bold text-primary">{projects.length}</p>
+      {/* Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0f1419]/80 border-b border-primary/20 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo & Title */}
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-2xl blur-xl opacity-50 animate-pulse"></div>
+                <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
+                  <FolderOpen size={28} className="text-white" />
+                </div>
               </div>
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <FolderOpen size={32} className="text-primary" />
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+                  Panel de Control
+                </h1>
+                <p className="text-sm text-gray-400">Bienvenido, {session?.user?.name || 'Admin'}</p>
               </div>
             </div>
+
+            {/* Actions */}
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={toggleTheme}
+                className="relative group p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/10 group-hover:to-secondary/10 rounded-xl transition-all duration-300"></div>
+                {theme === 'dark' ? <Sun size={20} className="text-primary relative z-10" /> : <Moon size={20} className="text-primary relative z-10" />}
+              </button>
+
+              <button 
+                onClick={() => router.push('/')}
+                className="relative group px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 transition-all duration-300 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 group-hover:from-primary/10 group-hover:via-primary/20 group-hover:to-primary/10 transition-all duration-500"></div>
+                <div className="relative z-10 flex items-center space-x-2 text-white font-medium">
+                  <ExternalLink size={18} className="group-hover:rotate-12 transition-transform duration-300" />
+                  <span className="hidden sm:inline">Ver Sitio</span>
+                </div>
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="relative group p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+              >
+                <LogOut size={20} className="text-red-400 group-hover:translate-x-0.5 transition-transform duration-300" />
+              </button>
+            </div>
           </div>
-          
-          <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] dark:from-[#1e2432] dark:to-[#252b3d] light:from-white light:to-gray-50 light:border-gray-200 rounded-2xl p-6 border border-secondary/30 hover:border-secondary/60 transition-all duration-300 hover:shadow-xl hover:shadow-secondary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 dark:text-gray-400 light:text-gray-600 text-sm font-medium mb-1">Mensajes Recibidos</p>
-                <p className="text-4xl font-bold text-secondary">{contacts.length}</p>
+        </div>
+      </header>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1f2e] to-[#151a27] border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <FolderOpen size={24} className="text-primary" />
+                </div>
+                <TrendingUp size={20} className="text-green-400" />
               </div>
-              <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center">
-                <MessageSquare size={32} className="text-secondary" />
-              </div>
+              <p className="text-gray-400 text-sm font-medium mb-1">Proyectos Totales</p>
+              <p className="text-4xl font-bold text-white">{projects.length}</p>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] dark:from-[#1e2432] dark:to-[#252b3d] light:from-white light:to-gray-50 light:border-gray-200 rounded-2xl p-6 border border-primary/30 hover:border-primary/60 transition-all duration-300 hover:shadow-xl hover:shadow-primary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 dark:text-gray-400 light:text-gray-600 text-sm font-medium mb-1">Habilidades</p>
-                <p className="text-4xl font-bold text-primary">{skills.length}</p>
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1f2e] to-[#151a27] border border-secondary/20 hover:border-secondary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-secondary/20 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/0 to-secondary/0 group-hover:from-secondary/5 group-hover:to-secondary/10 transition-all duration-500"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <MessageSquare size={24} className="text-secondary" />
+                </div>
+                <Eye size={20} className="text-blue-400" />
               </div>
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <Award size={32} className="text-primary" />
+              <p className="text-gray-400 text-sm font-medium mb-1">Mensajes Nuevos</p>
+              <p className="text-4xl font-bold text-white">{contacts.length}</p>
+            </div>
+          </div>
+
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1f2e] to-[#151a27] border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
+            <div className="relative p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Award size={24} className="text-primary" />
+                </div>
+                <CheckCircle2 size={20} className="text-primary" />
               </div>
+              <p className="text-gray-400 text-sm font-medium mb-1">Habilidades</p>
+              <p className="text-4xl font-bold text-white">{skills.length}</p>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-8 bg-[#1e2432] dark:bg-[#1e2432] light:bg-white light:border-gray-200 p-2 rounded-2xl border border-primary/20">
-          <button
-            onClick={() => setActiveTab('projects')}
-            className={`flex-1 px-6 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-              activeTab === 'projects' 
-                ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30' 
-                : 'text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-white light:hover:text-gray-900 hover:bg-[#252b3d] light:hover:bg-gray-100'
-            }`}
-          >
-            <FolderOpen size={20} />
-            Proyectos
-            <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-              activeTab === 'projects' ? 'bg-white/20' : 'bg-primary/20 text-primary'
-            }`}>
-              {projects.length}
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('contacts')}
-            className={`flex-1 px-6 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-              activeTab === 'contacts' 
-                ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30' 
-                : 'text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-white light:hover:text-gray-900 hover:bg-[#252b3d] light:hover:bg-gray-100'
-            }`}
-          >
-            <MessageSquare size={20} />
-            Mensajes
-            <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-              activeTab === 'contacts' ? 'bg-white/20' : 'bg-secondary/20 text-secondary'
-            }`}>
-              {contacts.length}
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('skills')}
-            className={`flex-1 px-6 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-              activeTab === 'skills' 
-                ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30' 
-                : 'text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-white light:hover:text-gray-900 hover:bg-[#252b3d] light:hover:bg-gray-100'
-            }`}
-          >
-            <Award size={20} />
-            Habilidades
-            <span className={`ml-2 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-              activeTab === 'skills' ? 'bg-white/20' : 'bg-primary/20 text-primary'
-            }`}>
-              {skills.length}
-            </span>
-          </button>
+        {/* Tabs - Modern Design */}
+        <div className="flex flex-wrap gap-3 mb-8 p-2 bg-[#0f1419]/50 backdrop-blur-xl rounded-2xl border border-white/10">
+          {[
+            { id: 'projects', icon: FolderOpen, label: 'Proyectos', count: projects.length },
+            { id: 'contacts', icon: MessageSquare, label: 'Mensajes', count: contacts.length },
+            { id: 'skills', icon: Award, label: 'Habilidades', count: skills.length }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex-1 relative group px-6 py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <div className="relative z-10 flex items-center justify-center space-x-3">
+                <tab.icon size={20} />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                  activeTab === tab.id ? 'bg-white/20' : 'bg-primary/20 text-primary'
+                }`}>
+                  {tab.count}
+                </span>
+              </div>
+            </button>
+          ))}
         </div>
 
         {/* Projects Tab */}
@@ -896,7 +905,7 @@ export default function AdminPage() {
                           {category}
                         </h3>
                         <div className="space-y-3">
-                          {categorySkills.map((skill) => (
+                          {(categorySkills as any[]).map((skill: any) => (
                             <div
                               key={skill.id}
                               className="bg-gradient-to-br from-[#0f1419] to-[#1a1f2e] p-4 rounded-xl border-2 border-primary/20 hover:border-primary/60 transition-all duration-300"

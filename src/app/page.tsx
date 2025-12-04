@@ -11,10 +11,12 @@ import { supabase } from '@/lib/supabase';
 
 export default function Home() {
   const [projects, setProjects] = useState([]);
+  const [skills, setSkills] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      const { data } = await supabase
+    const fetchData = async () => {
+      // Cargar proyectos
+      const { data: projectsData } = await supabase
         .from('portfolio_project')
         .select(`
           *,
@@ -22,11 +24,39 @@ export default function Home() {
         `)
         .order('created_at', { ascending: false });
       
-      setProjects(data || []);
+      // Cargar habilidades
+      const { data: skillsData } = await supabase
+        .from('portfolio_skill')
+        .select('*')
+        .order('category', { ascending: true });
+      
+      setProjects(projectsData || []);
+      setSkills(skillsData || []);
     };
     
-    fetchProjects();
+    fetchData();
   }, []);
+
+  // Mapeo de iconos según el nombre de la habilidad
+  const getIconForSkill = (skillName: string) => {
+    const name = skillName.toLowerCase();
+    if (name.includes('python') || name.includes('javascript') || name.includes('typescript') || name.includes('html') || name.includes('next') || name.includes('node') || name.includes('django')) {
+      return <Code size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />;
+    }
+    if (name.includes('css') || name.includes('tailwind')) {
+      return <Palette size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />;
+    }
+    if (name.includes('react')) {
+      return <Atom size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />;
+    }
+    if (name.includes('database') || name.includes('postgres') || name.includes('sql') || name.includes('mongo')) {
+      return <Database size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />;
+    }
+    if (name.includes('server')) {
+      return <Server size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />;
+    }
+    return <Code size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />;
+  };
 
   return (
     <div className="min-h-screen bg-accent text-customWhite">
@@ -56,7 +86,7 @@ export default function Home() {
             Ingeniero de Sistemas & Desarrollador Full Stack
           </p>
           <p className="text-lg text-customWhite max-w-2xl mx-auto mb-8 leading-loose" data-aos="fade-up" data-aos-delay="600">
-            Ingeniero de sistemas Marlon Pecho. Transformando ideas en soluciones digitales que impulsan negocios y cerrando brechas tecnológicas en Perú.
+            Ingeniero de sistemas Marlon Pecho. Transformando ideas en soluciones digitales que impulsan negocios y cerrando brechas tecnológicas en Perú!
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8" data-aos="fade-up" data-aos-delay="800">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary to-secondary text-white mb-6 hover:from-secondary hover:to-primary transition-all duration-500 hover:scale-110 hover:shadow-xl hover:shadow-primary/50 hover:brightness-110 glow permanent-glow animate-pulse" data-aos="fade-up" data-aos-delay="800">
@@ -112,77 +142,20 @@ export default function Home() {
             </div>
             <div data-aos="fade-up" data-aos-delay="400">
               <h3 className="text-2xl font-semibold mb-4">Habilidades</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="600">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Code size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">Python</span>
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
+                {skills.map((skill, index) => (
+                  <div
+                    key={index}
+                    className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-2 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow"
+                    data-aos="fade-up"
+                    data-aos-delay={`${600 + index * 100}`}
+                  >
+                    <div className="flex flex-col items-center justify-center text-center space-y-2">
+                      {getIconForSkill(skill.name)}
+                      <span className="font-semibold text-sm sm:text-base">{skill.name}</span>
+                    </div>
                   </div>
-                  <p className="text-gray-300 text-sm">Desarrollo backend, scripting y análisis de datos</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="700">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Code size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">JavaScript</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Interactividad web y lógica del lado del cliente</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="800">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Code size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">HTML5</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Estructura semántica y accesibilidad web</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="900">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Palette size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">CSS3</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Diseño responsivo y animaciones modernas</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="1000">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Code size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">TypeScript</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Desarrollo tipado y mantenible</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="1100">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Code size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">Next.js</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Aplicaciones web full-stack con SSR y optimización</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="1200">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Atom size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">React</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Interfaces de usuario dinámicas y componentes reutilizables</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="1300">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Database size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">PostgreSQL</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Gestión de datos relacionales y consultas optimizadas</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="1400">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Server size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">Node.js</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">APIs RESTful y servicios backend escalables</p>
-                </div>
-                <div className="bg-card p-4 rounded-lg border border-primary hover:bg-card/80 hover:-translate-y-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 glow" data-aos="fade-up" data-aos-delay="1500">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Server size={40} className="text-primary hover:text-secondary transition-all duration-300 filter hover:drop-shadow-[0_0_10px_rgba(1,195,142,0.8)] hover:scale-110 mb-2 glow" />
-                    <span className="font-semibold">Django</span>
-                  </div>
-                  <p className="text-gray-300 text-sm">Framework web Python para desarrollo rápido y seguro</p>
-                </div>
+                ))}
               </div>
             </div>
           </div>
