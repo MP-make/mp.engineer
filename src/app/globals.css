@@ -4,20 +4,38 @@
 @import "@fontsource/inter/700.css";
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --primary: #01c38e;        /* Verde principal */
-  --secondary: #13c4a6;      /* Verde azulado */
-  --accent: #1a1e29;         /* Azul oscuro */
-  --dark: #1a1e29;           /* Fondo principal */
-  --darker: #13141a;         /* Fondo más oscuro */
-  --card: #132d46;           /* Azul marino oscuro para tarjetas */
-  --background: #1a1e29;
+  --primary: #01c38e;
+  --secondary: #00a876;
+  --accent: #0f1419;
+  --card: #1e2432;
+  --custom-white: #e6e6e6;
+  --background: #0f1419;
   --foreground: #ffffff;
-  --color-primary: #01c38e;
-  --color-secondary: #13c4a6;
-  --color-accent: #1a1e29;
-  --color-white: #ffffff;
-  --neon-purple: #a855f7;
+}
+
+.light {
+  --primary: #01c38e;
+  --secondary: #00a876;
+  --accent: #ffffff;
+  --card: #f8f9fa;
+  --custom-white: #1a1a1a;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+}
+
+html.dark {
+  background: #0f1419;
+  color: #e6e6e6;
+}
+
+html.light {
+  background: #ffffff;
+  color: #1a1a1a;
 }
 
 @theme inline {

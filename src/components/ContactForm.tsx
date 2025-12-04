@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import emailjs from '@emailjs/browser';
+import { supabase } from '@/lib/supabase';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -25,18 +25,11 @@ const ContactForm = () => {
     setSubmitMessage('');
 
     try {
-      // Configurar EmailJS - Reemplazar con tus IDs reales de https://www.emailjs.com/
-      await emailjs.send(
-        'YOUR_SERVICE_ID',      // ← Obtener de EmailJS
-        'YOUR_TEMPLATE_ID',     // ← Obtener de EmailJS
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message,
-          to_email: 'marlonpecho264@gmail.com'  // ← TU EMAIL
-        },
-        'YOUR_PUBLIC_KEY'       // ← Obtener de EmailJS
-      );
+      const { error } = await supabase
+        .from('portfolio_contact')
+        .insert([formData]);
+
+      if (error) throw error;
 
       setSubmitMessage('✅ Mensaje enviado correctamente. Te responderé pronto!');
       setFormData({ name: '', email: '', message: '' });

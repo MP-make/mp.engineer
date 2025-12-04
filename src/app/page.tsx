@@ -7,15 +7,25 @@ import { Code, Database, Smartphone, Mail, Github, ExternalLink, CheckCircle, Cl
 import Typewriter from 'typewriter-effect';
 import { GitBranch, Cloud, Linkedin } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function Home() {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/projects/')
-      .then(res => res.json())
-      .then(data => setProjects(data))
-      .catch(err => console.error('Error fetching projects:', err));
+    const fetchProjects = async () => {
+      const { data } = await supabase
+        .from('portfolio_project')
+        .select(`
+          *,
+          images:portfolio_projectimage(image)
+        `)
+        .order('created_at', { ascending: false });
+      
+      setProjects(data || []);
+    };
+    
+    fetchProjects();
   }, []);
 
   return (
@@ -227,7 +237,7 @@ export default function Home() {
                 {/* Carrusel */}
                 <div className="p-4 pt-3">
                   <div className="transform group-hover:scale-105 transition-transform duration-500">
-                    <Carousel images={project.images.map(img => `http://localhost:8000${img}`)} />
+                    <Carousel images={project.images?.map(img => img.image) || []} />
                   </div>
                 </div>
                 
@@ -248,14 +258,18 @@ export default function Home() {
                       Stack Tecnológico
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      {project.technologies.map((tech, techIndex) => (
-                        <span 
-                          key={techIndex} 
-                          className="bg-primary/15 text-primary border-2 border-primary/40 text-sm px-4 py-2 rounded-full hover:bg-primary/25 hover:border-primary hover:scale-105 transition-all duration-300 font-semibold"
-                        >
-                          {tech}
-                        </span>
-                      ))}
+                      {Array.isArray(project.technologies) && project.technologies.length > 0 ? (
+                        project.technologies.map((tech, techIndex) => (
+                          <span 
+                            key={techIndex} 
+                            className="bg-primary/15 text-primary border-2 border-primary/40 text-sm px-4 py-2 rounded-full hover:bg-primary/25 hover:border-primary hover:scale-105 transition-all duration-300 font-semibold"
+                          >
+                            {tech}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-gray-400 text-sm italic">Sin tecnologías especificadas</span>
+                      )}
                     </div>
                   </div>
                   
