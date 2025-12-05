@@ -12,31 +12,7 @@ export default function AdminPage() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
 
-  // Redirigir a login si no está autenticado
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin/login');
-    }
-  }, [status, router]);
-
-  // Mostrar loading mientras verifica la sesión
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
-          <p className="text-white text-xl font-semibold">Verificando autenticación...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Si no está autenticado, no mostrar nada (ya se redirigió)
-  if (!session) {
-    return null;
-  }
-
-  // ...existing state declarations...
+  // State declarations
   const [projects, setProjects] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
@@ -64,11 +40,14 @@ export default function AdminPage() {
   });
   const [editingSkillId, setEditingSkillId] = useState<number | null>(null);
 
-  // ...existing handlers...
+  // Redirigir a login si no está autenticado
   useEffect(() => {
-    loadData();
-  }, []);
+    if (status === 'unauthenticated') {
+      router.push('/admin/login');
+    }
+  }, [status, router]);
 
+  // Load data function
   const loadData = async () => {
     setLoading(true);
     
@@ -92,6 +71,28 @@ export default function AdminPage() {
     setSkills(skillsData || []);
     setLoading(false);
   };
+
+  // Load data
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Mostrar loading mientras verifica la sesión
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
+          <p className="text-white text-xl font-semibold">Verificando autenticación...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no está autenticado, no mostrar nada (ya se redirigió)
+  if (!session) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

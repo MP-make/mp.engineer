@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -25,18 +24,30 @@ const ContactForm = () => {
     setSubmitMessage('');
 
     try {
-      const { error } = await supabase
-        .from('portfolio_contact')
-        .insert([formData]);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al enviar el mensaje');
+      }
 
       setSubmitMessage('✅ Mensaje enviado correctamente. Te responderé pronto!');
       setFormData({ name: '', email: '', message: '' });
       
     } catch (error) {
-      console.error('Error:', error);
-      setSubmitMessage('❌ Error al enviar. Por favor intenta nuevamente.');
+      console.error('Error al enviar mensaje:', error);
+      setSubmitMessage(
+        error instanceof Error 
+          ? `❌ ${error.message}` 
+          : '❌ Error al enviar. Por favor intenta nuevamente.'
+      );
     } finally {
       setIsSubmitting(false);
     }
