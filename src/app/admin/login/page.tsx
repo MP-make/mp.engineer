@@ -31,7 +31,7 @@ export default function LoginPage() {
         router.push('/admin');
         router.refresh();
       }
-    } catch (error) {
+    } catch {
       setError('Error al iniciar sesión. Intenta nuevamente.');
     } finally {
       setLoading(false);

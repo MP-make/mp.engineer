@@ -7,15 +7,41 @@ import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, 
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
 
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  link?: string;
+  technologies: string[];
+  status: 'completed' | 'in-progress';
+  created_at: string;
+  images?: { image: string }[];
+}
+
+interface Contact {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
+}
+
+interface Skill {
+  id: number;
+  name: string;
+  category: string;
+  proficiency: number;
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
 
   // State declarations
-  const [projects, setProjects] = useState<any[]>([]);
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [skills, setSkills] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills'>('projects');
 
@@ -201,7 +227,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleEdit = async (project: any) => {
+  const handleEdit = async (project: Project) => {
     setFormData({
       title: project.title,
       description: project.description,
@@ -283,7 +309,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleEditSkill = (skill: any) => {
+  const handleEditSkill = (skill: Skill) => {
     setSkillFormData({
       name: skill.name,
       category: skill.category,
@@ -432,7 +458,7 @@ export default function AdminPage() {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`flex-1 relative group px-6 py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
                 activeTab === tab.id
                   ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30'
@@ -726,10 +752,10 @@ export default function AdminPage() {
 
                         {/* Project Images */}
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {Array.isArray(project.images) && project.images.map((image: string, idx: number) => (
+                          {Array.isArray(project.images) && project.images.map((image: { image: string }, idx: number) => (
                             <img 
                               key={idx} 
-                              src={image} 
+                              src={image.image} 
                               alt={`Project Image ${idx + 1}`} 
                               className="w-24 h-24 object-cover rounded-lg border border-primary/20"
                             />
@@ -898,7 +924,7 @@ export default function AdminPage() {
                         if (!acc[skill.category]) acc[skill.category] = [];
                         acc[skill.category].push(skill);
                         return acc;
-                      }, {} as Record<string, any[]>)
+                      }, {} as Record<string, Skill[]>)
                     ).map(([category, categorySkills]) => (
                       <div key={category} className="mb-6">
                         <h3 className="text-lg font-bold text-primary mb-3 flex items-center gap-2">
@@ -906,7 +932,7 @@ export default function AdminPage() {
                           {category}
                         </h3>
                         <div className="space-y-3">
-                          {(categorySkills as any[]).map((skill: any) => (
+                          {(categorySkills).map((skill) => (
                             <div
                               key={skill.id}
                               className="bg-gradient-to-br from-[#0f1419] to-[#1a1f2e] p-4 rounded-xl border-2 border-primary/20 hover:border-primary/60 transition-all duration-300"

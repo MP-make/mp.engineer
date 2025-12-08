@@ -9,9 +9,27 @@ import { GitBranch, Cloud, Linkedin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  link?: string;
+  technologies: string[];
+  status: 'completed' | 'in-progress';
+  created_at: string;
+  images?: { image: string }[];
+}
+
+interface Skill {
+  id: number;
+  name: string;
+  category: string;
+  proficiency: number;
+}
+
 export default function Home() {
-  const [projects, setProjects] = useState([]);
-  const [skills, setSkills] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
