@@ -19,7 +19,8 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
   return (
     <section id="home" className="min-h-screen relative overflow-hidden">
       <div className="hidden lg:block w-full min-h-screen">
-        <div className={`flex w-full min-h-screen transition-all duration-[1500ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${isImageOnLeft ? 'flex-row-reverse' : 'flex-row'}`}>
+        {/* isImageOnLeft=false significa imagen a la DERECHA (flex-row-reverse pone imagen derecha) */}
+        <div className={`flex w-full min-h-screen transition-all duration-[1500ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${!isImageOnLeft ? 'flex-row-reverse' : 'flex-row'}`}>
           {/* Content Side */}
           <div className={`w-1/2 h-screen sticky top-0 flex items-center ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'}`}>
             <div className="w-full px-6 sm:px-10 lg:px-16 xl:px-20">
