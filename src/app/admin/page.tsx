@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2 } from 'lucide-react';
+import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -33,6 +33,13 @@ interface Skill {
   proficiency: number;
 }
 
+interface HeroImage {
+  id: number;
+  image: string;
+  title?: string;
+  order: number;
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -42,8 +49,9 @@ export default function AdminPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills' | 'hero'>('projects');
 
   // Form states
   const [formData, setFormData] = useState({
@@ -65,6 +73,15 @@ export default function AdminPage() {
     proficiency: 50
   });
   const [editingSkillId, setEditingSkillId] = useState<number | null>(null);
+
+  // Hero form states
+  const [heroFormData, setHeroFormData] = useState({
+    title: '',
+    order: 0
+  });
+  const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [heroSelectedFile, setHeroSelectedFile] = useState<File | null>(null);
+  const [editingHeroId, setEditingHeroId] = useState<number | null>(null);
 
   // Redirigir a login si no está autenticado
   useEffect(() => {
@@ -92,9 +109,15 @@ export default function AdminPage() {
       .select('*')
       .order('category', { ascending: true });
 
+    const { data: heroData } = await supabase
+      .from('portfolio_heroimage')
+      .select('*')
+      .order('order', { ascending: true });
+
     setProjects(projectsData || []);
     setContacts(contactsData || []);
     setSkills(skillsData || []);
+    setHeroImages(heroData || []);
     setLoading(false);
   };
 
@@ -327,6 +350,100 @@ export default function AdminPage() {
     }
   };
 
+  // Hero Image handlers
+  const handleHeroSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      let imageUrl = heroImageUrl;
+      
+      // Upload file if selected
+      if (heroSelectedFile) {
+        if (heroSelectedFile.size > 5 * 1024 * 1024) {
+          alert('El archivo es demasiado grande. Máximo 5MB.');
+          return;
+        }
+        
+        const fileExt = heroSelectedFile.name.split('.').pop();
+        const fileName = `hero-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        
+        const { error } = await supabase.storage
+          .from('portfolio-images')
+          .upload(fileName, heroSelectedFile);
+        
+        if (error) {
+          alert(`Error al subir imagen: ${error.message}`);
+          return;
+        }
+        
+        const { data: { publicUrl } } = supabase.storage  
+          .from('portfolio-images')
+          .getPublicUrl(fileName);
+        
+        imageUrl = publicUrl;
+      }
+      
+      if (!imageUrl) {
+        alert('Por favor selecciona una imagen o ingresa una URL');
+        return;
+      }
+
+      if (editingHeroId) {
+        await supabase
+          .from('portfolio_heroimage')
+          .update({
+            image: imageUrl,
+            title: heroFormData.title || null,
+            order: heroFormData.order
+          })
+          .eq('id', editingHeroId);
+      } else {
+        await supabase
+          .from('portfolio_heroimage')
+          .insert([{
+            image: imageUrl,
+            title: heroFormData.title || null,
+            order: heroFormData.order
+          }]);
+      }
+
+      setHeroFormData({ title: '', order: 0 });
+      setHeroImageUrl('');
+      setHeroSelectedFile(null);
+      setEditingHeroId(null);
+      loadData();
+      
+      alert('✅ Imagen del Hero guardada exitosamente!');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error al guardar la imagen.');
+    }
+  };
+
+  const handleEditHero = (heroImage: HeroImage) => {
+    setHeroFormData({
+      title: heroImage.title || '',
+      order: heroImage.order
+    });
+    setHeroImageUrl(heroImage.image);
+    setEditingHeroId(heroImage.id);
+    setActiveTab('hero');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDeleteHero = async (id: number) => {
+    if (confirm('¿Estás seguro de eliminar esta imagen del Hero?')) {
+      await supabase.from('portfolio_heroimage').delete().eq('id', id);
+      loadData();
+    }
+  };
+
+  const handleHeroFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setHeroSelectedFile(e.target.files[0]);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e] flex items-center justify-center">
@@ -454,7 +571,8 @@ export default function AdminPage() {
           {[
             { id: 'projects', icon: FolderOpen, label: 'Proyectos', count: projects.length },
             { id: 'contacts', icon: MessageSquare, label: 'Mensajes', count: contacts.length },
-            { id: 'skills', icon: Award, label: 'Habilidades', count: skills.length }
+            { id: 'skills', icon: Award, label: 'Habilidades', count: skills.length },
+            { id: 'hero', icon: Home, label: 'Hero Images', count: heroImages.length }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1033,6 +1151,212 @@ export default function AdminPage() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Hero Images Tab */}
+        {activeTab === 'hero' && (
+          <div className="grid lg:grid-cols-5 gap-8">
+            {/* Hero Form */}
+            <div className="lg:col-span-2">
+              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl sticky top-32">
+                <div className="flex items-center gap-3 mb-6">
+                  {editingHeroId ? (
+                    <>
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+                        <Edit2 size={20} className="text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold">Editar Imagen Hero</h2>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                        <Plus size={20} className="text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold">Nueva Imagen Hero</h2>
+                    </>
+                  )}
+                </div>
+
+                <form onSubmit={handleHeroSubmit} className="space-y-5">
+                  <div>
+                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
+                      <Upload size={16} className="text-primary" />
+                      Subir Imagen
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleHeroFileSelect}
+                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-secondary file:cursor-pointer"
+                    />
+                    {heroSelectedFile && (
+                      <div className="mt-3 flex items-center gap-2 bg-[#0f1419] p-2 rounded-lg border border-primary/20">
+                        <img 
+                          src={URL.createObjectURL(heroSelectedFile)} 
+                          alt="Preview" 
+                          className="w-16 h-16 object-cover rounded" 
+                        />
+                        <span className="flex-1 text-sm text-gray-300 truncate">{heroSelectedFile.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => setHeroSelectedFile(null)}
+                          className="p-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-lg transition-colors"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
+                      <ImageIcon size={16} className="text-primary" />
+                      O URL de Imagen
+                    </label>
+                    <input
+                      type="url"
+                      value={heroImageUrl}
+                      onChange={(e) => setHeroImageUrl(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                    />
+                    {heroImageUrl && !heroSelectedFile && (
+                      <div className="mt-3">
+                        <img 
+                          src={heroImageUrl} 
+                          alt="Preview" 
+                          className="w-full h-40 object-cover rounded-lg border border-primary/20" 
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
+                      <Tag size={16} className="text-primary" />
+                      Título (opcional)
+                    </label>
+                    <input
+                      type="text"
+                      value={heroFormData.title}
+                      onChange={(e) => setHeroFormData({ ...heroFormData, title: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
+                      placeholder="Descripción de la imagen"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 font-semibold text-gray-300">Orden</label>
+                    <input
+                      type="number"
+                      value={heroFormData.order}
+                      onChange={(e) => setHeroFormData({ ...heroFormData, order: parseInt(e.target.value) || 0 })}
+                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white"
+                      min="0"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Las imágenes se mostrarán en orden ascendente</p>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary px-6 py-4 rounded-xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 flex items-center justify-center gap-2"
+                    >
+                      {editingHeroId ? (
+                        <>
+                          <Save size={20} />
+                          Actualizar Imagen
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={20} />
+                          Agregar Imagen
+                        </>
+                      )}
+                    </button>
+
+                    {editingHeroId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHeroFormData({ title: '', order: 0 });
+                          setHeroImageUrl('');
+                          setHeroSelectedFile(null);
+                          setEditingHeroId(null);
+                        }}
+                        className="px-6 py-4 bg-red-600/20 hover:bg-red-600/30 border-2 border-red-600/50 hover:border-red-600 rounded-xl font-bold transition-all duration-300 flex items-center gap-2"
+                      >
+                        <X size={20} />
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Hero Images List */}
+            <div className="lg:col-span-3">
+              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl">
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                  <Home className="text-primary" />
+                  Imágenes del Hero (Carrusel de Bienvenida)
+                </h2>
+
+                <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                  {heroImages.length === 0 ? (
+                    <div className="text-center py-16">
+                      <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                        <ImageIcon size={48} className="text-primary/50" />
+                      </div>
+                      <p className="text-gray-400 text-lg">No hay imágenes del Hero</p>
+                      <p className="text-gray-500 text-sm mt-2">Agrega imágenes para el carrusel de bienvenida</p>
+                    </div>
+                  ) : (
+                    heroImages.map((heroImage) => (
+                      <div
+                        key={heroImage.id}
+                        className="bg-gradient-to-br from-[#0f1419] to-[#1a1f2e] p-4 rounded-xl border-2 border-primary/20 hover:border-primary/60 transition-all duration-300 hover:shadow-xl hover:shadow-primary/20"
+                      >
+                        <div className="flex gap-4">
+                          <img 
+                            src={heroImage.image} 
+                            alt={heroImage.title || 'Hero Image'} 
+                            className="w-40 h-24 object-cover rounded-lg border border-primary/20"
+                          />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h4 className="text-lg font-bold text-white">
+                                  {heroImage.title || 'Sin título'}
+                                </h4>
+                                <p className="text-sm text-gray-400">Orden: {heroImage.order}</p>
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEditHero(heroImage)}
+                                  className="bg-primary/20 hover:bg-primary text-primary hover:text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-primary/30 hover:border-primary"
+                                >
+                                  <Edit2 size={14} />
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteHero(heroImage.id)}
+                                  className="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-red-600/30 hover:border-red-600"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-500 truncate">{heroImage.image}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
