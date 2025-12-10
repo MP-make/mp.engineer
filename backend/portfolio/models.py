@@ -6,6 +6,8 @@ class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     link = models.URLField(blank=True, null=True)
+    demo_link = models.URLField(blank=True, null=True)
+    github_link = models.URLField(blank=True, null=True)
     technologies = models.JSONField(default=list)
     status = models.CharField(max_length=50, default='completed')
     created_at = models.DateTimeField(auto_now_add=True)

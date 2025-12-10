@@ -31,6 +31,14 @@ interface Translations {
     uxui: string;
     uxuiDesc: string;
   };
+  services: {
+    title: string;
+    subtitle: string;
+    services: {
+      title: string;
+      description: string;
+    }[];
+  };
   projects: {
     title: string;
     subtitle: string;
@@ -59,6 +67,7 @@ interface Translations {
     about: string;
     projects: string;
     contact: string;
+    services: string;
   };
   theme: {
     light: string;
@@ -97,6 +106,15 @@ const translations: Record<Language, Translations> = {
       uxui: 'Diseño UX/UI',
       uxuiDesc: 'Creando interfaces de usuario intuitivas con atención a la experiencia del usuario.',
     },
+    services: {
+      title: 'Servicios',
+      subtitle: 'Lo que ofrezco',
+      services: [
+        { title: 'Desarrollo Web', description: 'Creación de sitios web modernos y escalables.' },
+        { title: 'Gestión de Datos', description: 'Soluciones eficientes para bases de datos.' },
+        { title: 'Diseño UX/UI', description: 'Interfaces intuitivas y centradas en el usuario.' },
+      ]
+    },
     projects: {
       title: 'Proyectos',
       subtitle: 'Soluciones innovadoras construidas con las últimas tecnologías',
@@ -125,6 +143,7 @@ const translations: Record<Language, Translations> = {
       about: 'Sobre Mí',
       projects: 'Proyectos',
       contact: 'Contacto',
+      services: 'Servicios',
     },
     theme: {
       light: 'Claro',
@@ -161,6 +180,15 @@ const translations: Record<Language, Translations> = {
       uxui: 'UX/UI Design',
       uxuiDesc: 'Creating intuitive user interfaces with attention to user experience.',
     },
+    services: {
+      title: 'Services',
+      subtitle: 'What I offer',
+      services: [
+        { title: 'Web Development', description: 'Creating modern and scalable websites.' },
+        { title: 'Data Management', description: 'Efficient solutions for databases.' },
+        { title: 'UX/UI Design', description: 'Intuitive and user-centered interfaces.' },
+      ]
+    },
     projects: {
       title: 'Projects',
       subtitle: 'Innovative solutions built with the latest technologies',
@@ -189,6 +217,7 @@ const translations: Record<Language, Translations> = {
       about: 'About',
       projects: 'Projects',
       contact: 'Contact',
+      services: 'Services',
     },
     theme: {
       light: 'Light',
