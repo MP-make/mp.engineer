@@ -241,7 +241,7 @@ export default function AdminPage() {
           .insert(imageData);
       }
 
-      setFormData({ title: '', description: '', link: '', technologies: '', status: 'completed' });
+      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed' });
       setImageUrls([]);
       setSelectedFiles([]);
       setEditingId(null);
