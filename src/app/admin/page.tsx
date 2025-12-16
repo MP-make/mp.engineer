@@ -451,7 +451,7 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e] flex items-center justify-center">
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#0f1419]' : 'bg-gradient-to-br from-gray-100 via-white to-gray-200'} flex items-center justify-center`}>
         <div className="text-center">
           <div className="relative">
             <div className="inline-block animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-primary"></div>
@@ -459,7 +459,7 @@ export default function AdminPage() {
               <FolderOpen className="text-primary animate-pulse" size={32} />
             </div>
           </div>
-          <p className="text-white text-xl font-semibold mt-6">Cargando panel...</p>
+          <p className={`text-xl font-semibold mt-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Cargando panel...</p>
         </div>
       </div>
     );
@@ -474,7 +474,7 @@ export default function AdminPage() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0f1419]/80 border-b border-primary/20 shadow-2xl">
+      <header className={`sticky top-0 z-50 backdrop-blur-xl ${theme === 'dark' ? 'bg-[#0f1419]/80' : 'bg-white/80'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} shadow-2xl`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo & Title */}
@@ -489,7 +489,7 @@ export default function AdminPage() {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
                   Panel de Control
                 </h1>
-                <p className="text-sm text-gray-400">Bienvenido, {session?.user?.name || 'Admin'}</p>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Bienvenido, {session?.user?.name || 'Admin'}</p>
               </div>
             </div>
 
@@ -508,7 +508,7 @@ export default function AdminPage() {
                 className="relative group px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 transition-all duration-300 overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 group-hover:from-primary/10 group-hover:via-primary/20 group-hover:to-primary/10 transition-all duration-500"></div>
-                <div className="relative z-10 flex items-center space-x-2 text-white font-medium">
+                <div className="relative z-10 flex items-center space-x-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} font-medium">
                   <ExternalLink size={18} className="group-hover:rotate-12 transition-transform duration-300" />
                   <span className="hidden sm:inline">Ver Sitio</span>
                 </div>
@@ -528,7 +528,7 @@ export default function AdminPage() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1f2e] to-[#151a27] border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
+          <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
             <div className="relative p-6">
               <div className="flex items-center justify-between mb-4">
@@ -537,12 +537,12 @@ export default function AdminPage() {
                 </div>
                 <TrendingUp size={20} className="text-green-400" />
               </div>
-              <p className="text-gray-400 text-sm font-medium mb-1">Proyectos Totales</p>
-              <p className="text-4xl font-bold text-white">{projects.length}</p>
+              <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Proyectos Totales</p>
+              <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{projects.length}</p>
             </div>
           </div>
 
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1f2e] to-[#151a27] border border-secondary/20 hover:border-secondary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-secondary/20 hover:-translate-y-1">
+          <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
             <div className="absolute inset-0 bg-gradient-to-br from-secondary/0 to-secondary/0 group-hover:from-secondary/5 group-hover:to-secondary/10 transition-all duration-500"></div>
             <div className="relative p-6">
               <div className="flex items-center justify-between mb-4">
@@ -551,12 +551,12 @@ export default function AdminPage() {
                 </div>
                 <Eye size={20} className="text-blue-400" />
               </div>
-              <p className="text-gray-400 text-sm font-medium mb-1">Mensajes Nuevos</p>
-              <p className="text-4xl font-bold text-white">{contacts.length}</p>
+              <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Mensajes Nuevos</p>
+              <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{contacts.length}</p>
             </div>
           </div>
 
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1f2e] to-[#151a27] border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1">
+          <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
             <div className="relative p-6">
               <div className="flex items-center justify-between mb-4">
@@ -565,14 +565,14 @@ export default function AdminPage() {
                 </div>
                 <CheckCircle2 size={20} className="text-primary" />
               </div>
-              <p className="text-gray-400 text-sm font-medium mb-1">Habilidades</p>
-              <p className="text-4xl font-bold text-white">{skills.length}</p>
+              <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Habilidades</p>
+              <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{skills.length}</p>
             </div>
           </div>
         </div>
 
         {/* Tabs - Modern Design */}
-        <div className="flex flex-wrap gap-3 mb-8 p-2 bg-[#0f1419]/50 backdrop-blur-xl rounded-2xl border border-white/10">
+        <div className={`flex flex-wrap gap-3 mb-8 p-2 ${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-white/50'} backdrop-blur-xl rounded-2xl border ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
           {[
             { id: 'projects', icon: FolderOpen, label: 'Proyectos', count: projects.length },
             { id: 'contacts', icon: MessageSquare, label: 'Mensajes', count: contacts.length },
@@ -585,7 +585,7 @@ export default function AdminPage() {
               className={`flex-1 relative group px-6 py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
                 activeTab === tab.id
                   ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  : `${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'}`
               }`}
             >
               <div className="relative z-10 flex items-center justify-center space-x-3">
@@ -606,7 +606,7 @@ export default function AdminPage() {
           <div className="grid lg:grid-cols-5 gap-8">
             {/* Form */}
             <div className="lg:col-span-2">
-              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl sticky top-32">
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl sticky top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingId ? (
                     <>
@@ -626,9 +626,8 @@ export default function AdminPage() {
                 </div>
                 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* ...existing form fields... */}
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
                       <Tag size={16} className="text-primary" />
                       Título
                     </label>
@@ -636,18 +635,18 @@ export default function AdminPage() {
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
                       placeholder="Nombre del proyecto"
                       required
                     />
                   </div>
                   
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300">Descripción</label>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500 resize-none"
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
                       rows={4}
                       placeholder="Describe tu proyecto..."
                       required
@@ -655,7 +654,7 @@ export default function AdminPage() {
                   </div>
                   
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
                       <ExternalLink size={16} className="text-primary" />
                       Link (opcional)
                     </label>
@@ -663,13 +662,13 @@ export default function AdminPage() {
                       type="url"
                       value={formData.link}
                       onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
                       placeholder="https://ejemplo.com"
                     />
                   </div>
                   
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
                       <Github size={16} className="text-primary" />
                       Link de GitHub (opcional)
                     </label>
@@ -677,147 +676,112 @@ export default function AdminPage() {
                       type="url"
                       value={formData.github_link}
                       onChange={(e) => setFormData({ ...formData, github_link: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
                       placeholder="https://github.com/username/repo"
                     />
                   </div>
                   
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300">Tecnologías</label>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tecnologías</label>
                     <input
                       type="text"
                       value={formData.technologies}
                       onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
-                      placeholder="React, Next.js, TypeScript, Tailwind"
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      placeholder="React, Node.js, PostgreSQL"
+                      required
                     />
-                    <p className="text-xs text-gray-500 mt-1">Separa cada tecnología con coma</p>
-                  </div>
-
-                  {/* Image Upload Section */}
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
-                      <Upload size={16} className="text-primary" />
-                      Subir Imágenes del Proyecto
-                    </label>
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={handleFileSelect}
-                          className="flex-1 px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-secondary file:cursor-pointer"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        {selectedFiles.map((file, index) => (
-                          <div key={index} className="flex items-center gap-2 bg-[#0f1419] p-2 rounded-lg border border-primary/20">
-                            <img 
-                              src={URL.createObjectURL(file)} 
-                              alt={`Preview ${index + 1}`} 
-                              className="w-12 h-12 object-cover rounded" 
-                            />
-                            <span className="flex-1 text-sm text-gray-300 truncate">{file.name}</span>
-                            <span className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                            <button
-                              type="button"
-                              onClick={() => removeSelectedFile(index)}
-                              className="p-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-lg transition-colors"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                      <p className="text-xs text-gray-500">Selecciona múltiples imágenes (PNG, JPG, JPEG, GIF, WebP). Máximo 5MB por archivo.</p>
-                    </div>
-                  </div>
-
-                  {/* Image URLs Section */}
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
-                      <ImageIcon size={16} className="text-primary" />
-                      O agrega URLs de imágenes
-                    </label>
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <input
-                          type="url"
-                          value={newImageUrl}
-                          onChange={(e) => setNewImageUrl(e.target.value)}
-                          placeholder="https://ejemplo.com/imagen.jpg"
-                          className="flex-1 px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
-                        />
-                        <button
-                          type="button"
-                          onClick={addImageUrl}
-                          className="px-4 py-3 bg-primary hover:bg-secondary rounded-xl transition-colors flex items-center gap-2 font-semibold"
-                        >
-                          <Plus size={18} />
-                          Agregar
-                        </button>
-                      </div>
-                      <div className="space-y-2">
-                        {imageUrls.map((url, index) => (
-                          <div key={index} className="flex items-center gap-2 bg-[#0f1419] p-2 rounded-lg border border-primary/20">
-                            <img src={url} alt={`Preview ${index + 1}`} className="w-12 h-12 object-cover rounded" />
-                            <span className="flex-1 text-sm text-gray-300 truncate">{url}</span>
-                            <button
-                              type="button"
-                              onClick={() => removeImageUrl(index)}
-                              className="p-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-lg transition-colors"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                      <p className="text-xs text-gray-500">Agrega URLs de imágenes alojadas en Supabase Storage o servicios externos</p>
-                    </div>
                   </div>
                   
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300">Estado</label>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Estado</label>
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white cursor-pointer"
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                     >
-                      <option value="completed">✅ Completado</option>
-                      <option value="in-progress">🔄 En Desarrollo</option>
+                      <option value="completed">Completado</option>
+                      <option value="in-progress">En progreso</option>
                     </select>
                   </div>
-                  
-                  <div className="flex gap-3 pt-4">
+
+                  <div>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                    <div className="space-y-3">
+                      {imageUrls.map((url, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                          <button
+                            type="button"
+                            onClick={() => removeImageUrl(index)}
+                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                          >
+                            <Trash2 size={16} className="text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3 mt-3">
+                      <input
+                        type="url"
+                        value={newImageUrl}
+                        onChange={(e) => setNewImageUrl(e.target.value)}
+                        className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="https://ejemplo.com/imagen.jpg"
+                      />
+                      <button
+                        type="button"
+                        onClick={addImageUrl}
+                        className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                      >
+                        <Plus size={16} className="text-primary" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Subir Imágenes</label>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileSelect}
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                    />
+                    <div className="space-y-3 mt-3">
+                      {selectedFiles.map((file, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <div className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</div>
+                          <button
+                            type="button"
+                            onClick={() => removeSelectedFile(index)}
+                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                          >
+                            <Trash2 size={16} className="text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
                     <button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary px-6 py-4 rounded-xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 flex items-center justify-center gap-2"
+                      className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
                     >
-                      {editingId ? (
-                        <>
-                          <Save size={20} />
-                          Actualizar Proyecto
-                        </>
-                      ) : (
-                        <>
-                          <Plus size={20} />
-                          Crear Proyecto
-                        </>
-                      )}
+                      {editingId ? 'Guardar Cambios' : 'Crear Proyecto'}
                     </button>
-                    
                     {editingId && (
                       <button
                         type="button"
                         onClick={() => {
                           setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed' });
                           setImageUrls([]);
+                          setSelectedFiles([]);
                           setEditingId(null);
                         }}
-                        className="px-6 py-4 bg-red-600/20 hover:bg-red-600/30 border-2 border-red-600/50 hover:border-red-600 rounded-xl font-bold transition-all duration-300 flex items-center gap-2"
+                        className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
                       >
-                        <X size={20} />
+                        <X size={16} className="text-red-400" />
                       </button>
                     )}
                   </div>
@@ -826,121 +790,89 @@ export default function AdminPage() {
             </div>
 
             {/* Projects List */}
-            <div className="lg:col-span-3">
-              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                  <FolderOpen className="text-primary" />
-                  Proyectos Existentes
-                </h2>
-                
-                <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
-                  {projects.length === 0 ? (
-                    <div className="text-center py-16">
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                        <FolderOpen size={48} className="text-primary/50" />
-                      </div>
-                      <p className="text-gray-400 text-lg">No hay proyectos todavía</p>
-                      <p className="text-gray-500 text-sm mt-2">Crea tu primer proyecto usando el formulario</p>
-                    </div>
-                  ) : (
-                    projects.map((project) => (
-                      <div 
-                        key={project.id} 
-                        className="bg-gradient-to-br from-[#0f1419] to-[#1a1f2e] p-6 rounded-xl border-2 border-primary/20 hover:border-primary/60 transition-all duration-300 hover:shadow-xl hover:shadow-primary/20 group"
+            <div className="lg:col-span-3 space-y-6">
+              {projects.map((project) => (
+                <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleEdit(project)}
+                        className="p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300"
                       >
-                        <div className="flex justify-between items-start mb-3">
-                          <h3 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors duration-300">
-                            {project.title}
-                          </h3>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                            project.status === 'completed' 
-                              ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
-                              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50'
-                          }`}>
-                            {project.status === 'completed' ? '✅ Completado' : '🔄 En progreso'}
-                          </span>
-                        </div>
-                        
-                        <p className="text-gray-300 mb-4 text-sm leading-relaxed line-clamp-2">
-                          {project.description}
-                        </p>
-                        
-                        {project.link && (
-                          <a 
-                            href={project.link} 
-                            target="_blank" 
-                            className="text-primary hover:text-secondary text-sm hover:underline mb-3 flex items-center gap-1 transition-colors"
-                          >
-                            <ExternalLink size={14} />
-                            {project.link}
-                          </a>
-                        )}
-                        
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {Array.isArray(project.technologies) && project.technologies.map((tech: string, idx: number) => (
-                            <span 
-                              key={idx} 
-                              className="bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-primary/20 transition-colors"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-
-                        {/* Project Images */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {Array.isArray(project.images) && project.images.map((image: { image: string }, idx: number) => (
-                            <img 
-                              key={idx} 
-                              src={image.image} 
-                              alt={`Project Image ${idx + 1}`} 
-                              className="w-24 h-24 object-cover rounded-lg border border-primary/20"
-                            />
-                          ))}
-                        </div>
-                        
-                        <div className="flex items-center justify-between pt-4 border-t border-primary/10">
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <Calendar size={14} />
-                            {new Date(project.created_at).toLocaleDateString('es-ES', { 
-                              year: 'numeric', 
-                              month: 'long', 
-                              day: 'numeric' 
-                            })}
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEdit(project)}
-                              className="bg-primary/20 hover:bg-primary text-primary hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-primary/30 hover:border-primary"
-                            >
-                              <Edit2 size={14} />
-                              Editar
-                            </button>
-                            <button
-                              onClick={() => handleDelete(project.id)}
-                              className="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-red-600/30 hover:border-red-600"
-                            >
-                              <Trash2 size={14} />
-                              Eliminar
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
+                        <Edit2 size={16} className="text-yellow-400" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(project.id)}
+                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                      >
+                        <Trash2 size={16} className="text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className={`mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{project.description}</p>
+                  <div className="flex items-center gap-3 mb-4">
+                    {project.technologies.map((tech, index) => (
+                      <span key={index} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">{tech}</span>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {project.link && (
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium"
+                      >
+                        <ExternalLink size={16} />
+                        <span>Ver Proyecto</span>
+                      </a>
+                    )}
+                    {project.github_link && (
+                      <a
+                        href={project.github_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium"
+                      >
+                        <Github size={16} />
+                        <span>Ver Código</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
+          </div>
+        )}
+
+        {/* Contacts Tab */}
+        {activeTab === 'contacts' && (
+          <div className="space-y-6">
+            {contacts.map((contact) => (
+              <div key={contact.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{contact.name}</h3>
+                  <button
+                    onClick={() => handleDeleteContact(contact.id)}
+                    className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                  >
+                    <Trash2 size={16} className="text-red-400" />
+                  </button>
+                </div>
+                <p className={`mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{contact.email}</p>
+                <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{contact.message}</p>
+              </div>
+            ))}
           </div>
         )}
 
         {/* Skills Tab */}
         {activeTab === 'skills' && (
           <div className="grid lg:grid-cols-5 gap-8">
-            {/* Skill Form */}
+            {/* Form */}
             <div className="lg:col-span-2">
-              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl sticky top-32">
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl sticky top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingSkillId ? (
                     <>
@@ -958,69 +890,53 @@ export default function AdminPage() {
                     </>
                   )}
                 </div>
-
+                
                 <form onSubmit={handleSkillSubmit} className="space-y-5">
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300">Nombre</label>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Nombre</label>
                     <input
                       type="text"
                       value={skillFormData.name}
                       onChange={(e) => setSkillFormData({ ...skillFormData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
-                      placeholder="React, Python, Node.js..."
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      placeholder="Nombre de la habilidad"
                       required
                     />
                   </div>
-
+                  
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300">Categoría</label>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Categoría</label>
                     <input
                       type="text"
                       value={skillFormData.category}
                       onChange={(e) => setSkillFormData({ ...skillFormData, category: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
-                      placeholder="Frontend, Backend, Database..."
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      placeholder="Categoría de la habilidad"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Proficiencia</label>
+                    <input
+                      type="number"
+                      value={skillFormData.proficiency}
+                      onChange={(e) => setSkillFormData({ ...skillFormData, proficiency: parseInt(e.target.value) })}
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      placeholder="Proficiencia (0-100)"
+                      min={0}
+                      max={100}
                       required
                     />
                   </div>
 
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-300">
-                      Nivel de Dominio: {skillFormData.proficiency}%
-                    </label>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={skillFormData.proficiency}
-                      onChange={(e) => setSkillFormData({ ...skillFormData, proficiency: parseInt(e.target.value) })}
-                      className="w-full h-2 bg-[#0f1419] rounded-lg appearance-none cursor-pointer accent-primary"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Principiante</span>
-                      <span>Intermedio</span>
-                      <span>Experto</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
+                  <div className="flex items-center gap-3">
                     <button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary px-6 py-4 rounded-xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 flex items-center justify-center gap-2"
+                      className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
                     >
-                      {editingSkillId ? (
-                        <>
-                          <Save size={20} />
-                          Actualizar Habilidad
-                        </>
-                      ) : (
-                        <>
-                          <Plus size={20} />
-                          Crear Habilidad
-                        </>
-                      )}
+                      {editingSkillId ? 'Guardar Cambios' : 'Crear Habilidad'}
                     </button>
-
                     {editingSkillId && (
                       <button
                         type="button"
@@ -1028,9 +944,9 @@ export default function AdminPage() {
                           setSkillFormData({ name: '', category: '', proficiency: 50 });
                           setEditingSkillId(null);
                         }}
-                        className="px-6 py-4 bg-red-600/20 hover:bg-red-600/30 border-2 border-red-600/50 hover:border-red-600 rounded-xl font-bold transition-all duration-300 flex items-center gap-2"
+                        className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
                       >
-                        <X size={20} />
+                        <X size={16} className="text-red-400" />
                       </button>
                     )}
                   </div>
@@ -1039,137 +955,46 @@ export default function AdminPage() {
             </div>
 
             {/* Skills List */}
-            <div className="lg:col-span-3">
-              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                  <Award className="text-primary" />
-                  Habilidades Existentes
-                </h2>
-
-                <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
-                  {skills.length === 0 ? (
-                    <div className="text-center py-16">
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Award size={48} className="text-primary/50" />
-                      </div>
-                      <p className="text-gray-400 text-lg">No hay habilidades todavía</p>
-                      <p className="text-gray-500 text-sm mt-2">Agrega tu primera habilidad usando el formulario</p>
-                    </div>
-                  ) : (
-                    Object.entries(
-                      skills.reduce((acc, skill) => {
-                        if (!acc[skill.category]) acc[skill.category] = [];
-                        acc[skill.category].push(skill);
-                        return acc;
-                      }, {} as Record<string, Skill[]>)
-                    ).map(([category, categorySkills]) => (
-                      <div key={category} className="mb-6">
-                        <h3 className="text-lg font-bold text-primary mb-3 flex items-center gap-2">
-                          <Tag size={18} />
-                          {category}
-                        </h3>
-                        <div className="space-y-3">
-                          {(categorySkills).map((skill) => (
-                            <div
-                              key={skill.id}
-                              className="bg-gradient-to-br from-[#0f1419] to-[#1a1f2e] p-4 rounded-xl border-2 border-primary/20 hover:border-primary/60 transition-all duration-300"
-                            >
-                              <div className="flex justify-between items-center mb-2">
-                                <h4 className="text-lg font-bold text-white">{skill.name}</h4>
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => handleEditSkill(skill)}
-                                    className="bg-primary/20 hover:bg-primary text-primary hover:text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-primary/30 hover:border-primary"
-                                  >
-                                    <Edit2 size={14} />
-                                    Editar
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteSkill(skill.id)}
-                                    className="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-red-600/30 hover:border-red-600"
-                                  >
-                                    <Trash2 size={14} />
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="w-full bg-[#0a0e14] rounded-full h-3 overflow-hidden">
-                                <div
-                                  className="bg-gradient-to-r from-primary to-secondary h-full rounded-full transition-all duration-500"
-                                  style={{ width: `${skill.proficiency}%` }}
-                                ></div>
-                              </div>
-                              <p className="text-xs text-gray-400 mt-1 text-right">{skill.proficiency}% de dominio</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Contacts Tab */}
-        {activeTab === 'contacts' && (
-          <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-              <MessageSquare className="text-secondary" />
-              Mensajes de Contacto
-            </h2>
-            
-            <div className="space-y-4">
-              {contacts.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <MessageSquare size={48} className="text-secondary/50" />
-                  </div>
-                  <p className="text-gray-400 text-lg">No hay mensajes todavía</p>
-                  <p className="text-gray-500 text-sm mt-2">Los mensajes aparecerán aquí cuando alguien te contacte</p>
-                </div>
-              ) : (
-                contacts.map((contact) => (
-                  <div 
-                    key={contact.id} 
-                    className="bg-gradient-to-br from-[#0f1419] to-[#1a1f2e] p-6 rounded-xl border-2 border-secondary/20 hover:border-secondary/60 transition-all duration-300 hover:shadow-xl hover:shadow-secondary/20"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-secondary mb-1">{contact.name}</h3>
-                        <a href={`mailto:${contact.email}`} className="text-gray-400 text-sm hover:text-primary transition-colors flex items-center gap-1">
-                          📧 {contact.email}
-                        </a>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <div className="flex items-center gap-2 text-gray-500 text-xs">
-                            <Calendar size={14} />
-                            {new Date(contact.created_at).toLocaleDateString('es-ES')}
-                          </div>
-                          <div className="text-gray-500 text-xs mt-1">
-                            {new Date(contact.created_at).toLocaleTimeString('es-ES', { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteContact(contact.id)}
-                          className="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white p-2.5 rounded-lg transition-all duration-300 border border-red-600/30 hover:border-red-600"
-                          title="Eliminar mensaje"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-[#0a0e14] p-4 rounded-lg border border-primary/10">
-                      <p className="text-gray-300 leading-relaxed">{contact.message}</p>
+            <div className="lg:col-span-3 space-y-6">
+              {skills.map((skill) => (
+                <div key={skill.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{skill.name}</h3>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleEditSkill(skill)}
+                        className="p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300"
+                      >
+                        <Edit2 size={16} className="text-yellow-400" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSkill(skill.id)}
+                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                      >
+                        <Trash2 size={16} className="text-red-400" />
+                      </button>
                     </div>
                   </div>
-                ))
-              )}
+                  <p className={`text-gray-400 mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{skill.category}</p>
+                  <div className="relative pt-1">
+                    <div className="flex mb-2 items-center justify-between">
+                      <div>
+                        <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-primary/10">
+                          Proficiencia
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-semibold inline-block text-primary">
+                          {skill.proficiency}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary/20">
+                      <div style={{ width: `${skill.proficiency}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -1177,125 +1002,79 @@ export default function AdminPage() {
         {/* Hero Images Tab */}
         {activeTab === 'hero' && (
           <div className="grid lg:grid-cols-5 gap-8">
-            {/* Hero Form */}
+            {/* Form */}
             <div className="lg:col-span-2">
-              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl sticky top-32">
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl sticky top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingHeroId ? (
                     <>
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
                         <Edit2 size={20} className="text-white" />
                       </div>
-                      <h2 className="text-2xl font-bold">Editar Imagen Hero</h2>
+                      <h2 className="text-2xl font-bold">Editar Hero Image</h2>
                     </>
                   ) : (
                     <>
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                         <Plus size={20} className="text-white" />
                       </div>
-                      <h2 className="text-2xl font-bold">Nueva Imagen Hero</h2>
+                      <h2 className="text-2xl font-bold">Nueva Hero Image</h2>
                     </>
                   )}
                 </div>
-
+                
                 <form onSubmit={handleHeroSubmit} className="space-y-5">
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
-                      <Upload size={16} className="text-primary" />
-                      Subir Imagen
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleHeroFileSelect}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-secondary file:cursor-pointer"
-                    />
-                    {heroSelectedFile && (
-                      <div className="mt-3 flex items-center gap-2 bg-[#0f1419] p-2 rounded-lg border border-primary/20">
-                        <img 
-                          src={URL.createObjectURL(heroSelectedFile)} 
-                          alt="Preview" 
-                          className="w-16 h-16 object-cover rounded" 
-                        />
-                        <span className="flex-1 text-sm text-gray-300 truncate">{heroSelectedFile.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => setHeroSelectedFile(null)}
-                          className="p-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-lg transition-colors"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
-                      <ImageIcon size={16} className="text-primary" />
-                      O URL de Imagen
-                    </label>
-                    <input
-                      type="url"
-                      value={heroImageUrl}
-                      onChange={(e) => setHeroImageUrl(e.target.value)}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                    />
-                    {heroImageUrl && !heroSelectedFile && (
-                      <div className="mt-3">
-                        <img 
-                          src={heroImageUrl} 
-                          alt="Preview" 
-                          className="w-full h-40 object-cover rounded-lg border border-primary/20" 
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
-                      <Tag size={16} className="text-primary" />
-                      Título (opcional)
-                    </label>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Título (opcional)</label>
                     <input
                       type="text"
                       value={heroFormData.title}
                       onChange={(e) => setHeroFormData({ ...heroFormData, title: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
-                      placeholder="Descripción de la imagen"
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      placeholder="Título de la imagen"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Orden</label>
+                    <input
+                      type="number"
+                      value={heroFormData.order}
+                      onChange={(e) => setHeroFormData({ ...heroFormData, order: parseInt(e.target.value) })}
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      placeholder="Orden de la imagen"
+                      min={0}
+                      required
                     />
                   </div>
 
                   <div>
-                    <label className="block mb-2 font-semibold text-gray-300">Orden</label>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>URL de la Imagen</label>
                     <input
-                      type="number"
-                      value={heroFormData.order}
-                      onChange={(e) => setHeroFormData({ ...heroFormData, order: parseInt(e.target.value) || 0 })}
-                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white"
-                      min="0"
+                      type="url"
+                      value={heroImageUrl}
+                      onChange={(e) => setHeroImageUrl(e.target.value)}
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      placeholder="https://ejemplo.com/imagen.jpg"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Las imágenes se mostrarán en orden ascendente</p>
                   </div>
 
-                  <div className="flex gap-3 pt-4">
+                  <div>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Subir Imagen</label>
+                    <input
+                      type="file"
+                      onChange={handleHeroFileSelect}
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3">
                     <button
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary px-6 py-4 rounded-xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 flex items-center justify-center gap-2"
+                      className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
                     >
-                      {editingHeroId ? (
-                        <>
-                          <Save size={20} />
-                          Actualizar Imagen
-                        </>
-                      ) : (
-                        <>
-                          <Plus size={20} />
-                          Agregar Imagen
-                        </>
-                      )}
+                      {editingHeroId ? 'Guardar Cambios' : 'Crear Hero Image'}
                     </button>
-
                     {editingHeroId && (
                       <button
                         type="button"
@@ -1305,9 +1084,9 @@ export default function AdminPage() {
                           setHeroSelectedFile(null);
                           setEditingHeroId(null);
                         }}
-                        className="px-6 py-4 bg-red-600/20 hover:bg-red-600/30 border-2 border-red-600/50 hover:border-red-600 rounded-xl font-bold transition-all duration-300 flex items-center gap-2"
+                        className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
                       >
-                        <X size={20} />
+                        <X size={16} className="text-red-400" />
                       </button>
                     )}
                   </div>
@@ -1316,87 +1095,34 @@ export default function AdminPage() {
             </div>
 
             {/* Hero Images List */}
-            <div className="lg:col-span-3">
-              <div className="bg-gradient-to-br from-[#1e2432] to-[#252b3d] p-8 rounded-2xl border border-primary/30 shadow-2xl">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                  <Home className="text-primary" />
-                  Imágenes del Hero (Carrusel de Bienvenida)
-                </h2>
-
-                <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
-                  {heroImages.length === 0 ? (
-                    <div className="text-center py-16">
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                        <ImageIcon size={48} className="text-primary/50" />
-                      </div>
-                      <p className="text-gray-400 text-lg">No hay imágenes del Hero</p>
-                      <p className="text-gray-500 text-sm mt-2">Agrega imágenes para el carrusel de bienvenida</p>
-                    </div>
-                  ) : (
-                    heroImages.map((heroImage) => (
-                      <div
-                        key={heroImage.id}
-                        className="bg-gradient-to-br from-[#0f1419] to-[#1a1f2e] p-4 rounded-xl border-2 border-primary/20 hover:border-primary/60 transition-all duration-300 hover:shadow-xl hover:shadow-primary/20"
+            <div className="lg:col-span-3 space-y-6">
+              {heroImages.map((heroImage) => (
+                <div key={heroImage.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{heroImage.title || 'Sin Título'}</h3>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleEditHero(heroImage)}
+                        className="p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300"
                       >
-                        <div className="flex gap-4">
-                          <img 
-                            src={heroImage.image} 
-                            alt={heroImage.title || 'Hero Image'} 
-                            className="w-40 h-24 object-cover rounded-lg border border-primary/20"
-                          />
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <h4 className="text-lg font-bold text-white">
-                                  {heroImage.title || 'Sin título'}
-                                </h4>
-                                <p className="text-sm text-gray-400">Orden: {heroImage.order}</p>
-                              </div>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleEditHero(heroImage)}
-                                  className="bg-primary/20 hover:bg-primary text-primary hover:text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-primary/30 hover:border-primary"
-                                >
-                                  <Edit2 size={14} />
-                                  Editar
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteHero(heroImage.id)}
-                                  className="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 border border-red-600/30 hover:border-red-600"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </div>
-                            <p className="text-xs text-gray-500 truncate">{heroImage.image}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
+                        <Edit2 size={16} className="text-yellow-400" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteHero(heroImage.id)}
+                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                      >
+                        <Trash2 size={16} className="text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+                  <img src={heroImage.image} alt={heroImage.title || 'Hero Image'} className="w-full h-64 object-cover rounded-lg border-2 border-primary/30" />
+                  <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mt-4`}>Orden: {heroImage.order}</p>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         )}
       </div>
-
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(1, 195, 142, 0.1);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #01c38e, #00a876);
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, #00a876, #01c38e);
-        }
-      `}</style>
     </div>
   );
 }
