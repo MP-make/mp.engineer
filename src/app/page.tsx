@@ -144,10 +144,10 @@ export default function Home() {
       {/* Hero Section */}
       <section id="home" className="min-h-screen relative overflow-hidden">
         {/* Desktop */}
-        <div className="hidden lg:flex w-full min-h-screen relative">
+        <div className="hidden lg:flex w-full min-h-screen relative pt-16">
           {/* Texto - posición dinámica */}
           <div 
-            className={`absolute top-0 h-screen w-1/2 flex items-center transition-all duration-[1000ms] ease-in-out ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} z-10`}
+            className={`absolute top-16 h-screen w-1/2 flex items-center transition-all duration-[1000ms] ease-in-out ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} z-10`}
             style={{ left: imageOnRight ? '0%' : '50%' }}
           >
             <div className="w-full px-8 lg:px-16 xl:px-20">
@@ -207,7 +207,7 @@ export default function Home() {
 
           {/* Imagen - posición dinámica opuesta al texto */}
           <div 
-            className={`absolute top-0 h-screen w-1/2 overflow-hidden transition-all duration-[1000ms] ease-in-out`}
+            className={`absolute top-16 h-screen w-1/2 overflow-hidden transition-all duration-[1000ms] ease-in-out`}
             style={{ left: imageOnRight ? '50%' : '0%' }}
           >
             <div className="relative w-full h-full">
@@ -222,7 +222,6 @@ export default function Home() {
                     }`}
                   >
                     <img src={img.image} alt={img.title || 'Hero'} className="w-full h-full object-cover" />
-                    <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-black/10' : 'bg-white/5'}`}></div>
                   </div>
                 ))
               ) : (

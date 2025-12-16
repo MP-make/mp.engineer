@@ -39,7 +39,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full ${theme === 'dark' ? 'bg-accent/80' : 'bg-white/80'} backdrop-blur-md border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} z-50`}>
+    <nav className={`fixed top-0 w-full ${theme === 'dark' ? 'bg-accent' : 'bg-white'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} z-50`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -148,7 +148,7 @@ const Navbar = () => {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 ${theme === 'dark' ? 'bg-accent/90' : 'bg-white/90'} backdrop-blur-md rounded-lg mt-2 border ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'}`}>
+            <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 ${theme === 'dark' ? 'bg-accent' : 'bg-white'} rounded-lg mt-2 border ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'}`}>
               <a href="#home" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.home}</a>
               <a href="#about" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.about}</a>
               <a href="#services" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.services}</a>
