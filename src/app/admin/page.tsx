@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home } from 'lucide-react';
+import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -12,6 +12,7 @@ interface Project {
   title: string;
   description: string;
   link?: string;
+  github_link?: string;
   technologies: string[];
   status: 'completed' | 'in-progress';
   created_at: string;
@@ -58,6 +59,7 @@ export default function AdminPage() {
     title: '',
     description: '',
     link: '',
+    github_link: '',
     technologies: '',
     status: 'completed'
   });
@@ -196,6 +198,7 @@ export default function AdminPage() {
             title: formData.title,
             description: formData.description,
             link: formData.link || null,
+            github_link: formData.github_link || null,
             technologies: techArray,
             status: formData.status
           })
@@ -209,6 +212,7 @@ export default function AdminPage() {
             title: formData.title,
             description: formData.description,
             link: formData.link || null,
+            github_link: formData.github_link || null,
             technologies: techArray,
             status: formData.status,
             created_at: new Date().toISOString()
@@ -255,6 +259,7 @@ export default function AdminPage() {
       title: project.title,
       description: project.description,
       link: project.link || '',
+      github_link: project.github_link || '',
       technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
       status: project.status
     });
@@ -461,7 +466,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e]">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e]' : 'bg-gradient-to-br from-gray-100 via-white to-gray-200'}`}>
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
@@ -664,6 +669,20 @@ export default function AdminPage() {
                   </div>
                   
                   <div>
+                    <label className="block mb-2 font-semibold text-gray-300 flex items-center gap-2">
+                      <Github size={16} className="text-primary" />
+                      Link de GitHub (opcional)
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.github_link}
+                      onChange={(e) => setFormData({ ...formData, github_link: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#0f1419] border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-white placeholder-gray-500"
+                      placeholder="https://github.com/username/repo"
+                    />
+                  </div>
+                  
+                  <div>
                     <label className="block mb-2 font-semibold text-gray-300">Tecnologías</label>
                     <input
                       type="text"
@@ -792,7 +811,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setFormData({ title: '', description: '', link: '', technologies: '', status: 'completed' });
+                          setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed' });
                           setImageUrls([]);
                           setEditingId(null);
                         }}
