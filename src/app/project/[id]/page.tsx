@@ -8,6 +8,12 @@ import { useSession } from 'next-auth/react';
 import { ArrowLeft, ExternalLink, Github, Edit2, Save, X, Plus, Trash2, Upload, Globe, FolderOpen, Sun, Moon, ChevronDown, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface Project {
   id: number;
@@ -44,6 +50,7 @@ export default function ProjectPage() {
   // New states for UI enhancements
   const [activeRoleTab, setActiveRoleTab] = useState(0);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [authView, setAuthView] = useState<'login' | 'register'>('login');
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -102,7 +109,38 @@ export default function ProjectPage() {
         return section;
       }));
 
-      const contentStructure = { sections: updatedSections };
+      // Handle new images for roles
+      const updatedSectionsWithRoles = await Promise.all(updatedSections.map(async section => {
+        if (section.type === 'roles' && section.roles) {
+          const updatedRoles = await Promise.all(section.roles.map(async (role: any) => {
+            if (role.newImages && role.newImages.length > 0) {
+              const uploadedUrls = [];
+              for (const file of role.newImages) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                const { error } = await supabase.storage
+                  .from('portfolio-images')
+                  .upload(fileName, file);
+                if (error) throw error;
+                const { data: { publicUrl } } = supabase.storage
+                  .from('portfolio-images')
+                  .getPublicUrl(fileName);
+                uploadedUrls.push(publicUrl);
+              }
+              return {
+                ...role,
+                images: [...(role.images || []), ...uploadedUrls],
+                newImages: undefined
+              };
+            }
+            return role;
+          }));
+          return { ...section, roles: updatedRoles };
+        }
+        return section;
+      }));
+
+      const contentStructure = { sections: await Promise.all(updatedSectionsWithRoles) };
 
       const response = await fetch('/api/projects', {
         method: 'PUT',
@@ -433,8 +471,8 @@ export default function ProjectPage() {
       )}
 
       {/* Hero Section */}
-      <div className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center pt-64 pb-48">
-        <img src={project.images?.[0]?.image} alt={project.title} className="absolute inset-0 object-cover opacity-40 blur-sm" />
+      <div className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center pt-64 pb-48" style={{ backgroundImage: `url(${project.images?.[0]?.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        <div className="absolute inset-0 backdrop-blur-sm bg-black/40"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
         <div className="relative z-10 text-center max-w-7xl mx-auto px-4">
           <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-primary mb-8 font-medium">
@@ -562,63 +600,62 @@ export default function ProjectPage() {
                           </p>
                         )}
                       </div>
-                      <div className="lg:col-span-7">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
-                          {(section.images || []).map((image: string, imgIndex: number) => {
-                            if (imgIndex === 0) {
-                              return (
-                                <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                  <img
-                                    src={image}
-                                    alt={`Landing ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            } else {
-                              return (
-                                <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                  <img
-                                    src={image}
-                                    alt={`Landing ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            }
-                          })}
-                          {isEditing && (
-                            <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-                              <input
-                                type="file"
-                                multiple
-                                onChange={(e) => addImageToSection(index, e.target.files!)}
-                                className="hidden"
-                                id={`landing-upload-${index}`}
+                      <div className="lg:col-span-7 overflow-hidden py-10">
+                        <Swiper
+                          effect={'coverflow'}
+                          grabCursor={true}
+                          centeredSlides={true}
+                          slidesPerView={'auto'}
+                          loop={true}
+                          autoplay={{
+                            delay: 2500,
+                            disableOnInteraction: false,
+                          }}
+                          coverflowEffect={{
+                            rotate: 50,
+                            stretch: 0,
+                            depth: 100,
+                            modifier: 1,
+                            slideShadows: true,
+                          }}
+                          pagination={true}
+                          modules={[EffectCoverflow, Pagination, Autoplay]}
+                          className="w-full pt-10 pb-10"
+                        >
+                          {(section.images || []).map((image: string, imgIndex: number) => (
+                            <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                              <img 
+                                src={image} 
+                                alt={`Slide ${imgIndex}`} 
+                                className="block w-full h-full object-cover cursor-pointer"
+                                onClick={() => setLightboxImage(image)}
                               />
-                              <label htmlFor={`landing-upload-${index}`} className="cursor-pointer text-center">
-                                <Plus size={32} className="text-primary mx-auto mb-2" />
-                                <span className="text-sm text-primary">Agregar Imágenes</span>
-                              </label>
-                            </div>
-                          )}
-                        </div>
+                              {isEditing && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </SwiperSlide>
+                          ))}
+                        </Swiper>
+                        {isEditing && (
+                          <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center mt-6">
+                            <input
+                              type="file"
+                              multiple
+                              onChange={(e) => addImageToSection(index, e.target.files!)}
+                              className="hidden"
+                              id={`landing-upload-${index}`}
+                            />
+                            <label htmlFor={`landing-upload-${index}`} className="cursor-pointer text-center">
+                              <Plus size={32} className="text-primary mx-auto mb-2" />
+                              <span className="text-sm text-primary">Agregar Imágenes</span>
+                            </label>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -631,63 +668,62 @@ export default function ProjectPage() {
                   <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Paneles</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
-                      <div className="lg:col-span-7">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
-                          {(section.images || []).map((image: string, imgIndex: number) => {
-                            if (imgIndex === 0) {
-                              return (
-                                <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                  <img
-                                    src={image}
-                                    alt={`Paneles ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            } else {
-                              return (
-                                <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                  <img
-                                    src={image}
-                                    alt={`Paneles ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            }
-                          })}
-                          {isEditing && (
-                            <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-                              <input
-                                type="file"
-                                multiple
-                                onChange={(e) => addImageToSection(index, e.target.files!)}
-                                className="hidden"
-                                id={`paneles-upload-${index}`}
+                      <div className="lg:col-span-7 overflow-hidden py-10">
+                        <Swiper
+                          effect={'coverflow'}
+                          grabCursor={true}
+                          centeredSlides={true}
+                          slidesPerView={'auto'}
+                          loop={true}
+                          autoplay={{
+                            delay: 2500,
+                            disableOnInteraction: false,
+                          }}
+                          coverflowEffect={{
+                            rotate: 50,
+                            stretch: 0,
+                            depth: 100,
+                            modifier: 1,
+                            slideShadows: true,
+                          }}
+                          pagination={true}
+                          modules={[EffectCoverflow, Pagination, Autoplay]}
+                          className="w-full pt-10 pb-10"
+                        >
+                          {(section.images || []).map((image: string, imgIndex: number) => (
+                            <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                              <img 
+                                src={image} 
+                                alt={`Slide ${imgIndex}`} 
+                                className="block w-full h-full object-cover cursor-pointer"
+                                onClick={() => setLightboxImage(image)}
                               />
-                              <label htmlFor={`paneles-upload-${index}`} className="cursor-pointer text-center">
-                                <Plus size={32} className="text-primary mx-auto mb-2" />
-                                <span className="text-sm text-primary">Agregar Imágenes</span>
-                              </label>
-                            </div>
-                          )}
-                        </div>
+                              {isEditing && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </SwiperSlide>
+                          ))}
+                        </Swiper>
+                        {isEditing && (
+                          <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center mt-6">
+                            <input
+                              type="file"
+                              multiple
+                              onChange={(e) => addImageToSection(index, e.target.files!)}
+                              className="hidden"
+                              id={`paneles-upload-${index}`}
+                            />
+                            <label htmlFor={`paneles-upload-${index}`} className="cursor-pointer text-center">
+                              <Plus size={32} className="text-primary mx-auto mb-2" />
+                              <span className="text-sm text-primary">Agregar Imágenes</span>
+                            </label>
+                          </div>
+                        )}
                       </div>
                       <div className="lg:col-span-5 prose prose-invert prose-lg">
                         {isEditing ? (
@@ -715,7 +751,7 @@ export default function ProjectPage() {
                   <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Roles</h2>
                     <div className="flex space-x-2 bg-white/5 p-1 rounded-xl backdrop-blur-sm w-fit mx-auto mb-8">
-                      {(section.roles || []).map((role, i) => (
+                      {(section.roles || []).map((role: any, i: number) => (
                         <button
                           key={i}
                           onClick={() => setActiveRoleTab(i)}
@@ -748,63 +784,62 @@ export default function ProjectPage() {
                               </p>
                             )}
                           </div>
-                          <div className="lg:col-span-7">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
-                              {(section.roles[activeRoleTab].images || []).map((image: string, imgIndex: number) => {
-                                if (imgIndex === 0) {
-                                  return (
-                                    <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                      <img
-                                        src={image}
-                                        alt={`${section.roles[activeRoleTab].name} ${imgIndex + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                      />
-                                      {isEditing && (
-                                        <button
-                                          onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
-                                          className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                          <Trash2 size={16} />
-                                        </button>
-                                      )}
-                                    </div>
-                                  );
-                                } else {
-                                  return (
-                                    <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                      <img
-                                        src={image}
-                                        alt={`${section.roles[activeRoleTab].name} ${imgIndex + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                      />
-                                      {isEditing && (
-                                        <button
-                                          onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
-                                          className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                          <Trash2 size={16} />
-                                        </button>
-                                      )}
-                                    </div>
-                                  );
-                                }
-                              })}
-                              {isEditing && (
-                                <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-                                  <input
-                                    type="file"
-                                    multiple
-                                    onChange={(e) => { const files = Array.from(e.target.files!); updateRole(activeRoleTab, { images: [...(section.roles[activeRoleTab].images || []), ...files.map(f => URL.createObjectURL(f))] }); }}
-                                    className="hidden"
-                                    id={`role-upload-${activeRoleTab}`}
+                          <div className="lg:col-span-7 overflow-hidden py-10">
+                            <Swiper
+                              effect={'coverflow'}
+                              grabCursor={true}
+                              centeredSlides={true}
+                              slidesPerView={'auto'}
+                              loop={true}
+                              autoplay={{
+                                delay: 2500,
+                                disableOnInteraction: false,
+                              }}
+                              coverflowEffect={{
+                                rotate: 50,
+                                stretch: 0,
+                                depth: 100,
+                                modifier: 1,
+                                slideShadows: true,
+                              }}
+                              pagination={true}
+                              modules={[EffectCoverflow, Pagination, Autoplay]}
+                              className="w-full pt-10 pb-10"
+                            >
+                              {(section.roles[activeRoleTab].images || []).map((image: string, imgIndex: number) => (
+                                <SwiperSlide key={imgIndex} className="w-[600px] h-[200px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                                  <img 
+                                    src={image} 
+                                    alt={`Slide ${imgIndex}`} 
+                                    className="block w-full h-full object-cover cursor-pointer"
+                                    onClick={() => setLightboxImage(image)}
                                   />
-                                  <label htmlFor={`role-upload-${activeRoleTab}`} className="cursor-pointer text-center">
-                                    <Plus size={32} className="text-primary mx-auto mb-2" />
-                                    <span className="text-sm text-primary">Agregar Imágenes</span>
-                                  </label>
-                                </div>
-                              )}
-                            </div>
+                                  {isEditing && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </SwiperSlide>
+                              ))}
+                            </Swiper>
+                            {isEditing && (
+                              <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center mt-6">
+                                <input
+                                  type="file"
+                                  multiple
+                                  onChange={(e) => updateRole(activeRoleTab, { newImages: [...(section.roles[activeRoleTab].newImages || []), ...Array.from(e.target.files!)] })}
+                                  className="hidden"
+                                  id={`role-upload-${activeRoleTab}`}
+                                />
+                                <label htmlFor={`role-upload-${activeRoleTab}`} className="cursor-pointer text-center">
+                                  <Plus size={32} className="text-primary mx-auto mb-2" />
+                                  <span className="text-sm text-primary">Agregar Imágenes</span>
+                                </label>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -831,61 +866,53 @@ export default function ProjectPage() {
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Autenticación</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
                       <div className="lg:col-span-7">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
-                          {(section.images || []).map((image: string, imgIndex: number) => {
-                            if (imgIndex === 0) {
-                              return (
-                                <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                  <img
-                                    src={image}
-                                    alt={`Auth ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
+                        <div className="flex flex-col items-center">
+                          {/* El Switch */}
+                          <div className="flex bg-white/10 p-1 rounded-full mb-8 backdrop-blur-md">
+                            <button
+                              onClick={() => setAuthView('login')}
+                              className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${authView === 'login' ? 'bg-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                            >
+                              Iniciar Sesión
+                            </button>
+                            <button
+                              onClick={() => setAuthView('register')}
+                              className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${authView === 'register' ? 'bg-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                            >
+                              Registrarse
+                            </button>
+                          </div>
+
+                          {/* El Contenido Animado */}
+                          <div className="w-full max-w-4xl h-[400px] relative overflow-hidden rounded-2xl bg-gray-900 border border-white/10 shadow-2xl">
+                            <AnimatePresence mode="wait">
+                              <motion.div
+                                key={authView}
+                                initial={{ x: authView === 'login' ? -50 : 50, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: authView === 'login' ? 50 : -50, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="absolute inset-0"
+                              >
+                                {/* Lógica para mostrar imagen 0 si es login, imagen 1 si es registro */}
+                                <img 
+                                  src={(section.images || [])[authView === 'login' ? 0 : 1] || '/placeholder.jpg'} 
+                                  className="w-full h-full object-cover"
+                                />
+                                {/* Overlay con texto descriptivo */}
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
+                                  <h3 className="text-2xl font-bold text-white mb-2">
+                                    {authView === 'login' ? 'Acceso Seguro' : 'Registro de Usuarios'}
+                                  </h3>
+                                  <p className="text-gray-300">
+                                    {authView === 'login' 
+                                      ? 'Autenticación mediante credenciales encriptadas o proveedores sociales (OAuth).' 
+                                      : 'Formulario de registro con validación en tiempo real y verificación de correo.'}
+                                  </p>
                                 </div>
-                              );
-                            } else {
-                              return (
-                                <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
-                                  <img
-                                    src={image}
-                                    alt={`Auth ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            }
-                          })}
-                          {isEditing && (
-                            <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-                              <input
-                                type="file"
-                                multiple
-                                onChange={(e) => addImageToSection(index, e.target.files!)}
-                                className="hidden"
-                                id={`auth-upload-${index}`}
-                              />
-                              <label htmlFor={`auth-upload-${index}`} className="cursor-pointer text-center">
-                                <Plus size={32} className="text-primary mx-auto mb-2" />
-                                <span className="text-sm text-primary">Agregar Imágenes</span>
-                              </label>
-                            </div>
-                          )}
+                              </motion.div>
+                            </AnimatePresence>
+                          </div>
                         </div>
                       </div>
                       <div className="lg:col-span-5 prose prose-invert prose-lg">

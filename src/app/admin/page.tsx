@@ -118,16 +118,6 @@ export default function AdminPage() {
     }
   }, [status, router]);
 
-  // Set Supabase auth session when NextAuth session is available
-  useEffect(() => {
-    if (session?.accessToken && session?.refreshToken) {
-      supabase.auth.setSession({
-        access_token: session.accessToken,
-        refresh_token: session.refreshToken
-      });
-    }
-  }, [session]);
-
   // Load data function
   const loadData = async () => {
     setLoading(true);
@@ -391,8 +381,9 @@ export default function AdminPage() {
       alert('✅ Proyecto guardado exitosamente!');
     } catch (error) {
       console.error('Error saving project:', error);
-      console.error('Error message:', error?.message);
-      console.error('Error details:', error?.details);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+      }
       console.error('Full error object:', JSON.stringify(error, null, 2));
       alert('❌ Error al guardar el proyecto. Revisa la consola para más detalles.');
     }
