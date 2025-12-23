@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession } from 'next-auth/react';
-import { ArrowLeft, ExternalLink, Github, Code, Database, Smartphone, Users, Shield, Edit2, Save, X, Plus, Trash2, Upload } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Github, Edit2, Save, X, Plus, Trash2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 
@@ -39,6 +39,10 @@ export default function ProjectPage() {
   const [editLink, setEditLink] = useState('');
   const [editGithubLink, setEditGithubLink] = useState('');
   const [editSections, setEditSections] = useState<any[]>([]);
+
+  // New states for UI enhancements
+  const [activeRoleTab, setActiveRoleTab] = useState(0);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -281,9 +285,10 @@ export default function ProjectPage() {
       )}
 
       {/* Header */}
-      <div className={`border-b ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-gray-200 bg-white'} py-16`}>
-        <div className="max-w-7xl mx-auto px-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-primary hover:text-secondary mb-8 font-medium">
+      <div className="relative min-h-screen flex items-center justify-center" style={{ backgroundImage: `url(${project.images?.[0]?.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div className="relative z-10 text-center max-w-7xl mx-auto px-4">
+          <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-primary mb-8 font-medium">
             <ArrowLeft size={20} />
             Volver al inicio
           </Link>
@@ -295,13 +300,13 @@ export default function ProjectPage() {
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className={`w-full px-4 py-3 mb-4 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-center text-5xl font-bold`}
+                  className="w-full px-4 py-3 mb-4 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-6xl font-bold"
                   placeholder="Título del proyecto"
                 />
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className={`w-full px-4 py-3 mb-6 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-center text-xl`}
+                  className="w-full px-4 py-3 mb-6 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-xl"
                   rows={3}
                   placeholder="Descripción del proyecto"
                 />
@@ -309,12 +314,12 @@ export default function ProjectPage() {
                   type="text"
                   value={editTechnologies}
                   onChange={(e) => setEditTechnologies(e.target.value)}
-                  className={`w-full px-4 py-3 mb-8 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-center`}
+                  className="w-full px-4 py-3 mb-8 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center"
                   placeholder="Tecnologías separadas por coma"
                 />
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
                   {editTechnologies.split(',').map((tech, i) => (
-                    <span key={i} className="bg-primary/10 text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-medium">
+                    <span key={i} className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-medium">
                       {tech.trim()}
                     </span>
                   ))}
@@ -324,29 +329,29 @@ export default function ProjectPage() {
                     type="url"
                     value={editLink}
                     onChange={(e) => setEditLink(e.target.value)}
-                    className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300`}
+                    className="px-4 py-2 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300"
                     placeholder="Enlace del proyecto"
                   />
                   <input
                     type="url"
                     value={editGithubLink}
                     onChange={(e) => setEditGithubLink(e.target.value)}
-                    className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300`}
+                    className="px-4 py-2 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300"
                     placeholder="Enlace de GitHub"
                   />
                 </div>
               </>
             ) : (
               <>
-                <h1 className={`text-5xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                <h1 className="text-6xl font-bold mb-4 text-white">
                   {project.title}
                 </h1>
-                <p className={`text-xl mb-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto`}>
+                <p className="text-xl mb-6 text-gray-200 max-w-3xl mx-auto">
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
                   {project.technologies.map((tech, i) => (
-                    <span key={i} className="bg-primary/10 text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-medium">
+                    <span key={i} className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-medium">
                       {tech}
                     </span>
                   ))}
@@ -363,7 +368,7 @@ export default function ProjectPage() {
                     className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-xl font-bold hover:shadow-lg transition-all"
                   >
                     <ExternalLink size={20} />
-                    Ver Proyecto
+                    Ver Demo
                   </a>
                 )}
                 {project.github_link && (
@@ -371,10 +376,10 @@ export default function ProjectPage() {
                     href={project.github_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-primary/10 text-primary border border-primary/30 px-8 py-4 rounded-xl hover:bg-primary/20 transition-all"
+                    className="flex items-center gap-2 bg-white/10 text-white border border-white/30 px-8 py-4 rounded-xl hover:bg-white/20 transition-all"
                   >
                     <Github size={20} />
-                    Ver Código
+                    GitHub
                   </a>
                 )}
               </div>
@@ -384,18 +389,16 @@ export default function ProjectPage() {
       </div>
 
       {/* Sections */}
-      <div className="py-16">
+      <div>
         {sections.map((section: any, index: number) => {
           switch (section.type) {
             case 'landing':
               return (
-                <section key={index} className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-gray-100'}`}>
-                  <div className="max-w-7xl mx-auto">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                      <div>
-                        <h2 className={`text-4xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Sección de Introducción
-                        </h2>
+                <section key={index} className="bg-[#0f172a] py-20">
+                  <div className="max-w-7xl mx-auto px-4">
+                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Landing</h2>
+                    <div className="grid lg:grid-cols-5 gap-12 items-start">
+                      <div className="lg:col-span-2 sticky top-8">
                         {isEditing ? (
                           <textarea
                             value={section.text || ''}
@@ -410,39 +413,80 @@ export default function ProjectPage() {
                           </p>
                         )}
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        {(section.images || []).map((image: string, imgIndex: number) => (
-                          <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group">
-                            <img
-                              src={image}
-                              alt={`Introducción ${imgIndex + 1}`}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                            {isEditing && (
-                              <button
-                                onClick={() => removeImageFromSection(index, imgIndex)}
-                                className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                        {isEditing && (
-                          <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-                            <input
-                              type="file"
-                              multiple
-                              onChange={(e) => addImageToSection(index, e.target.files!)}
-                              className="hidden"
-                              id={`landing-upload-${index}`}
-                            />
-                            <label htmlFor={`landing-upload-${index}`} className="cursor-pointer text-center">
-                              <Plus size={32} className="text-primary mx-auto mb-2" />
-                              <span className="text-sm text-primary">Agregar Imágenes</span>
-                            </label>
-                          </div>
-                        )}
+                      <div className="lg:col-span-3">
+                        <div className="grid grid-cols-3 gap-4">
+                          {(section.images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                            if (imgIndex === 0) {
+                              return (
+                                <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                  <img
+                                    src={image}
+                                    alt={`Landing ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                  {isEditing && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                  <img
+                                    src={image}
+                                    alt={`Landing ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                  {isEditing && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            }
+                          })}
+                          {(section.images || []).slice(3).map((image: string, imgIndex: number) => (
+                            <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                              <img
+                                src={image}
+                                alt={`Landing ${imgIndex + 4}`}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                              {isEditing && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex + 3); }}
+                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          {isEditing && (
+                            <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
+                              <input
+                                type="file"
+                                multiple
+                                onChange={(e) => addImageToSection(index, e.target.files!)}
+                                className="hidden"
+                                id={`landing-upload-${index}`}
+                              />
+                              <label htmlFor={`landing-upload-${index}`} className="cursor-pointer text-center">
+                                <Plus size={32} className="text-primary mx-auto mb-2" />
+                                <span className="text-sm text-primary">Agregar Imágenes</span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -451,59 +495,100 @@ export default function ProjectPage() {
 
             case 'paneles':
               return (
-                <section key={index} className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'}`}>
-                  <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                      <h2 className={`text-4xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Sección de Galería
-                      </h2>
-                      {isEditing ? (
-                        <textarea
-                          value={section.text || ''}
-                          onChange={(e) => updateSection(index, { text: e.target.value })}
-                          className={`w-full px-4 py-3 max-w-3xl mx-auto ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-xl`}
-                          rows={4}
-                          placeholder="Describe la galería o paneles del proyecto..."
-                        />
-                      ) : (
-                        <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto`}>
-                          {section.text}
-                        </p>
-                      )}
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-8">
-                      {(section.images || []).map((image: string, imgIndex: number) => (
-                        <div key={imgIndex} className="aspect-video rounded-xl overflow-hidden shadow-lg relative group">
-                          <img
-                            src={image}
-                            alt={`Panel ${imgIndex + 1}`}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          />
+                <section key={index} className="bg-[#1e293b] py-20">
+                  <div className="max-w-7xl mx-auto px-4">
+                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Paneles</h2>
+                    <div className="grid lg:grid-cols-5 gap-12 items-start">
+                      <div className="lg:col-span-3">
+                        <div className="grid grid-cols-3 gap-4">
+                          {(section.images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                            if (imgIndex === 0) {
+                              return (
+                                <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                  <img
+                                    src={image}
+                                    alt={`Paneles ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                  {isEditing && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                  <img
+                                    src={image}
+                                    alt={`Paneles ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                  {isEditing && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            }
+                          })}
+                          {(section.images || []).slice(3).map((image: string, imgIndex: number) => (
+                            <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                              <img
+                                src={image}
+                                alt={`Paneles ${imgIndex + 4}`}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                              {isEditing && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex + 3); }}
+                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
                           {isEditing && (
-                            <button
-                              onClick={() => removeImageFromSection(index, imgIndex)}
-                              className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
+                              <input
+                                type="file"
+                                multiple
+                                onChange={(e) => addImageToSection(index, e.target.files!)}
+                                className="hidden"
+                                id={`paneles-upload-${index}`}
+                              />
+                              <label htmlFor={`paneles-upload-${index}`} className="cursor-pointer text-center">
+                                <Plus size={32} className="text-primary mx-auto mb-2" />
+                                <span className="text-sm text-primary">Agregar Imágenes</span>
+                              </label>
+                            </div>
                           )}
                         </div>
-                      ))}
-                      {isEditing && (
-                        <div className="aspect-video rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-                          <input
-                            type="file"
-                            multiple
-                            onChange={(e) => addImageToSection(index, e.target.files!)}
-                            className="hidden"
-                            id={`paneles-upload-${index}`}
+                      </div>
+                      <div className="lg:col-span-2 sticky top-8">
+                        {isEditing ? (
+                          <textarea
+                            value={section.text || ''}
+                            onChange={(e) => updateSection(index, { text: e.target.value })}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                            rows={6}
+                            placeholder="Describe la galería o paneles del proyecto..."
                           />
-                          <label htmlFor={`paneles-upload-${index}`} className="cursor-pointer text-center">
-                            <Plus size={32} className="text-primary mx-auto mb-2" />
-                            <span className="text-sm text-primary">Agregar Imágenes</span>
-                          </label>
-                        </div>
-                      )}
+                        ) : (
+                          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+                            {section.text}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </section>
@@ -511,127 +596,135 @@ export default function ProjectPage() {
 
             case 'roles':
               return (
-                <section key={index} className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-gray-100'}`}>
-                  <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                      <h2 className={`text-4xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        Sección de Roles y Responsabilidades
-                      </h2>
-                      {isEditing && (
-                        <button
-                          onClick={addRole}
-                          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors mb-8"
-                        >
-                          <Plus size={16} />
-                          Agregar Rol
+                <section key={index} className="bg-[#0f172a] py-20">
+                  <div className="max-w-7xl mx-auto px-4">
+                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Roles</h2>
+                    <div className="flex justify-center mb-8">
+                      {(section.roles || []).map((role, i) => (
+                        <button key={i} onClick={() => setActiveRoleTab(i)} className={`px-6 py-3 mx-2 rounded-lg font-medium transition-all ${activeRoleTab === i ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
+                          {role.name}
                         </button>
-                      )}
+                      ))}
                     </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {(section.roles || []).map((role: any, roleIndex: number) => (
-                        <div key={roleIndex} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-gray-200 bg-white'} shadow-lg hover:shadow-xl transition-all duration-300 relative`}>
-                          {isEditing && (
-                            <button
-                              onClick={() => removeRole(roleIndex)}
-                              className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          )}
-                          <div className="flex items-center gap-4 mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                              <Users size={24} className="text-primary" />
-                            </div>
+                    {section.roles && section.roles[activeRoleTab] && (
+                      <div className="animate-fade-in">
+                        <div className="grid lg:grid-cols-5 gap-12 items-start">
+                          <div className="lg:col-span-2 sticky top-8">
+                            <h3 className="text-2xl font-bold mb-4 text-white">{section.roles[activeRoleTab].name}</h3>
                             {isEditing ? (
-                              <input
-                                type="text"
-                                value={role.name || ''}
-                                onChange={(e) => updateRole(roleIndex, { name: e.target.value })}
-                                className={`flex-1 px-2 py-1 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded focus:outline-none focus:border-primary transition-all duration-300 text-xl font-bold`}
-                                placeholder="Nombre del rol"
+                              <textarea
+                                value={section.roles[activeRoleTab].description || ''}
+                                onChange={(e) => updateRole(activeRoleTab, { description: e.target.value })}
+                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                                rows={6}
+                                placeholder="Descripción del rol"
                               />
                             ) : (
-                              <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                {role.name}
-                              </h3>
+                              <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+                                {section.roles[activeRoleTab].description}
+                              </p>
                             )}
                           </div>
-                          {isEditing ? (
-                            <textarea
-                              value={role.description || ''}
-                              onChange={(e) => updateRole(roleIndex, { description: e.target.value })}
-                              className={`w-full px-2 py-1 mb-4 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded focus:outline-none focus:border-primary transition-all duration-300`}
-                              rows={3}
-                              placeholder="Descripción del rol"
-                            />
-                          ) : (
-                            <p className={`mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                              {role.description}
-                            </p>
-                          )}
-                          {role.images && role.images.length > 0 && (
-                            <div className="grid grid-cols-2 gap-2">
-                              {role.images.map((image: string, imgIndex: number) => (
-                                <div key={imgIndex} className="aspect-square rounded-lg overflow-hidden relative group">
+                          <div className="lg:col-span-3">
+                            <div className="grid grid-cols-3 gap-4">
+                              {(section.roles[activeRoleTab].images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                                if (imgIndex === 0) {
+                                  return (
+                                    <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                      <img
+                                        src={image}
+                                        alt={`${section.roles[activeRoleTab].name} ${imgIndex + 1}`}
+                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                      />
+                                      {isEditing && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
+                                          className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <Trash2 size={16} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  );
+                                } else {
+                                  return (
+                                    <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                      <img
+                                        src={image}
+                                        alt={`${section.roles[activeRoleTab].name} ${imgIndex + 1}`}
+                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                      />
+                                      {isEditing && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
+                                          className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <Trash2 size={16} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  );
+                                }
+                              })}
+                              {(section.roles[activeRoleTab].images || []).slice(3).map((image: string, imgIndex: number) => (
+                                <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
                                   <img
                                     src={image}
-                                    alt={`${role.name} ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    alt={`${section.roles[activeRoleTab].name} ${imgIndex + 4}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                   />
                                   {isEditing && (
                                     <button
-                                      onClick={() => {
-                                        const rolesSection = editSections.find(s => s.type === 'roles');
-                                        if (rolesSection) {
-                                          const sectionIndex = editSections.indexOf(rolesSection);
-                                          const roles = rolesSection.roles || [];
-                                          const updatedRoles = roles.map((r: any, i: number) => i === roleIndex ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex) } : r);
-                                          updateSection(sectionIndex, { roles: updatedRoles });
-                                        }
-                                      }}
-                                      className="absolute top-1 right-1 p-1 rounded bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                      onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex + 3) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
-                                      <Trash2 size={12} />
+                                      <Trash2 size={16} />
                                     </button>
                                   )}
                                 </div>
                               ))}
+                              {isEditing && (
+                                <div className="mt-4">
+                                  <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => { const files = Array.from(e.target.files!); updateRole(activeRoleTab, { images: [...(section.roles[activeRoleTab].images || []), ...files.map(f => URL.createObjectURL(f))] }); }}
+                                    className="hidden"
+                                    id={`role-upload-${activeRoleTab}`}
+                                  />
+                                  <label htmlFor={`role-upload-${activeRoleTab}`} className="cursor-pointer flex items-center gap-2 text-primary hover:text-primary/80">
+                                    <Upload size={16} />
+                                    Agregar Imágenes
+                                  </label>
+                                </div>
+                              )}
                             </div>
-                          )}
-                          {isEditing && (
-                            <div className="mt-4">
-                              <input
-                                type="file"
-                                multiple
-                                onChange={(e) => {
-                                  const files = Array.from(e.target.files!);
-                                  updateRole(roleIndex, { images: [...(role.images || []), ...files.map(f => URL.createObjectURL(f))] });
-                                }}
-                                className="hidden"
-                                id={`role-upload-${roleIndex}`}
-                              />
-                              <label htmlFor={`role-upload-${roleIndex}`} className="cursor-pointer flex items-center gap-2 text-primary hover:text-primary/80">
-                                <Upload size={16} />
-                                Agregar Imágenes
-                              </label>
-                            </div>
-                          )}
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
+                    {isEditing && (
+                      <div className="text-center mt-8">
+                        <button
+                          onClick={addRole}
+                          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors"
+                        >
+                          <Plus size={16} />
+                          Agregar Rol
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </section>
               );
 
             case 'auth':
               return (
-                <section key={index} className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'}`}>
-                  <div className="max-w-7xl mx-auto">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                      <div>
-                        <h2 className={`text-4xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          Sección de Autenticación y Seguridad
-                        </h2>
+                <section key={index} className="bg-[#1e293b] py-20">
+                  <div className="max-w-7xl mx-auto px-4">
+                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Autenticación</h2>
+                    <div className="grid lg:grid-cols-5 gap-12 items-start">
+                      <div className="lg:col-span-2 sticky top-8">
                         {isEditing ? (
                           <textarea
                             value={section.text || ''}
@@ -646,39 +739,80 @@ export default function ProjectPage() {
                           </p>
                         )}
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        {(section.images || []).map((image: string, imgIndex: number) => (
-                          <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group">
-                            <img
-                              src={image}
-                              alt={`Auth ${imgIndex + 1}`}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                            {isEditing && (
-                              <button
-                                onClick={() => removeImageFromSection(index, imgIndex)}
-                                className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                        {isEditing && (
-                          <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-                            <input
-                              type="file"
-                              multiple
-                              onChange={(e) => addImageToSection(index, e.target.files!)}
-                              className="hidden"
-                              id={`auth-upload-${index}`}
-                            />
-                            <label htmlFor={`auth-upload-${index}`} className="cursor-pointer text-center">
-                              <Plus size={32} className="text-primary mx-auto mb-2" />
-                              <span className="text-sm text-primary">Agregar Imágenes</span>
-                            </label>
-                          </div>
-                        )}
+                      <div className="lg:col-span-3">
+                        <div className="grid grid-cols-3 gap-4">
+                          {(section.images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                            if (imgIndex === 0) {
+                              return (
+                                <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                  <img
+                                    src={image}
+                                    alt={`Auth ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                  {isEditing && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                  <img
+                                    src={image}
+                                    alt={`Auth ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                  {isEditing && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            }
+                          })}
+                          {(section.images || []).slice(3).map((image: string, imgIndex: number) => (
+                            <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                              <img
+                                src={image}
+                                alt={`Auth ${imgIndex + 4}`}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                              {isEditing && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex + 3); }}
+                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          {isEditing && (
+                            <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
+                              <input
+                                type="file"
+                                multiple
+                                onChange={(e) => addImageToSection(index, e.target.files!)}
+                                className="hidden"
+                                id={`auth-upload-${index}`}
+                              />
+                              <label htmlFor={`auth-upload-${index}`} className="cursor-pointer text-center">
+                                <Plus size={32} className="text-primary mx-auto mb-2" />
+                                <span className="text-sm text-primary">Agregar Imágenes</span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -690,6 +824,13 @@ export default function ProjectPage() {
           }
         })}
       </div>
+
+      {/* Lightbox */}
+      {lightboxImage && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setLightboxImage(null)}>
+          <img src={lightboxImage} className="max-w-full max-h-full object-contain" />
+        </div>
+      )}
     </div>
   );
 }
