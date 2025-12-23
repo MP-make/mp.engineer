@@ -77,86 +77,17 @@ export default function ProjectPage() {
   }
 
   if (!project.is_full_page || !project.content_structure?.sections) {
-    // Render standard project page
+    // Render coming soon message
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
         <Navbar />
-        <div className="pt-24 pb-16 px-4">
-          <div className="max-w-4xl mx-auto">
-            <Link href="/" className="inline-flex items-center gap-2 text-primary hover:text-secondary mb-8 font-medium">
-              <ArrowLeft size={20} />
-              Volver al inicio
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">Página Próximamente</h1>
+            <p className="text-lg mb-6">Esta página completa está en desarrollo. ¡Vuelve pronto!</p>
+            <Link href="/" className="text-primary hover:text-secondary font-medium">
+              ← Volver al inicio
             </Link>
-
-            <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} shadow-2xl mb-8`}>
-              {project.images && project.images.length > 0 && (
-                <div className="aspect-video relative overflow-hidden">
-                  <img
-                    src={project.images[0].image}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <div className="p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h1 className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {project.title}
-                  </h1>
-                  <div className={`px-4 py-2 rounded-full text-sm font-bold ${
-                    project.status === 'completed'
-                      ? 'bg-green-500/10 text-green-400 border border-green-500/30'
-                      : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'
-                  }`}>
-                    {project.status === 'completed' ? 'Completado' : 'En Progreso'}
-                  </div>
-                </div>
-
-                <p className={`text-lg mb-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                  {project.description}
-                </p>
-
-                <div className="mb-6">
-                  <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
-                    Tecnologías
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {project.technologies.map((tech, i) => (
-                      <span key={i} className="bg-primary/10 text-primary border border-primary/30 px-3 py-1 rounded-full text-sm font-medium">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {(project.link || project.github_link) && (
-                  <div className="flex gap-3">
-                    {project.link && (
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
-                      >
-                        <ExternalLink size={18} />
-                        Ver Proyecto
-                      </a>
-                    )}
-                    {project.github_link && (
-                      <a
-                        href={project.github_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 bg-primary/10 text-primary border border-primary/30 px-6 py-3 rounded-xl hover:bg-primary/20 transition-all"
-                      >
-                        <Github size={18} />
-                        Ver Código
-                      </a>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </div>

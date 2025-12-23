@@ -55,7 +55,7 @@ export default function AdminPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills' | 'hero'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills' | 'hero' | 'pages'>('projects');
 
   // Form states
   const [formData, setFormData] = useState({
@@ -445,7 +445,7 @@ export default function AdminPage() {
       }
     }
 
-    setActiveTab('projects');
+    setActiveTab(project.is_full_page ? 'pages' : 'projects');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -767,6 +767,7 @@ export default function AdminPage() {
         <div className={`flex flex-wrap gap-3 mb-8 p-2 ${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-white/50'} backdrop-blur-xl rounded-2xl border ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
           {[
             { id: 'projects', icon: FolderOpen, label: 'Proyectos', count: projects.length },
+            { id: 'pages', icon: FolderOpen, label: 'Páginas', count: projects.filter(p => p.is_full_page).length },
             { id: 'contacts', icon: MessageSquare, label: 'Mensajes', count: contacts.length },
             { id: 'skills', icon: Award, label: 'Habilidades', count: skills.length },
             { id: 'hero', icon: Home, label: 'Hero Images', count: heroImages.length }
@@ -960,410 +961,6 @@ export default function AdminPage() {
                     />
                     <label className={`font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>¿Es una página completa?</label>
                   </div>
-
-                  {formData.is_full_page && (
-                    <div className="border-t pt-6">
-                      <h3 className="text-lg font-semibold mb-4">Sección Landing</h3>
-                      <div className="mb-4">
-                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
-                        <textarea
-                          value={landingText}
-                          onChange={(e) => setLandingText(e.target.value)}
-                          rows={4}
-                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                          placeholder="Descripción de la sección landing"
-                        />
-                      </div>
-                      <div>
-                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
-                        {landingImages.length > 0 && <Carousel images={landingImages} />}
-                        <div className="space-y-3">
-                          {landingImages.map((url, index) => (
-                            <div key={index} className="flex items-center gap-3">
-                              <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
-                              <button
-                                type="button"
-                                onClick={() => setLandingImages(landingImages.filter((_, i) => i !== index))}
-                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                              >
-                                <Trash2 size={16} className="text-red-400" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-3 mt-3">
-                          <input
-                            type="url"
-                            value={landingNewImageUrl}
-                            onChange={(e) => setLandingNewImageUrl(e.target.value)}
-                            placeholder="https://ejemplo.com/imagen.jpg"
-                            className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (landingNewImageUrl.trim()) {
-                                setLandingImages([...landingImages, landingNewImageUrl.trim()]);
-                                setLandingNewImageUrl('');
-                              }
-                            }}
-                            className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
-                          >
-                            <Plus size={16} className="text-primary" />
-                          </button>
-                        </div>
-                        <input
-                          type="file"
-                          multiple
-                          onChange={(e) => {
-                            if (e.target.files) setLandingSelectedFiles(Array.from(e.target.files));
-                          }}
-                          className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                        />
-                        <div className="space-y-3 mt-3">
-                          {landingSelectedFiles.map((file, index) => (
-                            <div key={index} className="flex items-center gap-3">
-                              <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
-                              <button
-                                type="button"
-                                onClick={() => setLandingSelectedFiles(landingSelectedFiles.filter((_, i) => i !== index))}
-                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                              >
-                                <Trash2 size={16} className="text-red-400" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Sección Paneles */}
-                      <div className="border-t pt-6">
-                        <h3 className="text-lg font-semibold mb-4">Sección Paneles</h3>
-                        <div className="mb-4">
-                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
-                          <textarea
-                            value={panelesText}
-                            onChange={(e) => setPanelesText(e.target.value)}
-                            rows={4}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                            placeholder="Descripción de la sección paneles"
-                          />
-                        </div>
-                        <div>
-                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
-                          {panelesImages.length > 0 && <Carousel images={panelesImages} />}
-                          <div className="space-y-3">
-                            {panelesImages.map((url, index) => (
-                              <div key={index} className="flex items-center gap-3">
-                                <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
-                                <button
-                                  type="button"
-                                  onClick={() => setPanelesImages(panelesImages.filter((_, i) => i !== index))}
-                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                                >
-                                  <Trash2 size={16} className="text-red-400" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex items-center gap-3 mt-3">
-                            <input
-                              type="url"
-                              value={panelesNewImageUrl}
-                              onChange={(e) => setPanelesNewImageUrl(e.target.value)}
-                              placeholder="https://ejemplo.com/imagen.jpg"
-                              className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (panelesNewImageUrl.trim()) {
-                                  setPanelesImages([...panelesImages, panelesNewImageUrl.trim()]);
-                                  setPanelesNewImageUrl('');
-                                }
-                              }}
-                              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
-                            >
-                              <Plus size={16} className="text-primary" />
-                            </button>
-                          </div>
-                          <input
-                            type="file"
-                            multiple
-                            onChange={(e) => {
-                              if (e.target.files) setPanelesSelectedFiles(Array.from(e.target.files));
-                            }}
-                            className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                          />
-                          <div className="space-y-3 mt-3">
-                            {panelesSelectedFiles.map((file, index) => (
-                              <div key={index} className="flex items-center gap-3">
-                                <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => setPanelesSelectedFiles(panelesSelectedFiles.filter((_, i) => i !== index))}
-                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                                >
-                                  <Trash2 size={16} className="text-red-400" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Sección Roles */}
-                      <div className="border-t pt-6">
-                        <h3 className="text-lg font-semibold mb-4">Sección Roles</h3>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setRoles([...roles, { name: '', description: '', images: [] }]);
-                            setRolesNewImageUrls([...rolesNewImageUrls, '']);
-                            setRolesSelectedFiles([...rolesSelectedFiles, []]);
-                          }}
-                          className="px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium mb-4"
-                        >
-                          + Agregar Rol
-                        </button>
-                        {roles.map((role, roleIndex) => (
-                          <div key={roleIndex} className="border p-4 mb-4 rounded-xl">
-                            <div className="mb-4">
-                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Nombre Rol</label>
-                              <input
-                                type="text"
-                                value={role.name}
-                                onChange={(e) => {
-                                  const newRoles = [...roles];
-                                  newRoles[roleIndex].name = e.target.value;
-                                  setRoles(newRoles);
-                                }}
-                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                                placeholder="Nombre del rol"
-                              />
-                            </div>
-                            <div className="mb-4">
-                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
-                              <textarea
-                                value={role.description}
-                                onChange={(e) => {
-                                  const newRoles = [...roles];
-                                  newRoles[roleIndex].description = e.target.value;
-                                  setRoles(newRoles);
-                                }}
-                                rows={3}
-                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                                placeholder="Descripción del rol"
-                              />
-                            </div>
-                            <div>
-                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
-                              {role.images.length > 0 && <Carousel images={role.images} />}
-                              <div className="space-y-3">
-                                {role.images.map((url, imgIndex) => (
-                                  <div key={imgIndex} className="flex items-center gap-3">
-                                    <img src={url} alt={`Imagen ${imgIndex + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const newRoles = [...roles];
-                                        newRoles[roleIndex].images = newRoles[roleIndex].images.filter((_, i) => i !== imgIndex);
-                                        setRoles(newRoles);
-                                      }}
-                                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                                    >
-                                      <Trash2 size={16} className="text-red-400" />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                              <div className="flex items-center gap-3 mt-3">
-                                <input
-                                  type="url"
-                                  value={rolesNewImageUrls[roleIndex] || ''}
-                                  onChange={(e) => {
-                                    const newUrls = [...rolesNewImageUrls];
-                                    newUrls[roleIndex] = e.target.value;
-                                    setRolesNewImageUrls(newUrls);
-                                  }}
-                                  placeholder="https://ejemplo.com/imagen.jpg"
-                                  className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (rolesNewImageUrls[roleIndex]?.trim()) {
-                                      const newRoles = [...roles];
-                                      newRoles[roleIndex].images = [...newRoles[roleIndex].images, rolesNewImageUrls[roleIndex].trim()];
-                                      setRoles(newRoles);
-                                      const newUrls = [...rolesNewImageUrls];
-                                      newUrls[roleIndex] = '';
-                                      setRolesNewImageUrls(newUrls);
-                                    }
-                                  }}
-                                  className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
-                                >
-                                  <Plus size={16} className="text-primary" />
-                                </button>
-                              </div>
-                              <input
-                                type="file"
-                                multiple
-                                onChange={(e) => {
-                                  if (e.target.files) {
-                                    const newFiles = [...rolesSelectedFiles];
-                                    newFiles[roleIndex] = Array.from(e.target.files);
-                                    setRolesSelectedFiles(newFiles);
-                                  }
-                                }}
-                                className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                              />
-                              <div className="space-y-3 mt-3">
-                                {(rolesSelectedFiles[roleIndex] || []).map((file, fileIndex) => (
-                                  <div key={fileIndex} className="flex items-center gap-3">
-                                    <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const newFiles = [...rolesSelectedFiles];
-                                        newFiles[roleIndex] = newFiles[roleIndex].filter((_, i) => i !== fileIndex);
-                                        setRolesSelectedFiles(newFiles);
-                                      }}
-                                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                                    >
-                                      <Trash2 size={16} className="text-red-400" />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => setRoles(roles.filter((_, i) => i !== roleIndex))}
-                              className="mt-4 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300 text-red-400"
-                            >
-                              Eliminar Rol
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Sección Auth */}
-                      <div className="border-t pt-6">
-                        <h3 className="text-lg font-semibold mb-4">Sección Auth</h3>
-                        <div className="mb-4">
-                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
-                          <textarea
-                            value={authText}
-                            onChange={(e) => setAuthText(e.target.value)}
-                            rows={4}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                            placeholder="Descripción de la sección auth"
-                          />
-                        </div>
-                        <div>
-                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
-                          {authImages.length > 0 && <Carousel images={authImages} />}
-                          <div className="space-y-3">
-                            {authImages.map((url, index) => (
-                              <div key={index} className="flex items-center gap-3">
-                                <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
-                                <button
-                                  type="button"
-                                  onClick={() => setAuthImages(authImages.filter((_, i) => i !== index))}
-                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                                >
-                                  <Trash2 size={16} className="text-red-400" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex items-center gap-3 mt-3">
-                            <input
-                              type="url"
-                              value={authNewImageUrl}
-                              onChange={(e) => setAuthNewImageUrl(e.target.value)}
-                              placeholder="https://ejemplo.com/imagen.jpg"
-                              className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (authNewImageUrl.trim()) {
-                                  setAuthImages([...authImages, authNewImageUrl.trim()]);
-                                  setAuthNewImageUrl('');
-                                }
-                              }}
-                              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
-                            >
-                              <Plus size={16} className="text-primary" />
-                            </button>
-                          </div>
-                          <input
-                            type="file"
-                            multiple
-                            onChange={(e) => {
-                              if (e.target.files) setAuthSelectedFiles(Array.from(e.target.files));
-                            }}
-                            className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                          />
-                          <div className="space-y-3 mt-3">
-                            {authSelectedFiles.map((file, index) => (
-                              <div key={index} className="flex items-center gap-3">
-                                <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => setAuthSelectedFiles(authSelectedFiles.filter((_, i) => i !== index))}
-                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                                >
-                                  <Trash2 size={16} className="text-red-400" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Vista Previa */}
-                      <div className="border-t pt-6">
-                        <h3 className="text-lg font-semibold mb-4">Vista Previa</h3>
-                        <div className="space-y-6">
-                          {/* Landing Preview */}
-                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
-                            <h4 className="font-semibold mb-2">Landing</h4>
-                            <p className="mb-2">{landingText || 'Texto de ejemplo para la sección landing'}</p>
-                            <Carousel images={landingImages.length > 0 ? landingImages : ['https://via.placeholder.com/800x400?text=Landing+Image']} />
-                          </div>
-
-                          {/* Paneles Preview */}
-                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
-                            <h4 className="font-semibold mb-2">Paneles</h4>
-                            <p className="mb-2">{panelesText || 'Texto de ejemplo para la sección paneles'}</p>
-                            <Carousel images={panelesImages.length > 0 ? panelesImages : ['https://via.placeholder.com/800x400?text=Paneles+Image']} />
-                          </div>
-
-                          {/* Roles Preview */}
-                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
-                            <h4 className="font-semibold mb-2">Roles</h4>
-                            {roles.length > 0 ? roles.map((role, index) => (
-                              <div key={index} className="mb-4">
-                                <h5 className="font-medium">{role.name || 'Nombre del Rol'}</h5>
-                                <p className="mb-2">{role.description || 'Descripción del rol'}</p>
-                                <Carousel images={role.images.length > 0 ? role.images : ['https://via.placeholder.com/400x200?text=Role+Image']} />
-                              </div>
-                            )) : <p>No hay roles definidos</p>}
-                          </div>
-
-                          {/* Auth Preview */}
-                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
-                            <h4 className="font-semibold mb-2">Auth</h4>
-                            <p className="mb-2">{authText || 'Texto de ejemplo para la sección auth'}</p>
-                            <Carousel images={authImages.length > 0 ? authImages : ['https://via.placeholder.com/800x400?text=Auth+Image']} />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   <div className="flex items-center gap-3">
                     <button
@@ -1725,6 +1322,644 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Pages Tab */}
+        {activeTab === 'pages' && (
+          <div className="space-y-6">
+            {editingId && (
+              <div className="grid lg:grid-cols-5 gap-8 mb-8">
+                {/* Form */}
+                <div className="lg:col-span-2">
+                  <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl sticky top-32`}>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+                        <Edit2 size={20} className="text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold">Editar Página Completa</h2>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                          <Tag size={16} className="text-primary" />
+                          Título
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.title}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          placeholder="Nombre del proyecto"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                        <textarea
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          rows={4}
+                          placeholder="Describe tu proyecto..."
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                          <ExternalLink size={16} className="text-primary" />
+                          Link (opcional)
+                        </label>
+                        <input
+                          type="url"
+                          value={formData.link}
+                          onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          placeholder="https://ejemplo.com"
+                        />
+                      </div>
+
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                          <Github size={16} className="text-primary" />
+                          Link de GitHub (opcional)
+                        </label>
+                        <input
+                          type="url"
+                          value={formData.github_link}
+                          onChange={(e) => setFormData({ ...formData, github_link: e.target.value })}
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          placeholder="https://github.com/username/repo"
+                        />
+                      </div>
+
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tecnologías</label>
+                        <input
+                          type="text"
+                          value={formData.technologies}
+                          onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          placeholder="React, Node.js, PostgreSQL"
+                        />
+                      </div>
+
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Estado</label>
+                        <select
+                          value={formData.status}
+                          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                        >
+                          <option value="completed">Completado</option>
+                          <option value="in-progress">En Progreso</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes del Proyecto</label>
+                        {imageUrls.length > 0 && <Carousel images={imageUrls} />}
+                        <div className="space-y-3">
+                          {imageUrls.map((url, index) => (
+                            <div key={index} className="flex items-center gap-3">
+                              <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                              <button
+                                type="button"
+                                onClick={() => removeImageUrl(index)}
+                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                              >
+                                <Trash2 size={16} className="text-red-400" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-3 mt-3">
+                          <input
+                            type="url"
+                            value={newImageUrl}
+                            onChange={(e) => setNewImageUrl(e.target.value)}
+                            placeholder="https://ejemplo.com/imagen.jpg"
+                            className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={addImageUrl}
+                            className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                          >
+                            <Plus size={16} className="text-primary" />
+                          </button>
+                        </div>
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleFileSelect}
+                          className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                        />
+                        <div className="space-y-3 mt-3">
+                          {selectedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center gap-3">
+                              <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeSelectedFile(index)}
+                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                              >
+                                <Trash2 size={16} className="text-red-400" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Sección Landing */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Sección Landing</h3>
+                        <div className="mb-4">
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                          <textarea
+                            value={landingText}
+                            onChange={(e) => setLandingText(e.target.value)}
+                            rows={4}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            placeholder="Descripción de la sección landing"
+                          />
+                        </div>
+                        <div>
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                          {landingImages.length > 0 && <Carousel images={landingImages} />}
+                          <div className="space-y-3">
+                            {landingImages.map((url, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                                <button
+                                  type="button"
+                                  onClick={() => setLandingImages(landingImages.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-3 mt-3">
+                            <input
+                              type="url"
+                              value={landingNewImageUrl}
+                              onChange={(e) => setLandingNewImageUrl(e.target.value)}
+                              placeholder="https://ejemplo.com/imagen.jpg"
+                              className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (landingNewImageUrl.trim()) {
+                                  setLandingImages([...landingImages, landingNewImageUrl.trim()]);
+                                  setLandingNewImageUrl('');
+                                }
+                              }}
+                              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                            >
+                              <Plus size={16} className="text-primary" />
+                            </button>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            onChange={(e) => {
+                              if (e.target.files) setLandingSelectedFiles(Array.from(e.target.files));
+                            }}
+                            className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                          />
+                          <div className="space-y-3 mt-3">
+                            {landingSelectedFiles.map((file, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setLandingSelectedFiles(landingSelectedFiles.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sección Paneles */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Sección Paneles</h3>
+                        <div className="mb-4">
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                          <textarea
+                            value={panelesText}
+                            onChange={(e) => setPanelesText(e.target.value)}
+                            rows={4}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            placeholder="Descripción de la sección paneles"
+                          />
+                        </div>
+                        <div>
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                          {panelesImages.length > 0 && <Carousel images={panelesImages} />}
+                          <div className="space-y-3">
+                            {panelesImages.map((url, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                                <button
+                                  type="button"
+                                  onClick={() => setPanelesImages(panelesImages.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-3 mt-3">
+                            <input
+                              type="url"
+                              value={panelesNewImageUrl}
+                              onChange={(e) => setPanelesNewImageUrl(e.target.value)}
+                              placeholder="https://ejemplo.com/imagen.jpg"
+                              className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (panelesNewImageUrl.trim()) {
+                                  setPanelesImages([...panelesImages, panelesNewImageUrl.trim()]);
+                                  setPanelesNewImageUrl('');
+                                }
+                              }}
+                              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                            >
+                              <Plus size={16} className="text-primary" />
+                            </button>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            onChange={(e) => {
+                              if (e.target.files) setPanelesSelectedFiles(Array.from(e.target.files));
+                            }}
+                            className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                          />
+                          <div className="space-y-3 mt-3">
+                            {panelesSelectedFiles.map((file, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setPanelesSelectedFiles(panelesSelectedFiles.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sección Roles */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Sección Roles</h3>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRoles([...roles, { name: '', description: '', images: [] }]);
+                            setRolesNewImageUrls([...rolesNewImageUrls, '']);
+                            setRolesSelectedFiles([...rolesSelectedFiles, []]);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium mb-4"
+                        >
+                          + Agregar Rol
+                        </button>
+                        {roles.map((role, roleIndex) => (
+                          <div key={roleIndex} className="border p-4 mb-4 rounded-xl">
+                            <div className="mb-4">
+                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Nombre Rol</label>
+                              <input
+                                type="text"
+                                value={role.name}
+                                onChange={(e) => {
+                                  const newRoles = [...roles];
+                                  newRoles[roleIndex].name = e.target.value;
+                                  setRoles(newRoles);
+                                }}
+                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                                placeholder="Nombre del rol"
+                              />
+                            </div>
+                            <div className="mb-4">
+                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                              <textarea
+                                value={role.description}
+                                onChange={(e) => {
+                                  const newRoles = [...roles];
+                                  newRoles[roleIndex].description = e.target.value;
+                                  setRoles(newRoles);
+                                }}
+                                rows={3}
+                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                                placeholder="Descripción del rol"
+                              />
+                            </div>
+                            <div>
+                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                              {role.images.length > 0 && <Carousel images={role.images} />}
+                              <div className="space-y-3">
+                                {role.images.map((url, imgIndex) => (
+                                  <div key={imgIndex} className="flex items-center gap-3">
+                                    <img src={url} alt={`Imagen ${imgIndex + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newRoles = [...roles];
+                                        newRoles[roleIndex].images = newRoles[roleIndex].images.filter((_, i) => i !== imgIndex);
+                                        setRoles(newRoles);
+                                      }}
+                                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                    >
+                                      <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="flex items-center gap-3 mt-3">
+                                <input
+                                  type="url"
+                                  value={rolesNewImageUrls[roleIndex] || ''}
+                                  onChange={(e) => {
+                                    const newUrls = [...rolesNewImageUrls];
+                                    newUrls[roleIndex] = e.target.value;
+                                    setRolesNewImageUrls(newUrls);
+                                  }}
+                                  placeholder="https://ejemplo.com/imagen.jpg"
+                                  className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (rolesNewImageUrls[roleIndex]?.trim()) {
+                                      const newRoles = [...roles];
+                                      newRoles[roleIndex].images = [...newRoles[roleIndex].images, rolesNewImageUrls[roleIndex].trim()];
+                                      setRoles(newRoles);
+                                      const newUrls = [...rolesNewImageUrls];
+                                      newUrls[roleIndex] = '';
+                                      setRolesNewImageUrls(newUrls);
+                                    }
+                                  }}
+                                  className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                                >
+                                  <Plus size={16} className="text-primary" />
+                                </button>
+                              </div>
+                              <input
+                                type="file"
+                                multiple
+                                onChange={(e) => {
+                                  if (e.target.files) {
+                                    const newFiles = [...rolesSelectedFiles];
+                                    newFiles[roleIndex] = Array.from(e.target.files);
+                                    setRolesSelectedFiles(newFiles);
+                                  }
+                                }}
+                                className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                              />
+                              <div className="space-y-3 mt-3">
+                                {(rolesSelectedFiles[roleIndex] || []).map((file, fileIndex) => (
+                                  <div key={fileIndex} className="flex items-center gap-3">
+                                    <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newFiles = [...rolesSelectedFiles];
+                                        newFiles[roleIndex] = newFiles[roleIndex].filter((_, i) => i !== fileIndex);
+                                        setRolesSelectedFiles(newFiles);
+                                      }}
+                                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                    >
+                                      <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setRoles(roles.filter((_, i) => i !== roleIndex))}
+                              className="mt-4 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300 text-red-400"
+                            >
+                              Eliminar Rol
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Sección Auth */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Sección Auth</h3>
+                        <div className="mb-4">
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                          <textarea
+                            value={authText}
+                            onChange={(e) => setAuthText(e.target.value)}
+                            rows={4}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            placeholder="Descripción de la sección auth"
+                          />
+                        </div>
+                        <div>
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                          {authImages.length > 0 && <Carousel images={authImages} />}
+                          <div className="space-y-3">
+                            {authImages.map((url, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                                <button
+                                  type="button"
+                                  onClick={() => setAuthImages(authImages.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-3 mt-3">
+                            <input
+                              type="url"
+                              value={authNewImageUrl}
+                              onChange={(e) => setAuthNewImageUrl(e.target.value)}
+                              placeholder="https://ejemplo.com/imagen.jpg"
+                              className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (authNewImageUrl.trim()) {
+                                  setAuthImages([...authImages, authNewImageUrl.trim()]);
+                                  setAuthNewImageUrl('');
+                                }
+                              }}
+                              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                            >
+                              <Plus size={16} className="text-primary" />
+                            </button>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            onChange={(e) => {
+                              if (e.target.files) setAuthSelectedFiles(Array.from(e.target.files));
+                            }}
+                            className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                          />
+                          <div className="space-y-3 mt-3">
+                            {authSelectedFiles.map((file, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setAuthSelectedFiles(authSelectedFiles.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vista Previa */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Vista Previa</h3>
+                        <div className="space-y-6">
+                          {/* Landing Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Landing</h4>
+                            <p className="mb-2">{landingText || 'Texto de ejemplo para la sección landing'}</p>
+                            <Carousel images={landingImages.length > 0 ? landingImages : ['https://via.placeholder.com/800x400?text=Landing+Image']} />
+                          </div>
+
+                          {/* Paneles Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Paneles</h4>
+                            <p className="mb-2">{panelesText || 'Texto de ejemplo para la sección paneles'}</p>
+                            <Carousel images={panelesImages.length > 0 ? panelesImages : ['https://via.placeholder.com/800x400?text=Paneles+Image']} />
+                          </div>
+
+                          {/* Roles Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Roles</h4>
+                            {roles.length > 0 ? roles.map((role, index) => (
+                              <div key={index} className="mb-4">
+                                <h5 className="font-medium">{role.name || 'Nombre del Rol'}</h5>
+                                <p className="mb-2">{role.description || 'Descripción del rol'}</p>
+                                <Carousel images={role.images.length > 0 ? role.images : ['https://via.placeholder.com/400x200?text=Role+Image']} />
+                              </div>
+                            )) : <p>No hay roles definidos</p>}
+                          </div>
+
+                          {/* Auth Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Auth</h4>
+                            <p className="mb-2">{authText || 'Texto de ejemplo para la sección auth'}</p>
+                            <Carousel images={authImages.length > 0 ? authImages : ['https://via.placeholder.com/800x400?text=Auth+Image']} />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="submit"
+                          className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
+                        >
+                          Guardar Cambios
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', is_full_page: false, content_structure: {} });
+                            setImageUrls([]);
+                            setSelectedFiles([]);
+                            setEditingId(null);
+                            // Reset section states
+                            setLandingText('');
+                            setLandingImages([]);
+                            setLandingNewImageUrl('');
+                            setLandingSelectedFiles([]);
+                            setPanelesText('');
+                            setPanelesImages([]);
+                            setPanelesNewImageUrl('');
+                            setPanelesSelectedFiles([]);
+                            setRoles([{ name: '', description: '', images: [] }]);
+                            setRolesNewImageUrls(['']);
+                            setRolesSelectedFiles([[]]);
+                            setAuthText('');
+                            setAuthImages([]);
+                            setAuthNewImageUrl('');
+                            setAuthSelectedFiles([]);
+                          }}
+                          className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                        >
+                          <X size={16} className="text-red-400" />
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+
+                {/* Preview Column */}
+                <div className="lg:col-span-3">
+                  <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                    <h3 className="text-xl font-bold mb-4">Vista Previa Completa</h3>
+                    <p className="mb-4">Aquí puedes ver cómo se verá la página completa con todas las secciones.</p>
+                    {/* You can add a mini preview or link to view */}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Projects List */}
+            {projects.filter(p => p.is_full_page).map((project) => (
+              <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleEdit(project)}
+                      className="px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium"
+                    >
+                      Editar Página
+                    </button>
+                    <button
+                      onClick={() => handleDelete(project.id)}
+                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                    >
+                      <Trash2 size={16} className="text-red-400" />
+                    </button>
+                  </div>
+                </div>
+                <p className={`mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{project.description}</p>
+                <a
+                  href={`/project/${project.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium"
+                >
+                  <ExternalLink size={16} />
+                  Ver Página Completa
+                </a>
+              </div>
+            ))}
           </div>
         )}
       </div>
