@@ -252,6 +252,9 @@ export default function ProjectPage() {
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
       <Navbar />
 
+      {/* Noise Texture */}
+      <div className="fixed inset-0 opacity-5 mix-blend-overlay pointer-events-none z-0" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cdefs%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E\")" }}></div>
+
       {/* Edit Controls */}
       {session && (
         <div className="fixed top-20 right-4 z-50">
@@ -284,9 +287,10 @@ export default function ProjectPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="relative min-h-screen flex items-center justify-center" style={{ backgroundImage: `url(${project.images?.[0]?.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      {/* Hero Section */}
+      <div className="relative h-[60vh] w-full overflow-hidden flex items-center justify-center">
+        <img src={project.images?.[0]?.image} alt={project.title} className="absolute inset-0 object-cover opacity-40 blur-sm" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
         <div className="relative z-10 text-center max-w-7xl mx-auto px-4">
           <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-primary mb-8 font-medium">
             <ArrowLeft size={20} />
@@ -300,13 +304,13 @@ export default function ProjectPage() {
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full px-4 py-3 mb-4 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-6xl font-bold"
+                  className="w-full px-4 py-3 mb-4 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-6xl font-bold tracking-tight"
                   placeholder="Título del proyecto"
                 />
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-4 py-3 mb-6 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-xl"
+                  className="w-full px-4 py-3 mb-6 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-xl leading-relaxed"
                   rows={3}
                   placeholder="Descripción del proyecto"
                 />
@@ -319,7 +323,7 @@ export default function ProjectPage() {
                 />
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
                   {editTechnologies.split(',').map((tech, i) => (
-                    <span key={i} className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-medium">
+                    <span key={i} className="backdrop-blur-md bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
                       {tech.trim()}
                     </span>
                   ))}
@@ -343,15 +347,15 @@ export default function ProjectPage() {
               </>
             ) : (
               <>
-                <h1 className="text-6xl font-bold mb-4 text-white">
+                <h1 className="text-6xl font-bold tracking-tight text-white mb-4 drop-shadow-lg">
                   {project.title}
                 </h1>
-                <p className="text-xl mb-6 text-gray-200 max-w-3xl mx-auto">
+                <p className="text-xl mb-6 text-gray-200 max-w-3xl mx-auto leading-relaxed">
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
                   {project.technologies.map((tech, i) => (
-                    <span key={i} className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-medium">
+                    <span key={i} className="backdrop-blur-md bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
                       {tech}
                     </span>
                   ))}
@@ -396,14 +400,14 @@ export default function ProjectPage() {
               return (
                 <section key={index} className="bg-[#0f172a] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Landing</h2>
-                    <div className="grid lg:grid-cols-5 gap-12 items-start">
-                      <div className="lg:col-span-2 sticky top-8">
+                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Landing</h2>
+                    <div className="grid lg:grid-cols-12 gap-12 items-center">
+                      <div className="lg:col-span-5 prose prose-invert prose-lg">
                         {isEditing ? (
                           <textarea
                             value={section.text || ''}
                             onChange={(e) => updateSection(index, { text: e.target.value })}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                             rows={6}
                             placeholder="Escribe aquí la introducción o descripción principal del proyecto..."
                           />
@@ -413,16 +417,16 @@ export default function ProjectPage() {
                           </p>
                         )}
                       </div>
-                      <div className="lg:col-span-3">
-                        <div className="grid grid-cols-3 gap-4">
-                          {(section.images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                      <div className="lg:col-span-7">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
+                          {(section.images || []).map((image: string, imgIndex: number) => {
                             if (imgIndex === 0) {
                               return (
-                                <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                   <img
                                     src={image}
                                     alt={`Landing ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                   {isEditing && (
                                     <button
@@ -436,11 +440,11 @@ export default function ProjectPage() {
                               );
                             } else {
                               return (
-                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                   <img
                                     src={image}
                                     alt={`Landing ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                   {isEditing && (
                                     <button
@@ -454,25 +458,8 @@ export default function ProjectPage() {
                               );
                             }
                           })}
-                          {(section.images || []).slice(3).map((image: string, imgIndex: number) => (
-                            <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
-                              <img
-                                src={image}
-                                alt={`Landing ${imgIndex + 4}`}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              />
-                              {isEditing && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex + 3); }}
-                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              )}
-                            </div>
-                          ))}
                           {isEditing && (
-                            <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
+                            <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
                               <input
                                 type="file"
                                 multiple
@@ -497,18 +484,18 @@ export default function ProjectPage() {
               return (
                 <section key={index} className="bg-[#1e293b] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Paneles</h2>
-                    <div className="grid lg:grid-cols-5 gap-12 items-start">
-                      <div className="lg:col-span-3">
-                        <div className="grid grid-cols-3 gap-4">
-                          {(section.images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Paneles</h2>
+                    <div className="grid lg:grid-cols-12 gap-12 items-center">
+                      <div className="lg:col-span-7">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
+                          {(section.images || []).map((image: string, imgIndex: number) => {
                             if (imgIndex === 0) {
                               return (
-                                <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                   <img
                                     src={image}
                                     alt={`Paneles ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                   {isEditing && (
                                     <button
@@ -522,11 +509,11 @@ export default function ProjectPage() {
                               );
                             } else {
                               return (
-                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                   <img
                                     src={image}
                                     alt={`Paneles ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                   {isEditing && (
                                     <button
@@ -540,25 +527,8 @@ export default function ProjectPage() {
                               );
                             }
                           })}
-                          {(section.images || []).slice(3).map((image: string, imgIndex: number) => (
-                            <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
-                              <img
-                                src={image}
-                                alt={`Paneles ${imgIndex + 4}`}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              />
-                              {isEditing && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex + 3); }}
-                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              )}
-                            </div>
-                          ))}
                           {isEditing && (
-                            <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
+                            <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
                               <input
                                 type="file"
                                 multiple
@@ -574,12 +544,12 @@ export default function ProjectPage() {
                           )}
                         </div>
                       </div>
-                      <div className="lg:col-span-2 sticky top-8">
+                      <div className="lg:col-span-5 prose prose-invert prose-lg">
                         {isEditing ? (
                           <textarea
                             value={section.text || ''}
                             onChange={(e) => updateSection(index, { text: e.target.value })}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                             rows={6}
                             placeholder="Describe la galería o paneles del proyecto..."
                           />
@@ -598,24 +568,32 @@ export default function ProjectPage() {
               return (
                 <section key={index} className="bg-[#0f172a] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Roles</h2>
-                    <div className="flex justify-center mb-8">
+                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Roles</h2>
+                    <div className="flex space-x-2 bg-white/5 p-1 rounded-xl backdrop-blur-sm w-fit mx-auto mb-8">
                       {(section.roles || []).map((role, i) => (
-                        <button key={i} onClick={() => setActiveRoleTab(i)} className={`px-6 py-3 mx-2 rounded-lg font-medium transition-all ${activeRoleTab === i ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
+                        <button
+                          key={i}
+                          onClick={() => setActiveRoleTab(i)}
+                          className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                            activeRoleTab === i
+                              ? 'bg-primary text-white shadow-lg'
+                              : 'text-gray-400 hover:text-white hover:bg-white/10'
+                          }`}
+                        >
                           {role.name}
                         </button>
                       ))}
                     </div>
                     {section.roles && section.roles[activeRoleTab] && (
-                      <div className="animate-fade-in">
-                        <div className="grid lg:grid-cols-5 gap-12 items-start">
-                          <div className="lg:col-span-2 sticky top-8">
-                            <h3 className="text-2xl font-bold mb-4 text-white">{section.roles[activeRoleTab].name}</h3>
+                      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="grid lg:grid-cols-12 gap-12 items-center">
+                          <div className="lg:col-span-5 prose prose-invert prose-lg">
+                            <h3 className="text-2xl font-bold tracking-tight mb-4 text-white">{section.roles[activeRoleTab].name}</h3>
                             {isEditing ? (
                               <textarea
                                 value={section.roles[activeRoleTab].description || ''}
                                 onChange={(e) => updateRole(activeRoleTab, { description: e.target.value })}
-                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                                 rows={6}
                                 placeholder="Descripción del rol"
                               />
@@ -625,16 +603,16 @@ export default function ProjectPage() {
                               </p>
                             )}
                           </div>
-                          <div className="lg:col-span-3">
-                            <div className="grid grid-cols-3 gap-4">
-                              {(section.roles[activeRoleTab].images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                          <div className="lg:col-span-7">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
+                              {(section.roles[activeRoleTab].images || []).map((image: string, imgIndex: number) => {
                                 if (imgIndex === 0) {
                                   return (
-                                    <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                    <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                       <img
                                         src={image}
                                         alt={`${section.roles[activeRoleTab].name} ${imgIndex + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                       />
                                       {isEditing && (
                                         <button
@@ -648,11 +626,11 @@ export default function ProjectPage() {
                                   );
                                 } else {
                                   return (
-                                    <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                    <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                       <img
                                         src={image}
                                         alt={`${section.roles[activeRoleTab].name} ${imgIndex + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                       />
                                       {isEditing && (
                                         <button
@@ -666,25 +644,8 @@ export default function ProjectPage() {
                                   );
                                 }
                               })}
-                              {(section.roles[activeRoleTab].images || []).slice(3).map((image: string, imgIndex: number) => (
-                                <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
-                                  <img
-                                    src={image}
-                                    alt={`${section.roles[activeRoleTab].name} ${imgIndex + 4}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex + 3) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
-                                </div>
-                              ))}
                               {isEditing && (
-                                <div className="mt-4">
+                                <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
                                   <input
                                     type="file"
                                     multiple
@@ -692,9 +653,9 @@ export default function ProjectPage() {
                                     className="hidden"
                                     id={`role-upload-${activeRoleTab}`}
                                   />
-                                  <label htmlFor={`role-upload-${activeRoleTab}`} className="cursor-pointer flex items-center gap-2 text-primary hover:text-primary/80">
-                                    <Upload size={16} />
-                                    Agregar Imágenes
+                                  <label htmlFor={`role-upload-${activeRoleTab}`} className="cursor-pointer text-center">
+                                    <Plus size={32} className="text-primary mx-auto mb-2" />
+                                    <span className="text-sm text-primary">Agregar Imágenes</span>
                                   </label>
                                 </div>
                               )}
@@ -722,33 +683,18 @@ export default function ProjectPage() {
               return (
                 <section key={index} className="bg-[#1e293b] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold mb-12 text-primary text-center">Autenticación</h2>
-                    <div className="grid lg:grid-cols-5 gap-12 items-start">
-                      <div className="lg:col-span-2 sticky top-8">
-                        {isEditing ? (
-                          <textarea
-                            value={section.text || ''}
-                            onChange={(e) => updateSection(index, { text: e.target.value })}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
-                            rows={6}
-                            placeholder="Describe las características de autenticación y seguridad..."
-                          />
-                        ) : (
-                          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
-                            {section.text}
-                          </p>
-                        )}
-                      </div>
-                      <div className="lg:col-span-3">
-                        <div className="grid grid-cols-3 gap-4">
-                          {(section.images || []).slice(0, 3).map((image: string, imgIndex: number) => {
+                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Autenticación</h2>
+                    <div className="grid lg:grid-cols-12 gap-12 items-center">
+                      <div className="lg:col-span-7">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[200px]">
+                          {(section.images || []).map((image: string, imgIndex: number) => {
                             if (imgIndex === 0) {
                               return (
-                                <div key={imgIndex} className="col-span-2 row-span-2 aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                <div key={imgIndex} className="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-2xl cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                   <img
                                     src={image}
                                     alt={`Auth ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                   {isEditing && (
                                     <button
@@ -762,11 +708,11 @@ export default function ProjectPage() {
                               );
                             } else {
                               return (
-                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
+                                <div key={imgIndex} className="rounded-2xl bg-gray-800 group relative overflow-hidden cursor-zoom-in" onClick={() => setLightboxImage(image)}>
                                   <img
                                     src={image}
                                     alt={`Auth ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                   {isEditing && (
                                     <button
@@ -780,25 +726,8 @@ export default function ProjectPage() {
                               );
                             }
                           })}
-                          {(section.images || []).slice(3).map((image: string, imgIndex: number) => (
-                            <div key={imgIndex + 3} className="aspect-square rounded-xl overflow-hidden relative group cursor-pointer" onClick={() => setLightboxImage(image)}>
-                              <img
-                                src={image}
-                                alt={`Auth ${imgIndex + 4}`}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              />
-                              {isEditing && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex + 3); }}
-                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              )}
-                            </div>
-                          ))}
                           {isEditing && (
-                            <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
+                            <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center">
                               <input
                                 type="file"
                                 multiple
@@ -813,6 +742,21 @@ export default function ProjectPage() {
                             </div>
                           )}
                         </div>
+                      </div>
+                      <div className="lg:col-span-5 prose prose-invert prose-lg">
+                        {isEditing ? (
+                          <textarea
+                            value={section.text || ''}
+                            onChange={(e) => updateSection(index, { text: e.target.value })}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                            rows={6}
+                            placeholder="Describe las características de autenticación y seguridad..."
+                          />
+                        ) : (
+                          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
+                            {section.text}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

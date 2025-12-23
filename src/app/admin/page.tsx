@@ -1318,7 +1318,7 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
-                  <img src={heroImage.image} alt={heroImage.title || 'Hero Image'} className="w-full h-64 object-cover rounded-lg border-2 border-primary/30" />
+                  <img src={heroImage.image} alt={heroImage.title || 'Hero Image'} className="w-full h-64 object-contain rounded-lg border-2 border-primary/30" />
                   <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mt-4`}>Orden: {heroImage.order}</p>
                 </div>
               ))}
