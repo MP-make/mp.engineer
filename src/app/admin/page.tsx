@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
+import Carousel from '@/components/Carousel';
 
 interface Project {
   id: number;
@@ -895,6 +896,61 @@ export default function AdminPage() {
                     </select>
                   </div>
 
+                  <div>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes del Proyecto</label>
+                    {imageUrls.length > 0 && <Carousel images={imageUrls} />}
+                    <div className="space-y-3">
+                      {imageUrls.map((url, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                          <button
+                            type="button"
+                            onClick={() => removeImageUrl(index)}
+                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                          >
+                            <Trash2 size={16} className="text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3 mt-3">
+                      <input
+                        type="url"
+                        value={newImageUrl}
+                        onChange={(e) => setNewImageUrl(e.target.value)}
+                        placeholder="https://ejemplo.com/imagen.jpg"
+                        className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={addImageUrl}
+                        className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                      >
+                        <Plus size={16} className="text-primary" />
+                      </button>
+                    </div>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileSelect}
+                      className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                    />
+                    <div className="space-y-3 mt-3">
+                      {selectedFiles.map((file, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeSelectedFile(index)}
+                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                          >
+                            <Trash2 size={16} className="text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -920,6 +976,7 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                        {landingImages.length > 0 && <Carousel images={landingImages} />}
                         <div className="space-y-3">
                           {landingImages.map((url, index) => (
                             <div key={index} className="flex items-center gap-3">
@@ -994,6 +1051,7 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                          {panelesImages.length > 0 && <Carousel images={panelesImages} />}
                           <div className="space-y-3">
                             {panelesImages.map((url, index) => (
                               <div key={index} className="flex items-center gap-3">
@@ -1031,6 +1089,11 @@ export default function AdminPage() {
                           </div>
                           <input
                             type="file"
+                            multiple
+                            onChange={(e) => {
+                              if (e.target.files) setPanelesSelectedFiles(Array.from(e.target.files));
+                            }}
+                            className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                           />
                           <div className="space-y-3 mt-3">
                             {panelesSelectedFiles.map((file, index) => (
@@ -1095,6 +1158,7 @@ export default function AdminPage() {
                             </div>
                             <div>
                               <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                              {role.images.length > 0 && <Carousel images={role.images} />}
                               <div className="space-y-3">
                                 {role.images.map((url, imgIndex) => (
                                   <div key={imgIndex} className="flex items-center gap-3">
@@ -1199,6 +1263,7 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                          {authImages.length > 0 && <Carousel images={authImages} />}
                           <div className="space-y-3">
                             {authImages.map((url, index) => (
                               <div key={index} className="flex items-center gap-3">
@@ -1255,6 +1320,45 @@ export default function AdminPage() {
                                 </button>
                               </div>
                             ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vista Previa */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Vista Previa</h3>
+                        <div className="space-y-6">
+                          {/* Landing Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Landing</h4>
+                            <p className="mb-2">{landingText || 'Texto de ejemplo para la sección landing'}</p>
+                            <Carousel images={landingImages.length > 0 ? landingImages : ['https://via.placeholder.com/800x400?text=Landing+Image']} />
+                          </div>
+
+                          {/* Paneles Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Paneles</h4>
+                            <p className="mb-2">{panelesText || 'Texto de ejemplo para la sección paneles'}</p>
+                            <Carousel images={panelesImages.length > 0 ? panelesImages : ['https://via.placeholder.com/800x400?text=Paneles+Image']} />
+                          </div>
+
+                          {/* Roles Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Roles</h4>
+                            {roles.length > 0 ? roles.map((role, index) => (
+                              <div key={index} className="mb-4">
+                                <h5 className="font-medium">{role.name || 'Nombre del Rol'}</h5>
+                                <p className="mb-2">{role.description || 'Descripción del rol'}</p>
+                                <Carousel images={role.images.length > 0 ? role.images : ['https://via.placeholder.com/400x200?text=Role+Image']} />
+                              </div>
+                            )) : <p>No hay roles definidos</p>}
+                          </div>
+
+                          {/* Auth Preview */}
+                          <div className={`${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-gray-100/50'} p-4 rounded-xl`}>
+                            <h4 className="font-semibold mb-2">Auth</h4>
+                            <p className="mb-2">{authText || 'Texto de ejemplo para la sección auth'}</p>
+                            <Carousel images={authImages.length > 0 ? authImages : ['https://via.placeholder.com/800x400?text=Auth+Image']} />
                           </div>
                         </div>
                       </div>
