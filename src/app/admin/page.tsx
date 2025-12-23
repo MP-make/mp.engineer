@@ -17,6 +17,8 @@ interface Project {
   status: 'completed' | 'in-progress';
   created_at: string;
   images?: { image: string }[];
+  is_full_page?: boolean;
+  content_structure?: any;
 }
 
 interface Contact {
@@ -61,12 +63,34 @@ export default function AdminPage() {
     link: '',
     github_link: '',
     technologies: '',
-    status: 'completed'
+    status: 'completed',
+    is_full_page: false,
+    content_structure: {}
   });
   const [editingId, setEditingId] = useState<number | null>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  // Section builder states
+  const [landingText, setLandingText] = useState('');
+  const [landingImages, setLandingImages] = useState<string[]>([]);
+  const [landingNewImageUrl, setLandingNewImageUrl] = useState('');
+  const [landingSelectedFiles, setLandingSelectedFiles] = useState<File[]>([]);
+
+  const [panelesText, setPanelesText] = useState('');
+  const [panelesImages, setPanelesImages] = useState<string[]>([]);
+  const [panelesNewImageUrl, setPanelesNewImageUrl] = useState('');
+  const [panelesSelectedFiles, setPanelesSelectedFiles] = useState<File[]>([]);
+
+  const [roles, setRoles] = useState([{ name: '', description: '', images: [] as string[] }]);
+  const [rolesNewImageUrls, setRolesNewImageUrls] = useState<string[]>(['']);
+  const [rolesSelectedFiles, setRolesSelectedFiles] = useState<File[][]>([[]]);
+
+  const [authText, setAuthText] = useState('');
+  const [authImages, setAuthImages] = useState<string[]>([]);
+  const [authNewImageUrl, setAuthNewImageUrl] = useState('');
+  const [authSelectedFiles, setAuthSelectedFiles] = useState<File[]>([]);
 
   // Skill form states
   const [skillFormData, setSkillFormData] = useState({
@@ -91,6 +115,16 @@ export default function AdminPage() {
       router.push('/admin/login');
     }
   }, [status, router]);
+
+  // Set Supabase auth session when NextAuth session is available
+  useEffect(() => {
+    if (session?.accessToken && session?.refreshToken) {
+      supabase.auth.setSession({
+        access_token: session.accessToken,
+        refresh_token: session.refreshToken
+      });
+    }
+  }, [session]);
 
   // Load data function
   const loadData = async () => {
@@ -191,44 +225,127 @@ export default function AdminPage() {
       const allImageUrls = [...uploadedUrls, ...imageUrls];
       let projectId = editingId;
 
+      let contentStructure = formData.content_structure;
+
+      if (formData.is_full_page) {
+        // Helper function to upload files
+        const uploadFiles = async (files: File[]): Promise<string[]> => {
+          const urls: string[] = [];
+          for (const file of files) {
+            if (file.size > 5 * 1024 * 1024) {
+              alert(`El archivo ${file.name} es demasiado grande. Máximo 5MB por archivo.`);
+              return [];
+            }
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image.webp'];
+            if (!allowedTypes.includes(file.type)) {
+              alert(`El archivo ${file.name} no es un tipo de imagen válido.`);
+              return [];
+            }
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const { data, error } = await supabase.storage
+              .from('portfolio-images')
+              .upload(fileName, file);
+            if (error) {
+              alert(`Error al subir ${file.name}: ${error.message}`);
+              return [];
+            }
+            const { data: { publicUrl } } = supabase.storage
+              .from('portfolio-images')
+              .getPublicUrl(fileName);
+            urls.push(publicUrl);
+          }
+          return urls;
+        };
+
+        // Upload section images
+        const landingUploaded = await uploadFiles(landingSelectedFiles);
+        if (landingUploaded.length === 0 && landingSelectedFiles.length > 0) return;
+        const landingAllImages = [...landingImages, ...landingUploaded];
+
+        const panelesUploaded = await uploadFiles(panelesSelectedFiles);
+        if (panelesUploaded.length === 0 && panelesSelectedFiles.length > 0) return;
+        const panelesAllImages = [...panelesImages, ...panelesUploaded];
+
+        const authUploaded = await uploadFiles(authSelectedFiles);
+        if (authUploaded.length === 0 && authSelectedFiles.length > 0) return;
+        const authAllImages = [...authImages, ...authUploaded];
+
+        // For roles
+        const rolesWithImages = await Promise.all(roles.map(async (role, index) => {
+          const uploaded = await uploadFiles(rolesSelectedFiles[index] || []);
+          if (uploaded.length === 0 && (rolesSelectedFiles[index] || []).length > 0) return null;
+          return {
+            name: role.name,
+            description: role.description,
+            images: [...role.images, ...uploaded]
+          };
+        }));
+        if (rolesWithImages.includes(null)) return;
+        const validRoles = rolesWithImages.filter(r => r !== null);
+
+        // Build content structure
+        contentStructure = {
+          sections: [
+            { type: 'landing', text: landingText, images: landingAllImages },
+            { type: 'paneles', text: panelesText, images: panelesAllImages },
+            { type: 'roles', roles: validRoles },
+            { type: 'auth', text: authText, images: authAllImages }
+          ]
+        };
+      }
+
       if (editingId) {
-        const { error } = await supabase
-          .from('portfolio_project')
-          .update({
-            title: formData.title,
-            description: formData.description,
-            link: formData.link || null,
-            github_link: formData.github_link || null,
-            technologies: techArray,
-            status: formData.status
-          })
-          .eq('id', editingId);
-        
-        if (error) throw error;
-      } else {
-        const { data, error } = await supabase
-          .from('portfolio_project')
-          .insert([{
+        const response = await fetch('/api/projects', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingId,
             title: formData.title,
             description: formData.description,
             link: formData.link || null,
             github_link: formData.github_link || null,
             technologies: techArray,
             status: formData.status,
+            is_full_page: formData.is_full_page,
+            content_structure: contentStructure
+          })
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update project');
+        }
+      } else {
+        const response = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: formData.title,
+            description: formData.description,
+            link: formData.link || null,
+            github_link: formData.github_link || null,
+            technologies: techArray,
+            status: formData.status,
+            is_full_page: formData.is_full_page,
+            content_structure: contentStructure,
             created_at: new Date().toISOString()
-          }])
-          .select();
-        
-        if (error) throw error;
+          })
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to create project');
+        }
+        const { data } = await response.json();
         projectId = data[0].id;
       }
 
       if (allImageUrls.length > 0 && projectId) {
         if (editingId) {
-          await supabase
-            .from('portfolio_projectimage')
-            .delete()
-            .eq('project_id', editingId);
+          const response = await fetch(`/api/project-images?project_id=${editingId}`, { method: 'DELETE' });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete images');
+          }
         }
 
         const imageData = allImageUrls.map(url => ({
@@ -236,21 +353,46 @@ export default function AdminPage() {
           image: url
         }));
 
-        await supabase
-          .from('portfolio_projectimage')
-          .insert(imageData);
+        const response = await fetch('/api/project-images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ images: imageData })
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to insert images');
+        }
       }
 
-      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed' });
+      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', is_full_page: false, content_structure: {} });
       setImageUrls([]);
       setSelectedFiles([]);
       setEditingId(null);
+      // Reset section states
+      setLandingText('');
+      setLandingImages([]);
+      setLandingNewImageUrl('');
+      setLandingSelectedFiles([]);
+      setPanelesText('');
+      setPanelesImages([]);
+      setPanelesNewImageUrl('');
+      setPanelesSelectedFiles([]);
+      setRoles([{ name: '', description: '', images: [] }]);
+      setRolesNewImageUrls(['']);
+      setRolesSelectedFiles([[]]);
+      setAuthText('');
+      setAuthImages([]);
+      setAuthNewImageUrl('');
+      setAuthSelectedFiles([]);
       loadData();
       
       alert('✅ Proyecto guardado exitosamente!');
     } catch (error) {
-      console.error('Error:', error);
-      alert('❌ Error al guardar el proyecto.');
+      console.error('Error saving project:', error);
+      console.error('Error message:', error?.message);
+      console.error('Error details:', error?.details);
+      console.error('Full error object:', JSON.stringify(error, null, 2));
+      alert('❌ Error al guardar el proyecto. Revisa la consola para más detalles.');
     }
   };
 
@@ -261,7 +403,9 @@ export default function AdminPage() {
       link: project.link || '',
       github_link: project.github_link || '',
       technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
-      status: project.status
+      status: project.status,
+      is_full_page: project.is_full_page || false,
+      content_structure: project.content_structure || {}
     });
     setEditingId(project.id);
 
@@ -274,20 +418,56 @@ export default function AdminPage() {
       setImageUrls(images.map(img => img.image));
     }
 
+    // Populate section states if full_page
+    if (project.is_full_page && project.content_structure?.sections) {
+      const sections = project.content_structure.sections;
+      const landing = sections.find((s: any) => s.type === 'landing');
+      if (landing) {
+        setLandingText(landing.text || '');
+        setLandingImages(landing.images || []);
+      }
+      const paneles = sections.find((s: any) => s.type === 'paneles');
+      if (paneles) {
+        setPanelesText(paneles.text || '');
+        setPanelesImages(paneles.images || []);
+      }
+      const rolesSection = sections.find((s: any) => s.type === 'roles');
+      if (rolesSection) {
+        setRoles(rolesSection.roles || [{ name: '', description: '', images: [] }]);
+        setRolesNewImageUrls(new Array((rolesSection.roles || [{ name: '', description: '', images: [] }]).length).fill(''));
+        setRolesSelectedFiles(new Array((rolesSection.roles || [{ name: '', description: '', images: [] }]).length).fill([]));
+      }
+      const auth = sections.find((s: any) => s.type === 'auth');
+      if (auth) {
+        setAuthText(auth.text || '');
+        setAuthImages(auth.images || []);
+      }
+    }
+
     setActiveTab('projects');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: number) => {
     if (confirm('¿Estás seguro de eliminar este proyecto?')) {
-      await supabase.from('portfolio_project').delete().eq('id', id);
+      const response = await fetch(`/api/projects?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('Error deleting project: ' + (errorData.error || 'Unknown error'));
+        return;
+      }
       loadData();
     }
   };
 
   const handleDeleteContact = async (id: number) => {
     if (confirm('¿Estás seguro de eliminar este mensaje?')) {
-      await supabase.from('portfolio_contact').delete().eq('id', id);
+      const response = await fetch(`/api/contact?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('Error deleting contact: ' + (errorData.error || 'Unknown error'));
+        return;
+      }
       loadData();
     }
   };
@@ -323,10 +503,16 @@ export default function AdminPage() {
     e.preventDefault();
 
     try {
-      if (editingSkillId) {
-        await supabase.from('portfolio_skill').update(skillFormData).eq('id', editingSkillId);
-      } else {
-        await supabase.from('portfolio_skill').insert([skillFormData]);
+      const method = editingSkillId ? 'PUT' : 'POST';
+      const body = editingSkillId ? { id: editingSkillId, ...skillFormData } : skillFormData;
+      const response = await fetch('/api/skills', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save skill');
       }
 
       setSkillFormData({ name: '', category: '', proficiency: 50 });
@@ -350,7 +536,12 @@ export default function AdminPage() {
 
   const handleDeleteSkill = async (id: number) => {
     if (confirm('¿Estás seguro de eliminar esta habilidad?')) {
-      await supabase.from('portfolio_skill').delete().eq('id', id);
+      const response = await fetch(`/api/skills?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('Error deleting skill: ' + (errorData.error || 'Unknown error'));
+        return;
+      }
       loadData();
     }
   };
@@ -689,7 +880,6 @@ export default function AdminPage() {
                       onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
                       className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
                       placeholder="React, Node.js, PostgreSQL"
-                      required
                     />
                   </div>
                   
@@ -701,67 +891,375 @@ export default function AdminPage() {
                       className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                     >
                       <option value="completed">Completado</option>
-                      <option value="in-progress">En progreso</option>
+                      <option value="in-progress">En Progreso</option>
                     </select>
                   </div>
 
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
-                    <div className="space-y-3">
-                      {imageUrls.map((url, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
-                          <button
-                            type="button"
-                            onClick={() => removeImageUrl(index)}
-                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                          >
-                            <Trash2 size={16} className="text-red-400" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-3 mt-3">
-                      <input
-                        type="url"
-                        value={newImageUrl}
-                        onChange={(e) => setNewImageUrl(e.target.value)}
-                        className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                        placeholder="https://ejemplo.com/imagen.jpg"
-                      />
-                      <button
-                        type="button"
-                        onClick={addImageUrl}
-                        className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
-                      >
-                        <Plus size={16} className="text-primary" />
-                      </button>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_full_page}
+                      onChange={(e) => setFormData({ ...formData, is_full_page: e.target.checked })}
+                      className="form-checkbox h-5 w-5 text-primary transition-all duration-300"
+                    />
+                    <label className={`font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>¿Es una página completa?</label>
                   </div>
 
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Subir Imágenes</label>
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleFileSelect}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                    />
-                    <div className="space-y-3 mt-3">
-                      {selectedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <div className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</div>
+                  {formData.is_full_page && (
+                    <div className="border-t pt-6">
+                      <h3 className="text-lg font-semibold mb-4">Sección Landing</h3>
+                      <div className="mb-4">
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                        <textarea
+                          value={landingText}
+                          onChange={(e) => setLandingText(e.target.value)}
+                          rows={4}
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          placeholder="Descripción de la sección landing"
+                        />
+                      </div>
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                        <div className="space-y-3">
+                          {landingImages.map((url, index) => (
+                            <div key={index} className="flex items-center gap-3">
+                              <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                              <button
+                                type="button"
+                                onClick={() => setLandingImages(landingImages.filter((_, i) => i !== index))}
+                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                              >
+                                <Trash2 size={16} className="text-red-400" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-3 mt-3">
+                          <input
+                            type="url"
+                            value={landingNewImageUrl}
+                            onChange={(e) => setLandingNewImageUrl(e.target.value)}
+                            placeholder="https://ejemplo.com/imagen.jpg"
+                            className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          />
                           <button
                             type="button"
-                            onClick={() => removeSelectedFile(index)}
-                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                            onClick={() => {
+                              if (landingNewImageUrl.trim()) {
+                                setLandingImages([...landingImages, landingNewImageUrl.trim()]);
+                                setLandingNewImageUrl('');
+                              }
+                            }}
+                            className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
                           >
-                            <Trash2 size={16} className="text-red-400" />
+                            <Plus size={16} className="text-primary" />
                           </button>
                         </div>
-                      ))}
+                        <input
+                          type="file"
+                          multiple
+                          onChange={(e) => {
+                            if (e.target.files) setLandingSelectedFiles(Array.from(e.target.files));
+                          }}
+                          className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                        />
+                        <div className="space-y-3 mt-3">
+                          {landingSelectedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center gap-3">
+                              <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => setLandingSelectedFiles(landingSelectedFiles.filter((_, i) => i !== index))}
+                                className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                              >
+                                <Trash2 size={16} className="text-red-400" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Sección Paneles */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Sección Paneles</h3>
+                        <div className="mb-4">
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                          <textarea
+                            value={panelesText}
+                            onChange={(e) => setPanelesText(e.target.value)}
+                            rows={4}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            placeholder="Descripción de la sección paneles"
+                          />
+                        </div>
+                        <div>
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                          <div className="space-y-3">
+                            {panelesImages.map((url, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                                <button
+                                  type="button"
+                                  onClick={() => setPanelesImages(panelesImages.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-3 mt-3">
+                            <input
+                              type="url"
+                              value={panelesNewImageUrl}
+                              onChange={(e) => setPanelesNewImageUrl(e.target.value)}
+                              placeholder="https://ejemplo.com/imagen.jpg"
+                              className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (panelesNewImageUrl.trim()) {
+                                  setPanelesImages([...panelesImages, panelesNewImageUrl.trim()]);
+                                  setPanelesNewImageUrl('');
+                                }
+                              }}
+                              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                            >
+                              <Plus size={16} className="text-primary" />
+                            </button>
+                          </div>
+                          <input
+                            type="file"
+                          />
+                          <div className="space-y-3 mt-3">
+                            {panelesSelectedFiles.map((file, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setPanelesSelectedFiles(panelesSelectedFiles.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sección Roles */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Sección Roles</h3>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRoles([...roles, { name: '', description: '', images: [] }]);
+                            setRolesNewImageUrls([...rolesNewImageUrls, '']);
+                            setRolesSelectedFiles([...rolesSelectedFiles, []]);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium mb-4"
+                        >
+                          + Agregar Rol
+                        </button>
+                        {roles.map((role, roleIndex) => (
+                          <div key={roleIndex} className="border p-4 mb-4 rounded-xl">
+                            <div className="mb-4">
+                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Nombre Rol</label>
+                              <input
+                                type="text"
+                                value={role.name}
+                                onChange={(e) => {
+                                  const newRoles = [...roles];
+                                  newRoles[roleIndex].name = e.target.value;
+                                  setRoles(newRoles);
+                                }}
+                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                                placeholder="Nombre del rol"
+                              />
+                            </div>
+                            <div className="mb-4">
+                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                              <textarea
+                                value={role.description}
+                                onChange={(e) => {
+                                  const newRoles = [...roles];
+                                  newRoles[roleIndex].description = e.target.value;
+                                  setRoles(newRoles);
+                                }}
+                                rows={3}
+                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                                placeholder="Descripción del rol"
+                              />
+                            </div>
+                            <div>
+                              <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                              <div className="space-y-3">
+                                {role.images.map((url, imgIndex) => (
+                                  <div key={imgIndex} className="flex items-center gap-3">
+                                    <img src={url} alt={`Imagen ${imgIndex + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newRoles = [...roles];
+                                        newRoles[roleIndex].images = newRoles[roleIndex].images.filter((_, i) => i !== imgIndex);
+                                        setRoles(newRoles);
+                                      }}
+                                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                    >
+                                      <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="flex items-center gap-3 mt-3">
+                                <input
+                                  type="url"
+                                  value={rolesNewImageUrls[roleIndex] || ''}
+                                  onChange={(e) => {
+                                    const newUrls = [...rolesNewImageUrls];
+                                    newUrls[roleIndex] = e.target.value;
+                                    setRolesNewImageUrls(newUrls);
+                                  }}
+                                  placeholder="https://ejemplo.com/imagen.jpg"
+                                  className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (rolesNewImageUrls[roleIndex]?.trim()) {
+                                      const newRoles = [...roles];
+                                      newRoles[roleIndex].images = [...newRoles[roleIndex].images, rolesNewImageUrls[roleIndex].trim()];
+                                      setRoles(newRoles);
+                                      const newUrls = [...rolesNewImageUrls];
+                                      newUrls[roleIndex] = '';
+                                      setRolesNewImageUrls(newUrls);
+                                    }
+                                  }}
+                                  className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                                >
+                                  <Plus size={16} className="text-primary" />
+                                </button>
+                              </div>
+                              <input
+                                type="file"
+                                multiple
+                                onChange={(e) => {
+                                  if (e.target.files) {
+                                    const newFiles = [...rolesSelectedFiles];
+                                    newFiles[roleIndex] = Array.from(e.target.files);
+                                    setRolesSelectedFiles(newFiles);
+                                  }
+                                }}
+                                className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                              />
+                              <div className="space-y-3 mt-3">
+                                {(rolesSelectedFiles[roleIndex] || []).map((file, fileIndex) => (
+                                  <div key={fileIndex} className="flex items-center gap-3">
+                                    <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newFiles = [...rolesSelectedFiles];
+                                        newFiles[roleIndex] = newFiles[roleIndex].filter((_, i) => i !== fileIndex);
+                                        setRolesSelectedFiles(newFiles);
+                                      }}
+                                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                    >
+                                      <Trash2 size={16} className="text-red-400" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setRoles(roles.filter((_, i) => i !== roleIndex))}
+                              className="mt-4 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300 text-red-400"
+                            >
+                              Eliminar Rol
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Sección Auth */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Sección Auth</h3>
+                        <div className="mb-4">
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                          <textarea
+                            value={authText}
+                            onChange={(e) => setAuthText(e.target.value)}
+                            rows={4}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            placeholder="Descripción de la sección auth"
+                          />
+                        </div>
+                        <div>
+                          <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes</label>
+                          <div className="space-y-3">
+                            {authImages.map((url, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                                <button
+                                  type="button"
+                                  onClick={() => setAuthImages(authImages.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-3 mt-3">
+                            <input
+                              type="url"
+                              value={authNewImageUrl}
+                              onChange={(e) => setAuthNewImageUrl(e.target.value)}
+                              placeholder="https://ejemplo.com/imagen.jpg"
+                              className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (authNewImageUrl.trim()) {
+                                  setAuthImages([...authImages, authNewImageUrl.trim()]);
+                                  setAuthNewImageUrl('');
+                                }
+                              }}
+                              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                            >
+                              <Plus size={16} className="text-primary" />
+                            </button>
+                          </div>
+                          <input
+                            type="file"
+                            multiple
+                            onChange={(e) => {
+                              if (e.target.files) setAuthSelectedFiles(Array.from(e.target.files));
+                            }}
+                            className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                          />
+                          <div className="space-y-3 mt-3">
+                            {authSelectedFiles.map((file, index) => (
+                              <div key={index} className="flex items-center gap-3">
+                                <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setAuthSelectedFiles(authSelectedFiles.filter((_, i) => i !== index))}
+                                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                                >
+                                  <Trash2 size={16} className="text-red-400" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="flex items-center gap-3">
                     <button
@@ -774,7 +1272,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed' });
+                          setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', is_full_page: false, content_structure: {} });
                           setImageUrls([]);
                           setSelectedFiles([]);
                           setEditingId(null);
@@ -794,7 +1292,10 @@ export default function AdminPage() {
               {projects.map((project) => (
                 <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
+                    <div className="flex items-center gap-3">
+                      <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
+                      {project.is_full_page && <span className="px-2 py-1 bg-blue-500 text-white text-xs rounded">Página Completa</span>}
+                    </div>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleEdit(project)}
