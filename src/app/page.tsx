@@ -337,20 +337,21 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  {(project.demo_link || project.github_link || project.link) && (
-                    <div className="flex gap-3 pt-4">
-                      {(project.demo_link || project.link) && (
-                        <a href={project.demo_link || project.link} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-3 rounded-xl font-bold text-sm transition-all hover:shadow-lg">
-                          <ExternalLink size={16} />{t.projects.viewDemo}
-                        </a>
-                      )}
-                      {project.github_link && (
-                        <a href={project.github_link} target="_blank" rel="noopener noreferrer" className={`flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'} text-primary border border-primary/30 px-4 py-3 rounded-xl transition-all`}>
-                          <Github size={18} />
-                        </a>
-                      )}
-                    </div>
-                  )}
+                  <div className="flex gap-3 pt-4">
+                    <a href={`/project/${project.id}`} className="flex-1 flex items-center justify-center gap-2 bg-primary/10 text-primary border border-primary/30 px-4 py-3 rounded-xl font-bold text-sm transition-all hover:bg-primary/20">
+                      Ver Detalles
+                    </a>
+                    {(project.demo_link || project.link) && (
+                      <a href={project.demo_link || project.link} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-3 rounded-xl font-bold text-sm transition-all hover:shadow-lg">
+                        <ExternalLink size={16} />{t.projects.viewDemo}
+                      </a>
+                    )}
+                    {project.github_link && (
+                      <a href={project.github_link} target="_blank" rel="noopener noreferrer" className={`flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'} text-primary border border-primary/30 px-4 py-3 rounded-xl transition-all`}>
+                        <Github size={18} />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
