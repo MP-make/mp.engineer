@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession } from 'next-auth/react';
-import { ArrowLeft, ExternalLink, Github, Edit2, Save, X, Plus, Trash2, Upload } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Github, Edit2, Save, X, Plus, Trash2, Upload, Globe, FolderOpen, Sun, Moon, ChevronDown, Menu } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Project {
   id: number;
@@ -28,7 +28,8 @@ export default function ProjectPage() {
   const id = params.id as string;
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
-  const { theme } = useTheme();
+  const { theme, toggleTheme, setTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const { data: session } = useSession();
 
   // Edit states
@@ -197,10 +198,154 @@ export default function ProjectPage() {
     }
   };
 
+  // Custom Header for Project Page
+  const Header = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isThemeOpen, setIsThemeOpen] = useState(false);
+    const [isLangOpen, setIsLangOpen] = useState(false);
+    const themeRef = useRef<HTMLDivElement>(null);
+    const langRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (themeRef.current && !themeRef.current.contains(event.target as Node)) {
+          setIsThemeOpen(false);
+        }
+        if (langRef.current && !langRef.current.contains(event.target as Node)) {
+          setIsLangOpen(false);
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    return (
+      <nav className={`fixed top-0 w-full ${theme === 'dark' ? 'bg-accent' : 'bg-white'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} z-50 shadow-lg`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center gap-2 group">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-105">
+                  <span className="text-white font-bold text-sm">&lt;/&gt;</span>
+                </div>
+                <div className="hidden sm:block">
+                  <span className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-900'} font-bold text-lg group-hover:text-primary transition-colors`}>
+                    Marlon Pecho
+                  </span>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'} -mt-0.5`}>
+                    Full-Stack Developer
+                  </p>
+                </div>
+              </Link>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <a href="#landing" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Landing</a>
+              <a href="#paneles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Paneles</a>
+              <a href="#roles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Roles</a>
+              <a href="#auth" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Autenticación</a>
+              
+              {/* Language Selector */}
+              <div className="relative" ref={langRef}>
+                <button
+                  onClick={() => { setIsLangOpen(!isLangOpen); setIsThemeOpen(false); }}
+                  className={`flex items-center gap-1 px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all duration-300`}
+                >
+                  <Globe size={18} />
+                  <span className="text-sm font-medium">{language.toUpperCase()}</span>
+                  <ChevronDown size={14} className={`transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isLangOpen && (
+                  <div className={`absolute right-0 mt-2 w-32 rounded-xl ${theme === 'dark' ? 'bg-[#1e2432] border-primary/30' : 'bg-white border-gray-200'} border shadow-xl overflow-hidden`}>
+                    <button
+                      onClick={() => { setLanguage('es'); setIsLangOpen(false); }}
+                      className={`w-full px-4 py-2 text-left text-sm ${language === 'es' ? 'bg-primary/20 text-primary' : theme === 'dark' ? 'text-white hover:bg-primary/10' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    >
+                      🇪🇸 Español
+                    </button>
+                    <button
+                      onClick={() => { setLanguage('en'); setIsLangOpen(false); }}
+                      className={`w-full px-4 py-2 text-left text-sm ${language === 'en' ? 'bg-primary/20 text-primary' : theme === 'dark' ? 'text-white hover:bg-primary/10' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    >
+                      🇺🇸 English
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Theme Selector */}
+              <div className="relative" ref={themeRef}>
+                <button
+                  onClick={() => { setIsThemeOpen(!isThemeOpen); setIsLangOpen(false); }}
+                  className={`flex items-center gap-1 px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all duration-300`}
+                >
+                  {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
+                  <ChevronDown size={14} className={`transition-transform ${isThemeOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isThemeOpen && (
+                  <div className={`absolute right-0 mt-2 w-32 rounded-xl ${theme === 'dark' ? 'bg-[#1e2432] border-primary/30' : 'bg-white border-gray-200'} border shadow-xl overflow-hidden`}>
+                    <button
+                      onClick={() => { setTheme('light'); setIsThemeOpen(false); }}
+                      className={`w-full px-4 py-2 text-left text-sm ${theme === 'light' ? 'bg-primary/20 text-primary' : theme === 'dark' ? 'text-white hover:bg-primary/10' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    >
+                      <Sun size={16} /> {t.theme.light}
+                    </button>
+                    <button
+                      onClick={() => { setTheme('dark'); setIsThemeOpen(false); }}
+                      className={`w-full px-4 py-2 text-left text-sm ${theme === 'dark' ? 'bg-primary/20 text-primary' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    >
+                      <Moon size={16} /> {t.theme.dark}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center gap-2">
+              {/* Mobile Language */}
+              <button
+                onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all`}
+              >
+                <Globe size={20} />
+              </button>
+              {/* Mobile Theme */}
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all`}
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary`}
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile menu */}
+          {isMenuOpen && (
+            <div className="md:hidden">
+              <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 ${theme === 'dark' ? 'bg-accent' : 'bg-white'} rounded-lg mt-2 border ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'}`}>
+                <a href="#landing" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Landing</a>
+                <a href="#paneles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Paneles</a>
+                <a href="#roles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Roles</a>
+                <a href="#auth" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Autenticación</a>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+    );
+  };
+
   if (loading) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
-        <Navbar />
+        <Header />
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
@@ -214,7 +359,7 @@ export default function ProjectPage() {
   if (!project) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
-        <Navbar />
+        <Header />
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">Proyecto no encontrado</h1>
@@ -231,7 +376,7 @@ export default function ProjectPage() {
     // Render coming soon message
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
-        <Navbar />
+        <Header />
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">Página Próximamente</h1>
@@ -250,7 +395,7 @@ export default function ProjectPage() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
-      <Navbar />
+      <Header />
 
       {/* Noise Texture */}
       <div className="fixed inset-0 opacity-5 mix-blend-overlay pointer-events-none z-0" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cdefs%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E\")" }}></div>
@@ -288,7 +433,7 @@ export default function ProjectPage() {
       )}
 
       {/* Hero Section */}
-      <div className="relative h-[60vh] w-full overflow-hidden flex items-center justify-center">
+      <div className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center pt-64 pb-48">
         <img src={project.images?.[0]?.image} alt={project.title} className="absolute inset-0 object-cover opacity-40 blur-sm" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
         <div className="relative z-10 text-center max-w-7xl mx-auto px-4">
@@ -398,7 +543,7 @@ export default function ProjectPage() {
           switch (section.type) {
             case 'landing':
               return (
-                <section key={index} className="bg-[#0f172a] py-20">
+                <section key={index} id="landing" className="bg-[#0f172a] py-20">
                   <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Landing</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
@@ -482,7 +627,7 @@ export default function ProjectPage() {
 
             case 'paneles':
               return (
-                <section key={index} className="bg-[#1e293b] py-20">
+                <section key={index} id="paneles" className="bg-[#1e293b] py-20">
                   <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Paneles</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
@@ -566,7 +711,7 @@ export default function ProjectPage() {
 
             case 'roles':
               return (
-                <section key={index} className="bg-[#0f172a] py-20">
+                <section key={index} id="roles" className="bg-[#0f172a] py-20">
                   <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Roles</h2>
                     <div className="flex space-x-2 bg-white/5 p-1 rounded-xl backdrop-blur-sm w-fit mx-auto mb-8">
@@ -681,7 +826,7 @@ export default function ProjectPage() {
 
             case 'auth':
               return (
-                <section key={index} className="bg-[#1e293b] py-20">
+                <section key={index} id="auth" className="bg-[#1e293b] py-20">
                   <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Autenticación</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">

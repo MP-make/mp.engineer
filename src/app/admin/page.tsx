@@ -667,7 +667,7 @@ export default function AdminPage() {
       </div>
 
       {/* Header */}
-      <header className={`sticky top-0 z-50 backdrop-blur-xl ${theme === 'dark' ? 'bg-[#0f1419]/80' : 'bg-white/80'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} shadow-2xl`}>
+      <header className={`sticky top-0 z-50 backdrop-blur-xl ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} shadow-2xl`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo & Title */}
@@ -1016,7 +1016,7 @@ export default function AdminPage() {
                   <p className={`mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{project.description}</p>
                   <div className="flex items-center gap-3 mb-4">
                     {project.technologies.map((tech, index) => (
-                      <span key={index} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">{tech}</span>
+                      <span key={index} className="bg-primary/10 text-primary border border-primary/10 px-4 py-2 rounded-full text-sm font-medium">{tech}</span>
                     ))}
                   </div>
                   <div className="flex items-center gap-3">
@@ -1344,7 +1344,7 @@ export default function AdminPage() {
                     <Navbar />
 
                     {/* Header */}
-                    <div className={`border-b ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-gray-200 bg-white'} py-16`}>
+                    <div className={`border-b ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-gray-200 bg-white'} mt-24 pt-10 pb-16`}>
                       <div className="max-w-7xl mx-auto px-4">
                         <div className="text-center">
                           <div className="mb-6">
@@ -1367,9 +1367,9 @@ export default function AdminPage() {
                               placeholder="Describe tu proyecto..."
                             />
                           </div>
-                          <div className="flex flex-wrap gap-2 justify-center mb-8">
+                          <div className="flex flex-wrap gap-3 justify-center mb-8 max-w-3xl mx-auto leading-loose p-4">
                             {formData.technologies.split(',').map((tech, i) => (
-                              <span key={i} className="bg-primary/10 text-primary border border-primary/30 px-4 py-2 rounded-full text-sm font-medium">
+                              <span key={i} className="inline-block m-1 bg-primary/10 text-primary border border-primary/20 px-4 py-2 rounded-full text-sm font-bold shadow-sm">
                                 {tech.trim()}
                               </span>
                             ))}
