@@ -76,9 +76,10 @@ export default function AdminPage() {
 
   // Section builder states
   const [landingText, setLandingText] = useState('');
-  const [landingImages, setLandingImages] = useState<string[]>([]);
-  const [landingNewImageUrl, setLandingNewImageUrl] = useState('');
-  const [landingSelectedFiles, setLandingSelectedFiles] = useState<File[]>([]);
+  const [landingDesktopImage, setLandingDesktopImage] = useState('');
+  const [landingMobileImage, setLandingMobileImage] = useState('');
+  const [landingDesktopFile, setLandingDesktopFile] = useState<File | null>(null);
+  const [landingMobileFile, setLandingMobileFile] = useState<File | null>(null);
 
   const [panelesText, setPanelesText] = useState('');
   const [panelesImages, setPanelesImages] = useState<string[]>([]);
@@ -251,9 +252,16 @@ export default function AdminPage() {
         };
 
         // Upload section images
-        const landingUploaded = await uploadFiles(landingSelectedFiles);
-        if (landingUploaded.length === 0 && landingSelectedFiles.length > 0) return;
-        const landingAllImages = [...landingImages, ...landingUploaded];
+        let landingDesktopUrl = landingDesktopImage;
+        let landingMobileUrl = landingMobileImage;
+        if (landingDesktopFile) {
+          const uploaded = await uploadFiles([landingDesktopFile]);
+          if (uploaded.length > 0) landingDesktopUrl = uploaded[0];
+        }
+        if (landingMobileFile) {
+          const uploaded = await uploadFiles([landingMobileFile]);
+          if (uploaded.length > 0) landingMobileUrl = uploaded[0];
+        }
 
         const panelesUploaded = await uploadFiles(panelesSelectedFiles);
         if (panelesUploaded.length === 0 && panelesSelectedFiles.length > 0) return;
@@ -279,7 +287,7 @@ export default function AdminPage() {
         // Build content structure
         contentStructure = {
           sections: [
-            { type: 'landing', text: landingText, images: landingAllImages },
+            { type: 'landing', text: landingText, desktopImage: landingDesktopUrl, mobileImage: landingMobileUrl },
             { type: 'paneles', text: panelesText, images: panelesAllImages },
             { type: 'roles', roles: validRoles },
             { type: 'auth', text: authText, images: authAllImages }
@@ -362,9 +370,10 @@ export default function AdminPage() {
       setEditingId(null);
       // Reset section states
       setLandingText('');
-      setLandingImages([]);
-      setLandingNewImageUrl('');
-      setLandingSelectedFiles([]);
+      setLandingDesktopImage('');
+      setLandingMobileImage('');
+      setLandingDesktopFile(null);
+      setLandingMobileFile(null);
       setPanelesText('');
       setPanelesImages([]);
       setPanelesNewImageUrl('');
@@ -417,7 +426,8 @@ export default function AdminPage() {
       const landing = sections.find((s: any) => s.type === 'landing');
       if (landing) {
         setLandingText(landing.text || '');
-        setLandingImages(landing.images || []);
+        setLandingDesktopImage(landing.desktopImage || '');
+        setLandingMobileImage(landing.mobileImage || '');
       }
       const paneles = sections.find((s: any) => s.type === 'paneles');
       if (paneles) {
@@ -1410,36 +1420,25 @@ export default function AdminPage() {
                               />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                              {landingImages.map((image, imgIndex) => (
-                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group">
-                                  <img
-                                    src={image}
-                                    alt={`Introducción ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setLandingImages(landingImages.filter((_, i) => i !== imgIndex))}
-                                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                </div>
-                              ))}
-                              <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
+                              <div className="mb-6">
+                                <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imagen Desktop</label>
                                 <input
                                   type="file"
-                                  multiple
-                                  onChange={(e) => {
-                                    if (e.target.files) setLandingSelectedFiles(Array.from(e.target.files));
-                                  }}
-                                  className="hidden"
-                                  id="landing-upload"
+                                  accept="image/*"
+                                  onChange={(e) => setLandingDesktopFile(e.target.files?.[0] || null)}
+                                  className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                                 />
-                                <label htmlFor="landing-upload" className="cursor-pointer text-center">
-                                  <Plus size={32} className="text-primary mx-auto mb-2" />
-                                  <span className="text-sm text-primary">Agregar Imágenes</span>
-                                </label>
+                                {landingDesktopImage && <img src={landingDesktopImage} alt="Desktop" className="w-full h-32 object-cover rounded-lg mt-2" />}
+                              </div>
+                              <div className="mb-6">
+                                <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imagen Mobile</label>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => setLandingMobileFile(e.target.files?.[0] || null)}
+                                  className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                                />
+                                {landingMobileImage && <img src={landingMobileImage} alt="Mobile" className="w-full h-32 object-cover rounded-lg mt-2" />}
                               </div>
                             </div>
                           </div>
@@ -1666,9 +1665,10 @@ export default function AdminPage() {
                         setEditingId(null);
                         // Reset section states
                         setLandingText('');
-                        setLandingImages([]);
-                        setLandingNewImageUrl('');
-                        setLandingSelectedFiles([]);
+                        setLandingDesktopImage('');
+                        setLandingMobileImage('');
+                        setLandingDesktopFile(null);
+                        setLandingMobileFile(null);
                         setPanelesText('');
                         setPanelesImages([]);
                         setPanelesNewImageUrl('');

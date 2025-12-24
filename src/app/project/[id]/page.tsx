@@ -15,6 +15,7 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import { AnimatePresence, motion } from 'framer-motion';
 import PhoneMockup from '@/components/PhoneMockup';
+import LaptopMockup from '@/components/LaptopMockup';
 
 interface Project {
   id: number;
@@ -55,6 +56,12 @@ export default function ProjectPage() {
   // Estado para alternar entre Desktop (Swiper) y Mobile (Mockup)
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
+  // New states for landing images
+  const [editDesktopImage, setEditDesktopImage] = useState('');
+  const [editMobileImage, setEditMobileImage] = useState('');
+  const [newDesktopFile, setNewDesktopFile] = useState<File | null>(null);
+  const [newMobileFile, setNewMobileFile] = useState<File | null>(null);
+
   useEffect(() => {
     const fetchProject = async () => {
       const { data } = await supabase
@@ -80,6 +87,11 @@ export default function ProjectPage() {
       setEditLink(project.link || '');
       setEditGithubLink(project.github_link || '');
       setEditSections(project.content_structure?.sections || []);
+      const landing = project.content_structure?.sections?.find((s: any) => s.type === 'landing');
+      if (landing) {
+        setEditDesktopImage(landing.desktopImage || '');
+        setEditMobileImage(landing.mobileImage || '');
+      }
     }
   }, [project]);
 
@@ -164,7 +176,37 @@ export default function ProjectPage() {
         return section;
       }));
 
-      const contentStructure = { sections: updatedSectionsWithMobile };
+      // Handle new desktop and mobile images for landing
+      let updatedDesktopImage = editDesktopImage;
+      let updatedMobileImage = editMobileImage;
+
+      if (newDesktopFile) {
+        const fileExt = newDesktopFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('portfolio-images')
+          .upload(fileName, newDesktopFile);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage
+          .from('portfolio-images')
+          .getPublicUrl(fileName);
+        updatedDesktopImage = publicUrl;
+      }
+
+      if (newMobileFile) {
+        const fileExt = newMobileFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const { error } = await supabase.storage
+          .from('portfolio-images')
+          .upload(fileName, newMobileFile);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage
+          .from('portfolio-images')
+          .getPublicUrl(fileName);
+        updatedMobileImage = publicUrl;
+      }
+
+      const contentStructure = { sections: updatedSectionsWithMobile.map(section => section.type === 'landing' ? { ...section, desktopImage: updatedDesktopImage, mobileImage: updatedMobileImage } : section) };
 
       const response = await fetch('/api/projects', {
         method: 'PUT',
@@ -520,7 +562,7 @@ export default function ProjectPage() {
                   className="w-full px-4 py-3 mb-6 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-xl leading-relaxed"
                   rows={3}
                   placeholder="Descripción del proyecto"
-                />
+                ></textarea>
                 <input
                   type="text"
                   value={editTechnologies}
@@ -616,10 +658,10 @@ export default function ProjectPage() {
                           <textarea
                             value={section.text || ''}
                             onChange={(e) => updateSection(index, { text: e.target.value })}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                             rows={6}
                             placeholder="Escribe aquí la introducción..."
-                          />
+                          ></textarea>
                         ) : (
                           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                             {section.text}
@@ -628,19 +670,35 @@ export default function ProjectPage() {
 
                         {/* Campo para Imagen Versión Móvil */}
                         {isEditing && (
-                          <div className="mt-6">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                              Imagen Versión Móvil (opcional)
-                            </label>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => updateSection(index, { newMobileImage: e.target.files?.[0] })}
-                              className="w-full px-4 py-3 bg-[#0f1419] text-white border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300"
-                            />
-                            {section.mobileImage && (
-                              <p className="text-sm text-gray-400 mt-2">Imagen actual: {section.mobileImage.split('/').pop()}</p>
-                            )}
+                          <div>
+                            <div className="mt-6">
+                              <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Imagen Versión Desktop
+                              </label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setNewDesktopFile(e.target.files?.[0] || null)}
+                                className="w-full px-4 py-3 bg-[#0f1419] text-white border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300"
+                              />
+                              {editDesktopImage && (
+                                <p className="text-sm text-gray-400 mt-2">Imagen actual: {editDesktopImage.split('/').pop()}</p>
+                              )}
+                            </div>
+                            <div className="mt-6">
+                              <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Imagen Versión Móvil
+                              </label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setNewMobileFile(e.target.files?.[0] || null)}
+                                className="w-full px-4 py-3 bg-[#0f1419] text-white border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300"
+                              />
+                              {editMobileImage && (
+                                <p className="text-sm text-gray-400 mt-2">Imagen actual: {editMobileImage.split('/').pop()}</p>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -661,7 +719,7 @@ export default function ProjectPage() {
                             {viewMode === 'desktop' ? (
                               <>📱 Ver en Celular</>
                             ) : (
-                              <>💻 Ver Galería 3D</>
+                              <>💻 Ver en Laptop</>
                             )}
                           </button>
                         </div>
@@ -670,61 +728,18 @@ export default function ProjectPage() {
                         {viewMode === 'mobile' ? (
                           // 1. VISTA MOCKUP CELULAR
                           <div className="animate-in fade-in zoom-in duration-500">
-                             {/* Usa la imagen móvil si existe, sino la primera de la galería */}
-                             <PhoneMockup imageSrc={section.mobileImage || (section.images && section.images[0]) || ''} />
+                             <PhoneMockup imageSrc={section.mobileImage || ''} />
                              <p className="text-center text-sm text-gray-500 mt-2">
-                               Haz scroll dentro del teléfono para navegar
+                               Haz scroll dentro del dispositivo para navegar
                              </p>
                           </div>
                         ) : (
-                          // 2. VISTA SWIPER 3D (Tu código existente)
-                          <Swiper
-                            effect={'coverflow'}
-                            grabCursor={true}
-                            centeredSlides={true}
-                            slidesPerView={'auto'}
-                            loop={true}
-                            autoplay={{ delay: 2500, disableOnInteraction: false }}
-                            coverflowEffect={{ rotate: 50, stretch: 0, depth: 100, modifier: 1, slideShadows: true }}
-                            pagination={true}
-                            modules={[EffectCoverflow, Pagination, Autoplay]}
-                            className="w-full pt-10 pb-10"
-                          >
-                            {(section.images || []).map((image: string, imgIndex: number) => (
-                              <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl relative group">
-                                <img 
-                                  src={image} 
-                                  alt={`Slide ${imgIndex}`} 
-                                  className="block w-full h-full object-cover cursor-pointer"
-                                  onClick={() => setLightboxImage(image)}
-                                />
-                                {isEditing && (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                )}
-                              </SwiperSlide>
-                            ))}
-                          </Swiper>
-                        )}
-
-                        {/* Input de subida (Solo visible si editando y NO en modo móvil para no romper layout) */}
-                        {isEditing && viewMode === 'desktop' && (
-                          <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center mt-6">
-                            <input
-                              type="file"
-                              multiple
-                              onChange={(e) => addImageToSection(index, e.target.files!)}
-                              className="hidden"
-                              id={`landing-upload-${index}`}
-                            />
-                            <label htmlFor={`landing-upload-${index}`} className="cursor-pointer text-center py-4 w-full">
-                              <Plus size={32} className="text-primary mx-auto mb-2" />
-                              <span className="text-sm text-primary">Agregar Imágenes</span>
-                            </label>
+                          // 2. VISTA LAPTOP MOCKUP
+                          <div className="animate-in fade-in zoom-in duration-500">
+                             <LaptopMockup imageSrc={section.desktopImage || ''} />
+                             <p className="text-center text-sm text-gray-500 mt-2">
+                               Haz scroll dentro del dispositivo para navegar
+                             </p>
                           </div>
                         )}
                       </div>
@@ -801,10 +816,10 @@ export default function ProjectPage() {
                           <textarea
                             value={section.text || ''}
                             onChange={(e) => updateSection(index, { text: e.target.value })}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                             rows={6}
                             placeholder="Describe la galería o paneles del proyecto..."
-                          />
+                          ></textarea>
                         ) : (
                           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                             {section.text}
@@ -845,10 +860,10 @@ export default function ProjectPage() {
                               <textarea
                                 value={section.roles[activeRoleTab].description || ''}
                                 onChange={(e) => updateRole(activeRoleTab, { description: e.target.value })}
-                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                                className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                                 rows={6}
                                 placeholder="Descripción del rol"
-                              />
+                              ></textarea>
                             ) : (
                               <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                                 {section.roles[activeRoleTab].description}
@@ -991,10 +1006,10 @@ export default function ProjectPage() {
                           <textarea
                             value={section.text || ''}
                             onChange={(e) => updateSection(index, { text: e.target.value })}
-                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
+                            className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                             rows={6}
                             placeholder="Describe las características de autenticación y seguridad..."
-                          />
+                          ></textarea>
                         ) : (
                           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                             {section.text}
