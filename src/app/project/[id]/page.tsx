@@ -14,6 +14,7 @@ import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import { AnimatePresence, motion } from 'framer-motion';
+import PhoneMockup from '@/components/PhoneMockup';
 
 interface Project {
   id: number;
@@ -51,6 +52,8 @@ export default function ProjectPage() {
   const [activeRoleTab, setActiveRoleTab] = useState(0);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [authView, setAuthView] = useState<'login' | 'register'>('login');
+  // Estado para alternar entre Desktop (Swiper) y Mobile (Mockup)
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -140,7 +143,28 @@ export default function ProjectPage() {
         return section;
       }));
 
-      const contentStructure = { sections: await Promise.all(updatedSectionsWithRoles) };
+      // Handle new mobile images for sections
+      const updatedSectionsWithMobile = await Promise.all(updatedSections.map(async (section) => {
+        if (section.newMobileImage) {
+          const fileExt = section.newMobileImage.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+          const { error } = await supabase.storage
+            .from('portfolio-images')
+            .upload(fileName, section.newMobileImage);
+          if (error) throw error;
+          const { data: { publicUrl } } = await supabase.storage
+            .from('portfolio-images')
+            .getPublicUrl(fileName);
+          return {
+            ...section,
+            mobileImage: publicUrl,
+            newMobileImage: undefined
+          };
+        }
+        return section;
+      }));
+
+      const contentStructure = { sections: updatedSectionsWithMobile };
 
       const response = await fetch('/api/projects', {
         method: 'PUT',
@@ -585,6 +609,8 @@ export default function ProjectPage() {
                   <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Landing</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
+                      
+                      {/* Columna de Texto (Sin cambios) */}
                       <div className="lg:col-span-5 prose prose-invert prose-lg">
                         {isEditing ? (
                           <textarea
@@ -592,56 +618,101 @@ export default function ProjectPage() {
                             onChange={(e) => updateSection(index, { text: e.target.value })}
                             className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419] text-white' : 'bg-white text-gray-900'} border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] rounded-xl focus:outline-none focus:border-primary transition-all duration-300 text-lg leading-relaxed`}
                             rows={6}
-                            placeholder="Escribe aquí la introducción o descripción principal del proyecto..."
+                            placeholder="Escribe aquí la introducción..."
                           />
                         ) : (
                           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                             {section.text}
                           </p>
                         )}
-                      </div>
-                      <div className="lg:col-span-7 overflow-hidden py-10">
-                        <Swiper
-                          effect={'coverflow'}
-                          grabCursor={true}
-                          centeredSlides={true}
-                          slidesPerView={'auto'}
-                          loop={true}
-                          autoplay={{
-                            delay: 2500,
-                            disableOnInteraction: false,
-                          }}
-                          coverflowEffect={{
-                            rotate: 50,
-                            stretch: 0,
-                            depth: 100,
-                            modifier: 1,
-                            slideShadows: true,
-                          }}
-                          pagination={true}
-                          modules={[EffectCoverflow, Pagination, Autoplay]}
-                          className="w-full pt-10 pb-10"
-                        >
-                          {(section.images || []).map((image: string, imgIndex: number) => (
-                            <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl relative group">
-                              <img 
-                                src={image} 
-                                alt={`Slide ${imgIndex}`} 
-                                className="block w-full h-full object-cover cursor-pointer"
-                                onClick={() => setLightboxImage(image)}
-                              />
-                              {isEditing && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              )}
-                            </SwiperSlide>
-                          ))}
-                        </Swiper>
+
+                        {/* Campo para Imagen Versión Móvil */}
                         {isEditing && (
+                          <div className="mt-6">
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Imagen Versión Móvil (opcional)
+                            </label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => updateSection(index, { newMobileImage: e.target.files?.[0] })}
+                              className="w-full px-4 py-3 bg-[#0f1419] text-white border border-white/10 rounded-xl focus:outline-none focus:border-primary transition-all duration-300"
+                            />
+                            {section.mobileImage && (
+                              <p className="text-sm text-gray-400 mt-2">Imagen actual: {section.mobileImage.split('/').pop()}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Columna de Imágenes (MODIFICADA) */}
+                      <div className="lg:col-span-7 overflow-hidden py-10 relative">
+                        
+                        {/* Botón Toggle: Solo visible en PC (md:flex), oculto en móvil */}
+                        <div className="hidden md:flex justify-end mb-6 absolute top-0 right-0 z-20">
+                          <button 
+                            onClick={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all shadow-lg ${
+                              viewMode === 'mobile' 
+                                ? 'bg-primary text-white border-primary' 
+                                : 'bg-white/10 text-gray-300 border-white/10 hover:bg-white/20'
+                            }`}
+                          >
+                            {viewMode === 'desktop' ? (
+                              <>📱 Ver en Celular</>
+                            ) : (
+                              <>💻 Ver Galería 3D</>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Renderizado Condicional */}
+                        {viewMode === 'mobile' ? (
+                          // 1. VISTA MOCKUP CELULAR
+                          <div className="animate-in fade-in zoom-in duration-500">
+                             {/* Usa la imagen móvil si existe, sino la primera de la galería */}
+                             <PhoneMockup imageSrc={section.mobileImage || (section.images && section.images[0]) || ''} />
+                             <p className="text-center text-sm text-gray-500 mt-2">
+                               Haz scroll dentro del teléfono para navegar
+                             </p>
+                          </div>
+                        ) : (
+                          // 2. VISTA SWIPER 3D (Tu código existente)
+                          <Swiper
+                            effect={'coverflow'}
+                            grabCursor={true}
+                            centeredSlides={true}
+                            slidesPerView={'auto'}
+                            loop={true}
+                            autoplay={{ delay: 2500, disableOnInteraction: false }}
+                            coverflowEffect={{ rotate: 50, stretch: 0, depth: 100, modifier: 1, slideShadows: true }}
+                            pagination={true}
+                            modules={[EffectCoverflow, Pagination, Autoplay]}
+                            className="w-full pt-10 pb-10"
+                          >
+                            {(section.images || []).map((image: string, imgIndex: number) => (
+                              <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                                <img 
+                                  src={image} 
+                                  alt={`Slide ${imgIndex}`} 
+                                  className="block w-full h-full object-cover cursor-pointer"
+                                  onClick={() => setLightboxImage(image)}
+                                />
+                                {isEditing && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
+                                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                )}
+                              </SwiperSlide>
+                            ))}
+                          </Swiper>
+                        )}
+
+                        {/* Input de subida (Solo visible si editando y NO en modo móvil para no romper layout) */}
+                        {isEditing && viewMode === 'desktop' && (
                           <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center mt-6">
                             <input
                               type="file"
@@ -650,7 +721,7 @@ export default function ProjectPage() {
                               className="hidden"
                               id={`landing-upload-${index}`}
                             />
-                            <label htmlFor={`landing-upload-${index}`} className="cursor-pointer text-center">
+                            <label htmlFor={`landing-upload-${index}`} className="cursor-pointer text-center py-4 w-full">
                               <Plus size={32} className="text-primary mx-auto mb-2" />
                               <span className="text-sm text-primary">Agregar Imágenes</span>
                             </label>

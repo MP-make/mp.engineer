@@ -174,3 +174,14 @@ span[class*="bg-green"] {
 .glow {
   filter: drop-shadow(0 0 8px rgba(5, 150, 105, 0.3));
 }
+
+/* =========================================
+   5. NO SCROLLBAR UTILITY
+   ========================================= */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
