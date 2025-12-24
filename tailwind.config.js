@@ -18,7 +18,8 @@ module.exports = {
         neonPurple: 'var(--neonPurple)',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['var(--font-jakarta)', 'sans-serif'],
+        heading: ['var(--font-outfit)', 'sans-serif'],
       },
     },
   },

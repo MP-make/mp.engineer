@@ -175,8 +175,8 @@ export default function AdminPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const techArray = formData.technologies.trim() 
-      ? formData.technologies.split(',').map(t => t.trim()).filter(t => t.length > 0)
+    const techArray = (formData.technologies || '').trim() 
+      ? (formData.technologies || '').split(',').map(t => t.trim()).filter(t => t.length > 0)
       : [];
     
     try {

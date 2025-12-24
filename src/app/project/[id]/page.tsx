@@ -28,7 +28,9 @@ interface Project {
   created_at: string;
   images?: { image: string }[];
   is_full_page?: boolean;
-  content_structure?: any;
+  content_structure?: {
+    sections: any[];
+  };
 }
 
 export default function ProjectPage() {
@@ -83,11 +85,20 @@ export default function ProjectPage() {
     if (project) {
       setEditTitle(project.title);
       setEditDescription(project.description);
-      setEditTechnologies(project.technologies.join(', '));
+      setEditTechnologies(
+        Array.isArray(project.technologies) 
+          ? project.technologies.join(', ') 
+          : (project.technologies || '') // Fallback seguro
+      );
       setEditLink(project.link || '');
       setEditGithubLink(project.github_link || '');
-      setEditSections(project.content_structure?.sections || []);
-      const landing = project.content_structure?.sections?.find((s: any) => s.type === 'landing');
+      const sections = project.content_structure?.sections || [];
+      setEditSections(sections.map((s: any) => ({
+        ...s,
+        enabled: s.enabled !== false,
+        ...(s.type === 'auth' ? { hasRegistration: s.hasRegistration !== false } : {})
+      })));
+      const landing = sections.find((s: any) => s.type === 'landing');
       if (landing) {
         setEditDesktopImage(landing.desktopImage || '');
         setEditMobileImage(landing.mobileImage || '');
@@ -217,7 +228,7 @@ export default function ProjectPage() {
           description: editDescription,
           link: editLink || null,
           github_link: editGithubLink || null,
-          technologies: editTechnologies.split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0),
+          technologies: String(editTechnologies ?? '').split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0),
           status: project.status,
           is_full_page: project.is_full_page,
           content_structure: contentStructure
@@ -236,7 +247,7 @@ export default function ProjectPage() {
         description: editDescription,
         link: editLink,
         github_link: editGithubLink,
-        technologies: editTechnologies.split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0),
+        technologies: String(editTechnologies ?? '').split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0),
         content_structure: contentStructure
       });
 
@@ -254,7 +265,11 @@ export default function ProjectPage() {
     if (project) {
       setEditTitle(project.title);
       setEditDescription(project.description);
-      setEditTechnologies(project.technologies.join(', '));
+      setEditTechnologies(
+        Array.isArray(project.technologies) 
+          ? project.technologies.join(', ') 
+          : (project.technologies || '') // Fallback seguro
+      );
       setEditLink(project.link || '');
       setEditGithubLink(project.github_link || '');
       setEditSections(project.content_structure?.sections || []);
@@ -304,6 +319,7 @@ export default function ProjectPage() {
 
   // Custom Header for Project Page
   const Header = () => {
+    const enabledSections = project?.content_structure?.sections?.filter((s: any) => s.enabled !== false) || [];
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isThemeOpen, setIsThemeOpen] = useState(false);
     const [isLangOpen, setIsLangOpen] = useState(false);
@@ -335,19 +351,19 @@ export default function ProjectPage() {
                 </div>
                 <div className="hidden sm:block">
                   <span className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-900'} font-bold text-lg group-hover:text-primary transition-colors`}>
-                    Marlon Pecho
+                    {t.project.header.name}
                   </span>
                   <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'} -mt-0.5`}>
-                    Full-Stack Developer
+                    {t.project.header.role}
                   </p>
                 </div>
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              <a href="#landing" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Landing</a>
-              <a href="#paneles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Paneles</a>
-              <a href="#roles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Roles</a>
-              <a href="#auth" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>Autenticación</a>
+              {enabledSections.some(s => s.type === 'landing') && <a href="#landing" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.project.header.landing}</a>}
+              {enabledSections.some(s => s.type === 'paneles') && <a href="#paneles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.project.header.panels}</a>}
+              {enabledSections.some(s => s.type === 'roles') && <a href="#roles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.project.header.roles}</a>}
+              {enabledSections.some(s => s.type === 'auth') && <a href="#auth" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.project.header.auth}</a>}
               
               {/* Language Selector */}
               <div className="relative" ref={langRef}>
@@ -434,10 +450,10 @@ export default function ProjectPage() {
           {isMenuOpen && (
             <div className="md:hidden">
               <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 ${theme === 'dark' ? 'bg-accent' : 'bg-white'} rounded-lg mt-2 border ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'}`}>
-                <a href="#landing" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Landing</a>
-                <a href="#paneles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Paneles</a>
-                <a href="#roles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Roles</a>
-                <a href="#auth" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>Autenticación</a>
+                {enabledSections.some(s => s.type === 'landing') && <a href="#landing" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.project.header.landing}</a>}
+                {enabledSections.some(s => s.type === 'paneles') && <a href="#paneles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.project.header.panels}</a>}
+                {enabledSections.some(s => s.type === 'roles') && <a href="#roles" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.project.header.roles}</a>}
+                {enabledSections.some(s => s.type === 'auth') && <a href="#auth" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.project.header.auth}</a>}
               </div>
             </div>
           )}
@@ -453,7 +469,7 @@ export default function ProjectPage() {
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
-            <p className="text-xl font-semibold">Cargando proyecto...</p>
+            <p className="text-xl font-semibold">{t.project.loading.loading}</p>
           </div>
         </div>
       </div>
@@ -466,9 +482,9 @@ export default function ProjectPage() {
         <Header />
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Proyecto no encontrado</h1>
+            <h1 className="text-4xl font-bold mb-4">{t.project.loading.notFound}</h1>
             <Link href="/" className="text-primary hover:text-secondary font-medium">
-              ← Volver al inicio
+              ← {t.project.hero.backHome}
             </Link>
           </div>
         </div>
@@ -483,10 +499,10 @@ export default function ProjectPage() {
         <Header />
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Página Próximamente</h1>
+            <h1 className="text-4xl font-bold mb-4">{t.project.loading.comingSoon}</h1>
             <p className="text-lg mb-6">Esta página completa está en desarrollo. ¡Vuelve pronto!</p>
             <Link href="/" className="text-primary hover:text-secondary font-medium">
-              ← Volver al inicio
+              ← {t.project.hero.backHome}
             </Link>
           </div>
         </div>
@@ -496,6 +512,7 @@ export default function ProjectPage() {
 
   // Render full-page project with sections
   const sections = isEditing ? editSections : project.content_structure.sections;
+  const filteredSections = isEditing ? sections : sections.filter((s: any) => s.enabled !== false);
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
@@ -513,7 +530,7 @@ export default function ProjectPage() {
               className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors"
             >
               <Edit2 size={16} />
-              Editar
+              {t.project.edit.edit}
             </button>
           ) : (
             <div className="flex gap-2">
@@ -522,14 +539,14 @@ export default function ProjectPage() {
                 className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
               >
                 <Save size={16} />
-                Guardar
+                {t.project.edit.save}
               </button>
               <button
                 onClick={handleCancel}
                 className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
               >
                 <X size={16} />
-                Cancelar
+                {t.project.edit.cancel}
               </button>
             </div>
           )}
@@ -554,28 +571,30 @@ export default function ProjectPage() {
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   className="w-full px-4 py-3 mb-4 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-6xl font-bold tracking-tight"
-                  placeholder="Título del proyecto"
+                  placeholder={t.project.hero.titlePlaceholder}
                 />
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   className="w-full px-4 py-3 mb-6 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-xl leading-relaxed"
                   rows={3}
-                  placeholder="Descripción del proyecto"
+                  placeholder={t.project.hero.descriptionPlaceholder}
                 ></textarea>
                 <input
                   type="text"
                   value={editTechnologies}
                   onChange={(e) => setEditTechnologies(e.target.value)}
                   className="w-full px-4 py-3 mb-8 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center"
-                  placeholder="Tecnologías separadas por coma"
+                  placeholder={t.project.hero.techPlaceholder}
                 />
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
-                  {editTechnologies.split(',').map((tech, i) => (
-                    <span key={i} className="backdrop-blur-md bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
-                      {tech.trim()}
-                    </span>
-                  ))}
+                  {editTechnologies && String(editTechnologies).trim().length > 0 ? (
+                    String(editTechnologies).split(',').map((tech, i) => (
+                      <span key={i} className="backdrop-blur-md bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
+                        {tech.trim()}
+                      </span>
+                    ))
+                  ) : null}
                 </div>
                 <div className="flex gap-4 justify-center mb-8">
                   <input
@@ -603,11 +622,11 @@ export default function ProjectPage() {
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
-                  {project.technologies.map((tech, i) => (
+                  {project.technologies && Array.isArray(project.technologies) ? project.technologies.map((tech, i) => (
                     <span key={i} className="backdrop-blur-md bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
                       {tech}
                     </span>
-                  ))}
+                  )) : []}
                 </div>
               </>
             )}
@@ -621,7 +640,7 @@ export default function ProjectPage() {
                     className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-xl font-bold hover:shadow-lg transition-all"
                   >
                     <ExternalLink size={20} />
-                    Ver Demo
+                    {t.project.hero.viewDemo}
                   </a>
                 )}
                 {project.github_link && (
@@ -632,7 +651,7 @@ export default function ProjectPage() {
                     className="flex items-center gap-2 bg-white/10 text-white border border-white/30 px-8 py-4 rounded-xl hover:bg-white/20 transition-all"
                   >
                     <Github size={20} />
-                    GitHub
+                    {t.project.hero.github}
                   </a>
                 )}
               </div>
@@ -643,13 +662,13 @@ export default function ProjectPage() {
 
       {/* Sections */}
       <div>
-        {sections.map((section: any, index: number) => {
+        {filteredSections.map((section: any, index: number) => {
           switch (section.type) {
             case 'landing':
               return (
                 <section key={index} id="landing" className="bg-[#0f172a] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Landing</h2>
+                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">{t.project.sections.landing}</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
                       
                       {/* Columna de Texto (Sin cambios) */}
@@ -666,6 +685,13 @@ export default function ProjectPage() {
                           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                             {section.text}
                           </p>
+                        )}
+
+                        {isEditing && (
+                          <label className="flex items-center gap-2 mt-4">
+                            <input type="checkbox" checked={section.enabled !== false} onChange={(e) => updateSection(index, { enabled: e.target.checked })} />
+                            <span className="text-gray-300">Habilitada</span>
+                          </label>
                         )}
 
                         {/* Campo para Imagen Versión Móvil */}
@@ -825,6 +851,13 @@ export default function ProjectPage() {
                             {section.text}
                           </p>
                         )}
+
+                        {isEditing && (
+                          <label className="flex items-center gap-2 mt-4">
+                            <input type="checkbox" checked={section.enabled !== false} onChange={(e) => updateSection(index, { enabled: e.target.checked })} />
+                            <span className="text-gray-300">Habilitada</span>
+                          </label>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -841,7 +874,7 @@ export default function ProjectPage() {
                         <button
                           key={i}
                           onClick={() => setActiveRoleTab(i)}
-                          className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                          className={`px-6 py-2 rounded-lg font-medium transition-all ${
                             activeRoleTab === i
                               ? 'bg-primary text-white shadow-lg'
                               : 'text-gray-400 hover:text-white hover:bg-white/10'
@@ -868,6 +901,13 @@ export default function ProjectPage() {
                               <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                                 {section.roles[activeRoleTab].description}
                               </p>
+                            )}
+
+                            {isEditing && (
+                              <label className="flex items-center gap-2 mt-4">
+                                <input type="checkbox" checked={section.enabled !== false} onChange={(e) => updateSection(index, { enabled: e.target.checked })} />
+                                <span className="text-gray-300">Habilitada</span>
+                              </label>
                             )}
                           </div>
                           <div className="lg:col-span-7 overflow-hidden py-10">
@@ -961,12 +1001,14 @@ export default function ProjectPage() {
                             >
                               Iniciar Sesión
                             </button>
-                            <button
-                              onClick={() => setAuthView('register')}
-                              className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${authView === 'register' ? 'bg-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
-                            >
-                              Registrarse
-                            </button>
+                            {section.hasRegistration !== false && (
+                              <button
+                                onClick={() => setAuthView('register')}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${authView === 'register' ? 'bg-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                              >
+                                Registrarse
+                              </button>
+                            )}
                           </div>
 
                           {/* El Contenido Animado */}
@@ -1014,6 +1056,19 @@ export default function ProjectPage() {
                           <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
                             {section.text}
                           </p>
+                        )}
+
+                        {isEditing && (
+                          <div className="mt-4 space-y-2">
+                            <label className="flex items-center gap-2">
+                              <input type="checkbox" checked={section.enabled !== false} onChange={(e) => updateSection(index, { enabled: e.target.checked })} />
+                              <span className="text-gray-300">Habilitada</span>
+                            </label>
+                            <label className="flex items-center gap-2">
+                              <input type="checkbox" checked={section.hasRegistration !== false} onChange={(e) => updateSection(index, { hasRegistration: e.target.checked })} />
+                              <span className="text-gray-300">Tiene Registro</span>
+                            </label>
+                          </div>
                         )}
                       </div>
                     </div>

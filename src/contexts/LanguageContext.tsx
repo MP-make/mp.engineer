@@ -74,6 +74,48 @@ interface Translations {
     dark: string;
     system: string;
   };
+  project: {
+    header: {
+      landing: string;
+      panels: string;
+      roles: string;
+      auth: string;
+      name: string;
+      role: string;
+    };
+    hero: {
+      titlePlaceholder: string;
+      descriptionPlaceholder: string;
+      techPlaceholder: string;
+      linkPlaceholder: string;
+      githubPlaceholder: string;
+      viewDemo: string;
+      github: string;
+      backHome: string;
+    };
+    sections: {
+      landing: string;
+      panels: string;
+      roles: string;
+      auth: string;
+      landingTextPlaceholder: string;
+      panelsTextPlaceholder: string;
+      roleDescriptionPlaceholder: string;
+      authTextPlaceholder: string;
+      addRole: string;
+      addImages: string;
+    };
+    edit: {
+      edit: string;
+      save: string;
+      cancel: string;
+    };
+    loading: {
+      loading: string;
+      notFound: string;
+      comingSoon: string;
+    };
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -150,6 +192,48 @@ const translations: Record<Language, Translations> = {
       dark: 'Oscuro',
       system: 'Sistema',
     },
+    project: {
+      header: {
+        landing: 'Landing',
+        panels: 'Paneles',
+        roles: 'Roles',
+        auth: 'Autenticación',
+        name: 'Marlon Pecho',
+        role: 'Desarrollador Full-Stack',
+      },
+      hero: {
+        titlePlaceholder: 'Título del proyecto',
+        descriptionPlaceholder: 'Descripción del proyecto',
+        techPlaceholder: 'Tecnologías separadas por coma',
+        linkPlaceholder: 'Enlace del proyecto',
+        githubPlaceholder: 'Enlace de GitHub',
+        viewDemo: 'Ver Demo',
+        github: 'GitHub',
+        backHome: 'Volver al inicio',
+      },
+      sections: {
+        landing: 'Landing',
+        panels: 'Paneles',
+        roles: 'Roles',
+        auth: 'Autenticación',
+        landingTextPlaceholder: 'Escribe aquí la introducción...',
+        panelsTextPlaceholder: 'Describe la galería o paneles del proyecto...',
+        roleDescriptionPlaceholder: 'Descripción del rol',
+        authTextPlaceholder: 'Describe las características de autenticación y seguridad...',
+        addRole: 'Agregar Rol',
+        addImages: 'Agregar Imágenes',
+      },
+      edit: {
+        edit: 'Editar',
+        save: 'Guardar',
+        cancel: 'Cancelar',
+      },
+      loading: {
+        loading: 'Cargando proyecto...',
+        notFound: 'Proyecto no encontrado',
+        comingSoon: 'Página Próximamente',
+      },
+    },
   },
   en: {
     hero: {
@@ -223,6 +307,48 @@ const translations: Record<Language, Translations> = {
       light: 'Light',
       dark: 'Dark',
       system: 'System',
+    },
+    project: {
+      header: {
+        landing: 'Landing',
+        panels: 'Panels',
+        roles: 'Roles',
+        auth: 'Authentication',
+        name: 'Marlon Pecho',
+        role: 'Full-Stack Developer',
+      },
+      hero: {
+        titlePlaceholder: 'Project Title',
+        descriptionPlaceholder: 'Project Description',
+        techPlaceholder: 'Technologies separated by comma',
+        linkPlaceholder: 'Project Link',
+        githubPlaceholder: 'GitHub Link',
+        viewDemo: 'View Demo',
+        github: 'GitHub',
+        backHome: 'Back to Home',
+      },
+      sections: {
+        landing: 'Landing',
+        panels: 'Panels',
+        roles: 'Roles',
+        auth: 'Authentication',
+        landingTextPlaceholder: 'Write the introduction here...',
+        panelsTextPlaceholder: 'Describe the gallery or panels of the project...',
+        roleDescriptionPlaceholder: 'Role description',
+        authTextPlaceholder: 'Describe the authentication and security features...',
+        addRole: 'Add Role',
+        addImages: 'Add Images',
+      },
+      edit: {
+        edit: 'Edit',
+        save: 'Save',
+        cancel: 'Cancel',
+      },
+      loading: {
+        loading: 'Loading project...',
+        notFound: 'Project not found',
+        comingSoon: 'Page Coming Soon',
+      },
     },
   },
 };
