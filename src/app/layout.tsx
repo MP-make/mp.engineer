@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "MP.Engineer - Portafolio",
   description: "Portafolio profesional Marlon Pecho, Estudiante de Ingeniería de Sistemas Avanzados y Desarrollador Full-Stack.",
   icons: {
-    icon: '/favicon.png',
+    icon: '/faviconlimpio.png',
   },
 };
 

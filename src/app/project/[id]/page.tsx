@@ -21,6 +21,7 @@ interface Project {
   id: number;
   title: string;
   description: string;
+  short_description?: string;
   link?: string;
   github_link?: string;
   technologies: string[];
@@ -72,6 +73,7 @@ export default function ProjectPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editShortDescription, setEditShortDescription] = useState('');
   const [editTechnologies, setEditTechnologies] = useState('');
   const [editLink, setEditLink] = useState('');
   const [editGithubLink, setEditGithubLink] = useState('');
@@ -118,6 +120,7 @@ export default function ProjectPage() {
       );
       setEditLink(project.link || '');
       setEditGithubLink(project.github_link || '');
+      setEditShortDescription(project.short_description || '');
       const sections = project.content_structure?.sections || [];
       setEditSections(sections.map((s: any) => ({
         ...s,
@@ -252,6 +255,7 @@ export default function ProjectPage() {
           id: project.id,
           title: editTitle,
           description: editDescription,
+          short_description: editShortDescription,
           link: editLink || null,
           github_link: editGithubLink || null,
           technologies: String(editTechnologies ?? '').split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0),
@@ -271,6 +275,7 @@ export default function ProjectPage() {
         ...project,
         title: editTitle,
         description: editDescription,
+        short_description: editShortDescription,
         link: editLink,
         github_link: editGithubLink,
         technologies: String(editTechnologies ?? '').split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0),
@@ -298,6 +303,7 @@ export default function ProjectPage() {
       );
       setEditLink(project.link || '');
       setEditGithubLink(project.github_link || '');
+      setEditShortDescription(project.short_description || '');
       setEditSections(project.content_structure?.sections || []);
     }
   };
@@ -600,6 +606,13 @@ export default function ProjectPage() {
                   placeholder={t.project.hero.titlePlaceholder}
                 />
                 <textarea
+                  value={editShortDescription}
+                  onChange={(e) => setEditShortDescription(e.target.value)}
+                  className="w-full px-4 py-3 mb-6 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-lg leading-relaxed"
+                  rows={2}
+                  placeholder="Descripción corta para las tarjetas"
+                ></textarea>
+                <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   className="w-full px-4 py-3 mb-6 bg-black/20 text-white border-2 border-white/30 rounded-xl focus:outline-none focus:border-white transition-all duration-300 text-center text-xl leading-relaxed"
@@ -645,7 +658,7 @@ export default function ProjectPage() {
                   {project.title}
                 </h1>
                 <p className="text-xl mb-6 text-gray-200 max-w-3xl mx-auto leading-relaxed">
-                  {project.description}
+                  {project.description ? project.description.substring(0, 100) + '...' : ''}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
                   {project.technologies && Array.isArray(project.technologies) ? project.technologies.map((tech, i) => (

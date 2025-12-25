@@ -18,6 +18,16 @@ FROM information_schema.columns
 WHERE table_name = 'portfolio_skill' 
 ORDER BY ordinal_position;
 
+-- Agregar campo short_description a la tabla portfolio_project para descripciones cortas en cards
+ALTER TABLE portfolio_project 
+ADD COLUMN IF NOT EXISTS short_description TEXT;
+
+-- Verificar que el cambio se aplicó
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'portfolio_project' 
+AND column_name = 'short_description';
+
 -- Crear tabla para imágenes del Hero
 CREATE TABLE IF NOT EXISTS portfolio_heroimage (
     id SERIAL PRIMARY KEY,

@@ -19,6 +19,7 @@ interface Project {
   id: number;
   title: string;
   description: string;
+  short_description?: string;
   link?: string;
   demo_link?: string;
   github_link?: string;
@@ -330,7 +331,7 @@ export default function Home() {
                 <div className="p-4 pt-2"><div className="rounded-xl overflow-hidden"><Carousel images={project.images?.map(img => img.image) || []} /></div></div>
                 <div className="p-6 pt-2 space-y-4">
                   <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} group-hover:text-primary transition-colors`}>{project.title}</h3>
-                  <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} text-sm`}>{project.description}</p>
+                  <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} text-sm`}>{project.short_description || project.description}</p>
                   <div className={`pt-4 border-t ${theme === 'dark' ? 'border-primary/10' : 'border-gray-200'}`}>
                     <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} mb-3 font-bold uppercase tracking-wider flex items-center gap-2`}><Code size={12} className="text-primary" />{t.projects.techStack}</p>
                     <div className="flex flex-wrap gap-2">

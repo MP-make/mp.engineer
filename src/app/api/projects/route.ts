@@ -15,13 +15,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, link, github_link, technologies, status, is_full_page, content_structure, created_at } = body;
+    const { title, description, short_description, link, github_link, technologies, status, is_full_page, content_structure, created_at } = body;
 
     const { data, error } = await supabase
       .from('portfolio_project')
       .insert([{
         title,
         description,
+        short_description,
         link: link || null,
         github_link: github_link || null,
         technologies,
@@ -49,13 +50,14 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, title, description, link, github_link, technologies, status, is_full_page, content_structure } = body;
+    const { id, title, description, short_description, link, github_link, technologies, status, is_full_page, content_structure } = body;
 
     const { data, error } = await supabase
       .from('portfolio_project')
       .update({
         title,
         description,
+        short_description,
         link: link || null,
         github_link: github_link || null,
         technologies,
