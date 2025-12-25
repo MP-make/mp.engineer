@@ -33,6 +33,32 @@ interface Project {
   };
 }
 
+const TextReveal = ({ text }: { text: string }) => {
+  const words = text.split(" ");
+
+  return (
+    <motion.p
+      className="font-sans text-lg leading-loose text-slate-300 font-light"
+    >
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0,
+            delay: i * 0.03
+          }}
+          className="inline-block mr-1.5"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </motion.p>
+  );
+};
+
 export default function ProjectPage() {
   const params = useParams();
   const id = params.id as string;
@@ -682,9 +708,7 @@ export default function ProjectPage() {
                             placeholder="Escribe aquí la introducción..."
                           ></textarea>
                         ) : (
-                          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
-                            {section.text}
-                          </p>
+                          <TextReveal text={section.text} />
                         )}
 
                         {isEditing && (
@@ -847,9 +871,7 @@ export default function ProjectPage() {
                             placeholder="Describe la galería o paneles del proyecto..."
                           ></textarea>
                         ) : (
-                          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
-                            {section.text}
-                          </p>
+                          <TextReveal text={section.text} />
                         )}
 
                         {isEditing && (
@@ -1053,9 +1075,7 @@ export default function ProjectPage() {
                             placeholder="Describe las características de autenticación y seguridad..."
                           ></textarea>
                         ) : (
-                          <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
-                            {section.text}
-                          </p>
+                          <TextReveal text={section.text} />
                         )}
 
                         {isEditing && (
