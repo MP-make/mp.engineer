@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
 
-const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: "MP.Engineer - Portafolio",
@@ -17,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${outfit.variable} ${jakarta.variable}`}>
-      <body className="font-sans antialiased bg-[#0f172a]">
+    <html lang="es" className={`${inter.variable}`}>
+      <body className="font-sans antialiased bg-slate-950">
         <ClientProviders>
           {children}
         </ClientProviders>

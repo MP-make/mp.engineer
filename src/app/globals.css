@@ -1,3 +1,7 @@
+@import "@fontsource/space-grotesk/400.css";
+@import "@fontsource/space-grotesk/500.css";
+@import "@fontsource/space-grotesk/600.css";
+@import "@fontsource/space-grotesk/700.css";
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
@@ -35,13 +39,13 @@
 
 .dark {
   /* --- MODO OSCURO (Profundo) --- */
-  --background: #0B1120; /* Azul noche profundo */
+  --background: #020617; /* Slate-950 profundo */
   --foreground: #f1f5f9; /* Blanco hueso */
   --muted-foreground: #94a3b8;
   
-  /* Verde Menta (Para contraste en oscuro) */
-  --primary: #10b981; 
-  --primary-hover: #059669;
+  /* Emerald sofisticado */
+  --primary: #34d399; 
+  --primary-hover: #10b981;
   --on-primary: #020617;
   
   --border: #1e293b;
@@ -62,6 +66,7 @@
   --color-input: var(--input);
   --color-card: var(--card);
   --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Space Grotesk', sans-serif;
 }
 
 /* =========================================

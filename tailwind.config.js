@@ -18,8 +18,11 @@ module.exports = {
         neonPurple: 'var(--neonPurple)',
       },
       fontFamily: {
-        sans: ['var(--font-jakarta)', 'sans-serif'],
-        heading: ['var(--font-outfit)', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        heading: ['Space Grotesk', 'sans-serif'],
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
     },
   },

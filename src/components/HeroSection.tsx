@@ -18,6 +18,8 @@ interface HeroSectionProps {
 export default function HeroSection({ t, theme, currentSlide, heroImages, isImageOnLeft }: HeroSectionProps) {
   return (
     <section id="home" className="min-h-screen relative overflow-hidden">
+      {/* Glow effect background */}
+      <div className="absolute inset-0 bg-gradient-radial from-emerald-400/10 via-transparent to-transparent pointer-events-none"></div>
       <div className="hidden lg:block w-full min-h-screen">
         {/* isImageOnLeft=false significa imagen a la DERECHA (flex-row-reverse pone imagen derecha) */}
         <div className={`flex w-full min-h-screen transition-all duration-[1500ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${!isImageOnLeft ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -34,7 +36,7 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
                         : 'opacity-0 translate-y-8 blur-sm pointer-events-none'
                     }`}
                   >
-                    <h1 className={`text-4xl sm:text-5xl xl:text-6xl font-bold leading-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <h1 className={`text-4xl sm:text-5xl xl:text-6xl font-heading font-bold leading-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       <span className="text-primary">{slide.title.split(' ')[0]}</span>{' '}
                       {slide.title.split(' ').slice(1).join(' ')}
                     </h1>
@@ -107,7 +109,7 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
           <div className="relative min-h-[180px] mb-6">
             {t.hero.slides.map((slide: any, index: number) => (
               <div key={index} className={`absolute inset-0 transition-all duration-700 ${currentSlide % t.hero.slides.length === index ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <h1 className={`text-3xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                <h1 className={`text-3xl font-heading font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   <span className="text-primary">{slide.title.split(' ')[0]}</span> {slide.title.split(' ').slice(1).join(' ')}
                 </h1>
                 <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{slide.subtitle}</p>

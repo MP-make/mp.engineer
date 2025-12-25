@@ -143,6 +143,8 @@ export default function Home() {
 
       {/* Hero Section */}
       <section id="home" className="min-h-screen relative overflow-hidden">
+        {/* Glow effect background */}
+        <div className="absolute inset-0 bg-gradient-radial from-emerald-400/10 via-transparent to-transparent pointer-events-none"></div>
         {/* Desktop */}
         <div className="hidden lg:flex w-full min-h-screen relative pt-16">
           {/* Texto - posición dinámica */}
@@ -162,7 +164,7 @@ export default function Home() {
                         : 'opacity-0 translate-y-4 pointer-events-none'
                     }`}
                   >
-                    <h1 className={`text-4xl sm:text-5xl xl:text-6xl font-bold leading-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <h1 className={`text-6xl font-heading font-bold leading-tight mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       <span className="text-primary">{slide.title.split(' ')[0]}</span>{' '}
                       {slide.title.split(' ').slice(1).join(' ')}
                     </h1>
@@ -267,7 +269,7 @@ export default function Home() {
       {/* About Section */}
       <section id="about" className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-gray-100'}`}>
         <div className="max-w-7xl mx-auto">
-          <h2 className={`text-4xl font-bold text-center mb-12 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.about.title}</h2>
+          <h2 className={`text-4xl font-heading font-bold text-center mb-12 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.about.title}</h2>
           <div className="grid md:grid-cols-2 gap-12">
             <div>
               <h3 className={`text-2xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{t.about.professionalSummary}</h3>
@@ -294,7 +296,7 @@ export default function Home() {
               <h3 className={`text-2xl font-semibold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{t.about.skills}</h3>
               <div className="grid grid-cols-3 gap-4">
                 {skills.map((skill) => (
-                  <div key={skill.id} className={`group ${theme === 'dark' ? 'bg-[#0f1419] hover:bg-[#151a25]' : 'bg-white hover:bg-gray-50'} p-4 rounded-xl border border-primary/20 hover:border-primary hover:-translate-y-1 transition-all duration-200 shadow-sm hover:shadow-lg`}>
+                  <div key={skill.id} className={`group ${theme === 'dark' ? 'bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10' : 'bg-white hover:bg-gray-50'} p-4 rounded-xl border border-primary/20 hover:border-primary hover:-translate-y-1 transition-all duration-200 shadow-sm hover:shadow-lg`}>
                     <div className="flex flex-col items-center justify-center text-center gap-2">
                       <div className="text-primary group-hover:text-secondary transition-colors duration-200">
                         {getIconForSkill(skill.name)}
@@ -313,13 +315,13 @@ export default function Home() {
       <section id="projects" className={`py-20 px-4 ${theme === 'dark' ? 'bg-gradient-to-b from-[#1e2432] to-[#0f1419]' : 'bg-gradient-to-b from-gray-100 to-white'}`}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className={`text-4xl md:text-5xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.projects.title} <span className="text-primary">Destacados</span></h2>
+            <h2 className={`text-4xl md:text-5xl font-heading font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.projects.title} <span className="text-primary">Destacados</span></h2>
             <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-lg max-w-2xl mx-auto`}>{t.projects.subtitle}</p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
             {projects.map((project) => (
-              <div key={project.id} className={`group ${theme === 'dark' ? 'bg-[#1a1f2e]' : 'bg-white'} rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-gray-200 hover:border-primary/50'} transition-all duration-500 hover:shadow-2xl hover:-translate-y-2`}>
+              <div key={project.id} className={`group ${theme === 'dark' ? 'bg-white/5 border-white/10 backdrop-blur-sm' : 'bg-white'} rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-gray-200 hover:border-primary/50'} transition-all duration-500 hover:shadow-2xl hover:-translate-y-2`}>
                 <div className="p-4 pb-0 flex justify-end">
                   <div className={`${project.status === 'completed' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-yellow-400 to-orange-500'} text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2`}>
                     {project.status === 'completed' ? <><CheckCircle size={14} />{t.projects.completed}</> : <><Clock size={14} />{t.projects.inProgress}</>}
@@ -369,7 +371,7 @@ export default function Home() {
       {/* Contact Section */}
       <section id="contact" className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'}`}>
         <div className="max-w-4xl mx-auto">
-          <h2 className={`text-4xl font-bold text-center mb-12 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.contact.title}</h2>
+          <h2 className={`text-4xl font-heading font-bold text-center mb-12 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.contact.title}</h2>
           <div className="grid md:grid-cols-2 gap-12">
             <div>
               <h3 className={`text-2xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{t.contact.connect}</h3>
