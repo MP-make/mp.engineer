@@ -555,11 +555,11 @@ export default function ProjectPage() {
 
       {/* Hero Section */}
       <div className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center pt-64 pb-48" style={{ backgroundImage: `url(${project.images?.[0]?.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/40"></div>
+        <div className="absolute inset-0 backdrop-blur-sm bg-black/60"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
         <div className="relative z-10 text-center max-w-7xl mx-auto px-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-primary mb-8 font-medium">
-            <ArrowLeft size={20} />
+          <Link href="/" className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 px-6 py-3 rounded-xl font-semibold text-lg transition-all hover:scale-105 mb-8">
+            <ArrowLeft size={24} />
             Volver al inicio
           </Link>
 
@@ -615,7 +615,7 @@ export default function ProjectPage() {
               </>
             ) : (
               <>
-                <h1 className="text-6xl font-bold tracking-tight text-white mb-4 drop-shadow-lg">
+                <h1 className="text-6xl font-heading font-bold tracking-tight text-white mb-4 drop-shadow-lg">
                   {project.title}
                 </h1>
                 <p className="text-xl mb-6 text-gray-200 max-w-3xl mx-auto leading-relaxed">
@@ -623,7 +623,7 @@ export default function ProjectPage() {
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
                   {project.technologies && Array.isArray(project.technologies) ? project.technologies.map((tech, i) => (
-                    <span key={i} className="backdrop-blur-md bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
+                    <span key={i} className="backdrop-blur-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 px-4 py-2 rounded-full text-sm font-medium">
                       {tech}
                     </span>
                   )) : []}
@@ -637,7 +637,7 @@ export default function ProjectPage() {
                     href={project.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-xl font-bold hover:shadow-lg transition-all"
+                    className="flex items-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold hover:shadow-lg transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                   >
                     <ExternalLink size={20} />
                     {t.project.hero.viewDemo}
@@ -668,7 +668,7 @@ export default function ProjectPage() {
               return (
                 <section key={index} id="landing" className="bg-[#0f172a] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">{t.project.sections.landing}</h2>
+                    <h2 className="text-3xl font-heading font-bold tracking-tight mb-12 text-primary text-left">{t.project.sections.landing}</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
                       
                       {/* Columna de Texto (Sin cambios) */}
@@ -753,7 +753,7 @@ export default function ProjectPage() {
                         {/* Renderizado Condicional */}
                         {viewMode === 'mobile' ? (
                           // 1. VISTA MOCKUP CELULAR
-                          <div className="animate-in fade-in zoom-in duration-500">
+                          <div className="animate-in fade-in zoom-in duration-500 rounded-2xl border border-white/5 shadow-2xl shadow-black/50">
                              <PhoneMockup imageSrc={section.mobileImage || ''} />
                              <p className="text-center text-sm text-gray-500 mt-2">
                                Haz scroll dentro del dispositivo para navegar
@@ -761,7 +761,7 @@ export default function ProjectPage() {
                           </div>
                         ) : (
                           // 2. VISTA LAPTOP MOCKUP
-                          <div className="animate-in fade-in zoom-in duration-500">
+                          <div className="animate-in fade-in zoom-in duration-500 rounded-2xl border border-white/5 shadow-2xl shadow-black/50">
                              <LaptopMockup imageSrc={section.desktopImage || ''} />
                              <p className="text-center text-sm text-gray-500 mt-2">
                                Haz scroll dentro del dispositivo para navegar
@@ -778,7 +778,7 @@ export default function ProjectPage() {
               return (
                 <section key={index} id="paneles" className="bg-[#1e293b] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Paneles</h2>
+                    <h2 className="text-3xl font-heading font-bold tracking-tight mb-12 text-primary text-left">Paneles</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
                       <div className="lg:col-span-7 overflow-hidden py-10">
                         <Swiper
@@ -803,7 +803,7 @@ export default function ProjectPage() {
                           className="w-full pt-10 pb-10"
                         >
                           {(section.images || []).map((image: string, imgIndex: number) => (
-                            <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                            <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl border border-white/5 shadow-2xl shadow-black/50 overflow-hidden relative group">
                               <img 
                                 src={image} 
                                 alt={`Slide ${imgIndex}`} 
@@ -868,7 +868,7 @@ export default function ProjectPage() {
               return (
                 <section key={index} id="roles" className="bg-[#0f172a] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Roles</h2>
+                    <h2 className="text-3xl font-heading font-bold tracking-tight mb-12 text-primary text-left">Roles</h2>
                     <div className="flex space-x-2 bg-white/5 p-1 rounded-xl backdrop-blur-sm w-fit mx-auto mb-8">
                       {(section.roles || []).map((role: any, i: number) => (
                         <button
@@ -933,7 +933,7 @@ export default function ProjectPage() {
                               className="w-full pt-10 pb-10"
                             >
                               {(section.roles[activeRoleTab].images || []).map((image: string, imgIndex: number) => (
-                                <SwiperSlide key={imgIndex} className="w-[600px] h-[200px] rounded-2xl overflow-hidden shadow-2xl relative group">
+                                <SwiperSlide key={imgIndex} className="w-[600px] h-[200px] rounded-2xl border border-white/5 shadow-2xl shadow-black/50 overflow-hidden relative group backdrop-blur-md bg-white/10">
                                   <img 
                                     src={image} 
                                     alt={`Slide ${imgIndex}`} 
@@ -989,7 +989,7 @@ export default function ProjectPage() {
               return (
                 <section key={index} id="auth" className="bg-[#1e293b] py-20">
                   <div className="max-w-7xl mx-auto px-4">
-                    <h2 className="text-4xl font-bold tracking-tight mb-12 text-primary text-center">Autenticación</h2>
+                    <h2 className="text-3xl font-heading font-bold tracking-tight mb-12 text-primary text-left">Autenticación</h2>
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
                       <div className="lg:col-span-7">
                         <div className="flex flex-col items-center">
@@ -1012,7 +1012,7 @@ export default function ProjectPage() {
                           </div>
 
                           {/* El Contenido Animado */}
-                          <div className="w-full max-w-4xl h-[400px] relative overflow-hidden rounded-2xl bg-gray-900 border border-white/10 shadow-2xl">
+                          <div className="w-full max-w-4xl h-[400px] relative overflow-hidden rounded-2xl bg-gray-900 border border-white/10 shadow-2xl shadow-black/50">
                             <AnimatePresence mode="wait">
                               <motion.div
                                 key={authView}
