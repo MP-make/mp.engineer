@@ -798,10 +798,10 @@ export default function AdminPage() {
 
         {/* Projects Tab */}
         {activeTab === 'projects' && (
-          <div className="grid lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
             {/* Form */}
-            <div className="lg:col-span-2">
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl sticky top-32`}>
+            <div className="lg:col-span-2 order-2 lg:order-1">
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl lg:sticky lg:top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingId ? (
                     <>
@@ -991,7 +991,7 @@ export default function AdminPage() {
             </div>
 
             {/* Projects List */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 order-1 lg:order-2 space-y-6">
               {projects.map((project) => (
                 <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
                   <div className="flex items-center justify-between mb-4">
@@ -1073,10 +1073,10 @@ export default function AdminPage() {
 
         {/* Skills Tab */}
         {activeTab === 'skills' && (
-          <div className="grid lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
             {/* Form */}
-            <div className="lg:col-span-2">
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl sticky top-32`}>
+            <div className="lg:col-span-2 order-2 lg:order-1">
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl lg:sticky lg:top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingSkillId ? (
                     <>
@@ -1159,7 +1159,7 @@ export default function AdminPage() {
             </div>
 
             {/* Skills List */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 order-1 lg:order-2 space-y-6">
               {skills.map((skill) => (
                 <div key={skill.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
                   <div className="flex items-center justify-between mb-4">
@@ -1205,10 +1205,10 @@ export default function AdminPage() {
 
         {/* Hero Images Tab */}
         {activeTab === 'hero' && (
-          <div className="grid lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
             {/* Form */}
-            <div className="lg:col-span-2">
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl sticky top-32`}>
+            <div className="lg:col-span-2 order-2 lg:order-1">
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl lg:sticky lg:top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingHeroId ? (
                     <>
@@ -1299,7 +1299,7 @@ export default function AdminPage() {
             </div>
 
             {/* Hero Images List */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 order-1 lg:order-2 space-y-6">
               {heroImages.map((heroImage) => (
                 <div key={heroImage.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
                   <div className="flex items-center justify-between mb-4">
@@ -1375,7 +1375,7 @@ export default function AdminPage() {
                               </span>
                             ))}
                           </div>
-                          <div className="flex gap-4 justify-center">
+                          <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             {formData.link && (
                               <a
                                 href={formData.link}
@@ -1419,7 +1419,7 @@ export default function AdminPage() {
                                 placeholder="Escribe aquí la introducción o descripción principal del proyecto..."
                               />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="mb-6">
                                 <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imagen Desktop</label>
                                 <input

@@ -41,7 +41,7 @@ const TextReveal = ({ text }: { text: string }) => {
     <motion.p
       className="font-sans text-lg leading-loose text-slate-300 font-light"
     >
-      {words.map((word, i) => (
+      {words.map((word: string, i: number) => (
         <motion.span
           key={i}
           initial={{ opacity: 0 }}
@@ -177,7 +177,7 @@ export default function ProjectPage() {
                   .from('portfolio-images')
                   .upload(fileName, file);
                 if (error) throw error;
-                const { data: { publicUrl } } = supabase.storage
+                const { data: { publicUrl } } = await supabase.storage
                   .from('portfolio-images')
                   .getPublicUrl(fileName);
                 uploadedUrls.push(publicUrl);
@@ -227,7 +227,7 @@ export default function ProjectPage() {
           .from('portfolio-images')
           .upload(fileName, newDesktopFile);
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = await supabase.storage
           .from('portfolio-images')
           .getPublicUrl(fileName);
         updatedDesktopImage = publicUrl;
@@ -240,7 +240,7 @@ export default function ProjectPage() {
           .from('portfolio-images')
           .upload(fileName, newMobileFile);
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = await supabase.storage
           .from('portfolio-images')
           .getPublicUrl(fileName);
         updatedMobileImage = publicUrl;
@@ -320,7 +320,7 @@ export default function ProjectPage() {
   const removeImageFromSection = (sectionIndex: number, imageIndex: number) => {
     const section = editSections[sectionIndex];
     const images = section.images || [];
-    updateSection(sectionIndex, { images: images.filter((_: string, i: number) => i !== imageIndex) });
+    updateSection(sectionIndex, { images: images.filter((img: string, i: number) => i !== imageIndex) });
   };
 
   const addRole = () => {
@@ -336,7 +336,7 @@ export default function ProjectPage() {
     if (rolesSection) {
       const sectionIndex = editSections.indexOf(rolesSection);
       const roles = rolesSection.roles || [];
-      updateSection(sectionIndex, { roles: roles.map((r: any, i: number) => i === roleIndex ? { ...r, ...updates } : r) });
+      updateSection(sectionIndex, { roles: roles.map((role: any, i: number) => i === roleIndex ? { ...role, ...updates } : role) });
     }
   };
 
@@ -345,7 +345,7 @@ export default function ProjectPage() {
     if (rolesSection) {
       const sectionIndex = editSections.indexOf(rolesSection);
       const roles = rolesSection.roles || [];
-      updateSection(sectionIndex, { roles: roles.filter((_: any, i: number) => i !== roleIndex) });
+      updateSection(sectionIndex, { roles: roles.filter((role: any, i: number) => i !== roleIndex) });
     }
   };
 
@@ -628,7 +628,7 @@ export default function ProjectPage() {
                 />
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
                   {editTechnologies && String(editTechnologies).trim().length > 0 ? (
-                    String(editTechnologies).split(',').map((tech, i) => (
+                    String(editTechnologies).split(',').map((tech: string, i: number) => (
                       <span key={i} className="backdrop-blur-md bg-white/10 border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium">
                         {tech.trim()}
                       </span>
@@ -661,7 +661,7 @@ export default function ProjectPage() {
                   {project.description ? project.description.substring(0, 100) + '...' : ''}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center mb-8">
-                  {project.technologies && Array.isArray(project.technologies) ? project.technologies.map((tech, i) => (
+                  {project.technologies && Array.isArray(project.technologies) ? project.technologies.map((tech: string, i: number) => (
                     <span key={i} className="backdrop-blur-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 px-4 py-2 rounded-full text-sm font-medium">
                       {tech}
                     </span>
@@ -841,10 +841,11 @@ export default function ProjectPage() {
                         >
                           {(() => {
                             const allImages = [
-                              ...(section.images || []).map((img, idx) => ({ src: img, isNew: false, originalIndex: idx })),
-                              ...(section.newImages || []).map((file, idx) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
+                              ...(section.images || []).map((img: string, idx: number) => ({ src: img, isNew: false, originalIndex: idx })),
+                              ...(section.newImages || []).map((file: File, idx: number) => 
+({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
                             ];
-                            return allImages.map((image, imgIndex) => (
+                            return allImages.map((image: any, imgIndex: number) => (
                               <SwiperSlide key={`${image.isNew ? 'new' : 'old'}-${imgIndex}`} className={`bg-center bg-cover w-[300px] h-[300px] rounded-2xl border ${image.isNew ? 'border-yellow-500/50' : 'border-white/5'} shadow-2xl shadow-black/50 overflow-hidden relative group`}>
                                 <img 
                                   src={image.src} 
@@ -864,7 +865,7 @@ export default function ProjectPage() {
                                       if (image.isNew) {
                                         // Remove from newImages
                                         const newImages = section.newImages || [];
-                                        updateSection(index, { newImages: newImages.filter((_, i) => i !== image.originalIndex) });
+                                        updateSection(index, { newImages: newImages.filter((file: File, i: number) => i !== image.originalIndex) });
                                       } else {
                                         // Remove from images
                                         removeImageFromSection(index, image.originalIndex);
@@ -991,10 +992,10 @@ export default function ProjectPage() {
                               {(() => {
                                 const role = section.roles[activeRoleTab];
                                 const allImages = [
-                                  ...(role.images || []).map((img, idx) => ({ src: img, isNew: false, originalIndex: idx })),
-                                  ...(role.newImages || []).map((file, idx) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
+                                  ...(role.images || []).map((img: string, idx: number) => ({ src: img, isNew: false, originalIndex: idx })),
+                                  ...(role.newImages || []).map((file: File, idx: number) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
                                 ];
-                                return allImages.map((image, imgIndex) => (
+                                return allImages.map((image: any, imgIndex: number) => (
                                   <SwiperSlide key={`${image.isNew ? 'new' : 'old'}-${imgIndex}`} className={`w-[600px] h-[200px] rounded-2xl border ${image.isNew ? 'border-yellow-500/50' : 'border-white/5'} shadow-2xl shadow-black/50 overflow-hidden relative group backdrop-blur-md bg-white/10`}>
                                     <img 
                                       src={image.src} 
@@ -1013,10 +1014,10 @@ export default function ProjectPage() {
                                           e.stopPropagation(); 
                                           if (image.isNew) {
                                             // Remove from newImages
-                                            updateRole(activeRoleTab, { newImages: (role.newImages || []).filter((_, i) => i !== image.originalIndex) });
+                                            updateRole(activeRoleTab, { newImages: (role.newImages || []).filter((file: File, i: number) => i !== image.originalIndex) });
                                           } else {
                                             // Remove from images
-                                            updateRole(activeRoleTab, { images: role.images.filter((_, i) => i !== image.originalIndex) });
+                                            updateRole(activeRoleTab, { images: role.images.filter((img: string, i: number) => i !== image.originalIndex) });
                                           }
                                         }}
                                         className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
