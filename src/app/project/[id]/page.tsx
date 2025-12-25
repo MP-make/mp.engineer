@@ -839,24 +839,45 @@ export default function ProjectPage() {
                           modules={[EffectCoverflow, Pagination, Autoplay]}
                           className="w-full pt-10 pb-10"
                         >
-                          {(section.images || []).map((image: string, imgIndex: number) => (
-                            <SwiperSlide key={imgIndex} className="bg-center bg-cover w-[300px] h-[300px] rounded-2xl border border-white/5 shadow-2xl shadow-black/50 overflow-hidden relative group">
-                              <img 
-                                src={image} 
-                                alt={`Slide ${imgIndex}`} 
-                                className="block w-full h-full object-cover cursor-pointer"
-                                onClick={() => setLightboxImage(image)}
-                              />
-                              {isEditing && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); removeImageFromSection(index, imgIndex); }}
-                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              )}
-                            </SwiperSlide>
-                          ))}
+                          {(() => {
+                            const allImages = [
+                              ...(section.images || []).map((img, idx) => ({ src: img, isNew: false, originalIndex: idx })),
+                              ...(section.newImages || []).map((file, idx) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
+                            ];
+                            return allImages.map((image, imgIndex) => (
+                              <SwiperSlide key={`${image.isNew ? 'new' : 'old'}-${imgIndex}`} className={`bg-center bg-cover w-[300px] h-[300px] rounded-2xl border ${image.isNew ? 'border-yellow-500/50' : 'border-white/5'} shadow-2xl shadow-black/50 overflow-hidden relative group`}>
+                                <img 
+                                  src={image.src} 
+                                  alt={`Slide ${imgIndex}`} 
+                                  className="block w-full h-full object-cover cursor-pointer"
+                                  onClick={() => setLightboxImage(image.src)}
+                                />
+                                {image.isNew && (
+                                  <div className="absolute top-2 left-2 bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">
+                                    NUEVO
+                                  </div>
+                                )}
+                                {isEditing && (
+                                  <button
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      if (image.isNew) {
+                                        // Remove from newImages
+                                        const newImages = section.newImages || [];
+                                        updateSection(index, { newImages: newImages.filter((_, i) => i !== image.originalIndex) });
+                                      } else {
+                                        // Remove from images
+                                        removeImageFromSection(index, image.originalIndex);
+                                      }
+                                    }}
+                                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                )}
+                              </SwiperSlide>
+                            ));
+                          })()}
                         </Swiper>
                         {isEditing && (
                           <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center mt-6">
@@ -967,24 +988,45 @@ export default function ProjectPage() {
                               modules={[EffectCoverflow, Pagination, Autoplay]}
                               className="w-full pt-10 pb-10"
                             >
-                              {(section.roles[activeRoleTab].images || []).map((image: string, imgIndex: number) => (
-                                <SwiperSlide key={imgIndex} className="w-[600px] h-[200px] rounded-2xl border border-white/5 shadow-2xl shadow-black/50 overflow-hidden relative group backdrop-blur-md bg-white/10">
-                                  <img 
-                                    src={image} 
-                                    alt={`Slide ${imgIndex}`} 
-                                    className="block w-full h-full object-cover cursor-pointer"
-                                    onClick={() => setLightboxImage(image)}
-                                  />
-                                  {isEditing && (
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); const rolesSection = editSections.find(s => s.type === 'roles'); if (rolesSection) { const sectionIndex = editSections.indexOf(rolesSection); const roles = rolesSection.roles || []; const updatedRoles = roles.map((r: any, i: number) => i === activeRoleTab ? { ...r, images: r.images.filter((_: string, j: number) => j !== imgIndex) } : r); updateSection(sectionIndex, { roles: updatedRoles }); } }}
-                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Trash2 size={16} />
-                                    </button>
-                                  )}
-                                </SwiperSlide>
-                              ))}
+                              {(() => {
+                                const role = section.roles[activeRoleTab];
+                                const allImages = [
+                                  ...(role.images || []).map((img, idx) => ({ src: img, isNew: false, originalIndex: idx })),
+                                  ...(role.newImages || []).map((file, idx) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
+                                ];
+                                return allImages.map((image, imgIndex) => (
+                                  <SwiperSlide key={`${image.isNew ? 'new' : 'old'}-${imgIndex}`} className={`w-[600px] h-[200px] rounded-2xl border ${image.isNew ? 'border-yellow-500/50' : 'border-white/5'} shadow-2xl shadow-black/50 overflow-hidden relative group backdrop-blur-md bg-white/10`}>
+                                    <img 
+                                      src={image.src} 
+                                      alt={`Slide ${imgIndex}`} 
+                                      className="block w-full h-full object-cover cursor-pointer"
+                                      onClick={() => setLightboxImage(image.src)}
+                                    />
+                                    {image.isNew && (
+                                      <div className="absolute top-2 left-2 bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">
+                                        NUEVO
+                                      </div>
+                                    )}
+                                    {isEditing && (
+                                      <button
+                                        onClick={(e) => { 
+                                          e.stopPropagation(); 
+                                          if (image.isNew) {
+                                            // Remove from newImages
+                                            updateRole(activeRoleTab, { newImages: (role.newImages || []).filter((_, i) => i !== image.originalIndex) });
+                                          } else {
+                                            // Remove from images
+                                            updateRole(activeRoleTab, { images: role.images.filter((_, i) => i !== image.originalIndex) });
+                                          }
+                                        }}
+                                        className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                      >
+                                        <Trash2 size={16} />
+                                      </button>
+                                    )}
+                                  </SwiperSlide>
+                                ));
+                              })()}
                             </Swiper>
                             {isEditing && (
                               <div className="rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center mt-6">
