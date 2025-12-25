@@ -1459,28 +1459,45 @@ export default function AdminPage() {
                             />
                           </div>
                           <div className="grid md:grid-cols-3 gap-8">
-                            {panelesImages.map((image, imgIndex) => (
-                              <div key={imgIndex} className="aspect-video rounded-xl overflow-hidden relative group">
-                                <img
-                                  src={image}
-                                  alt={`Galería ${imgIndex + 1}`}
-                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => setPanelesImages(panelesImages.filter((_, i) => i !== imgIndex))}
-                                  className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              </div>
-                            ))}
+                            {(() => {
+                              const allImages = [
+                                ...panelesImages.map((img, idx) => ({ src: img, isNew: false, originalIndex: idx })),
+                                ...panelesSelectedFiles.map((file, idx) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
+                              ];
+                              return allImages.map((image, imgIndex) => (
+                                <div key={`${image.isNew ? 'new' : 'old'}-${imgIndex}`} className={`aspect-video rounded-xl overflow-hidden relative group ${image.isNew ? 'border-2 border-yellow-500/50' : ''}`}>
+                                  <img
+                                    src={image.src}
+                                    alt={`Galería ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                  />
+                                  {image.isNew && (
+                                    <div className="absolute top-2 left-2 bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">
+                                      NUEVO
+                                    </div>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (image.isNew) {
+                                        setPanelesSelectedFiles(panelesSelectedFiles.filter((_, i) => i !== image.originalIndex));
+                                      } else {
+                                        setPanelesImages(panelesImages.filter((_, i) => i !== image.originalIndex));
+                                      }
+                                    }}
+                                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              ));
+                            })()}
                             <div className="aspect-video rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
                               <input
                                 type="file"
                                 multiple
                                 onChange={(e) => {
-                                  if (e.target.files) setPanelesSelectedFiles(Array.from(e.target.files));
+                                  if (e.target.files) setPanelesSelectedFiles([...panelesSelectedFiles, ...Array.from(e.target.files)]);
                                 }}
                                 className="hidden"
                                 id="paneles-upload"
@@ -1531,26 +1548,43 @@ export default function AdminPage() {
                                   placeholder="Descripción del rol en el proyecto..."
                                 />
                                 <div className="grid grid-cols-2 gap-2">
-                                  {role.images.map((image, imgIndex) => (
-                                    <div key={imgIndex} className="aspect-square rounded-lg overflow-hidden relative group">
-                                      <img
-                                        src={image}
-                                        alt={`${role.name} ${imgIndex + 1}`}
-                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const newRoles = [...roles];
-                                          newRoles[roleIndex].images = newRoles[roleIndex].images.filter((_, i) => i !== imgIndex);
-                                          setRoles(newRoles);
-                                        }}
-                                        className="absolute top-1 right-1 p-1 rounded bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                      >
-                                        <Trash2 size={12} />
-                                      </button>
-                                    </div>
-                                  ))}
+                                  {(() => {
+                                    const roleImages = [
+                                      ...role.images.map((img, idx) => ({ src: img, isNew: false, originalIndex: idx })),
+                                      ...(rolesSelectedFiles[roleIndex] || []).map((file, idx) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
+                                    ];
+                                    return roleImages.map((image, imgIndex) => (
+                                      <div key={`${image.isNew ? 'new' : 'old'}-${imgIndex}`} className={`aspect-square rounded-lg overflow-hidden relative group ${image.isNew ? 'border-2 border-yellow-500/50' : ''}`}>
+                                        <img
+                                          src={image.src}
+                                          alt={`${role.name} ${imgIndex + 1}`}
+                                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                        />
+                                        {image.isNew && (
+                                          <div className="absolute top-1 left-1 bg-yellow-500 text-black px-1 py-0.5 rounded text-xs font-bold">
+                                            NUEVO
+                                          </div>
+                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            if (image.isNew) {
+                                              const newFiles = [...rolesSelectedFiles];
+                                              newFiles[roleIndex] = (newFiles[roleIndex] || []).filter((_, i) => i !== image.originalIndex);
+                                              setRolesSelectedFiles(newFiles);
+                                            } else {
+                                              const newRoles = [...roles];
+                                              newRoles[roleIndex].images = newRoles[roleIndex].images.filter((_, i) => i !== image.originalIndex);
+                                              setRoles(newRoles);
+                                            }
+                                          }}
+                                          className="absolute top-1 right-1 p-1 rounded bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                    ));
+                                  })()}
                                   <div className="aspect-square rounded-lg border-2 border-dashed border-primary/30 flex items-center justify-center">
                                     <input
                                       type="file"
@@ -1558,7 +1592,7 @@ export default function AdminPage() {
                                       onChange={(e) => {
                                         if (e.target.files) {
                                           const newFiles = [...rolesSelectedFiles];
-                                          newFiles[roleIndex] = Array.from(e.target.files);
+                                          newFiles[roleIndex] = [...(newFiles[roleIndex] || []), ...Array.from(e.target.files)];
                                           setRolesSelectedFiles(newFiles);
                                         }
                                       }}
@@ -1609,28 +1643,45 @@ export default function AdminPage() {
                               />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                              {authImages.map((image, imgIndex) => (
-                                <div key={imgIndex} className="aspect-square rounded-xl overflow-hidden relative group">
-                                  <img
-                                    src={image}
-                                    alt={`Autenticación ${imgIndex + 1}`}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setAuthImages(authImages.filter((_, i) => i !== imgIndex))}
-                                    className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                </div>
-                              ))}
+                              {(() => {
+                                const authAllImages = [
+                                  ...authImages.map((img, idx) => ({ src: img, isNew: false, originalIndex: idx })),
+                                  ...authSelectedFiles.map((file, idx) => ({ src: URL.createObjectURL(file), isNew: true, originalIndex: idx }))
+                                ];
+                                return authAllImages.map((image, imgIndex) => (
+                                  <div key={`${image.isNew ? 'new' : 'old'}-${imgIndex}`} className={`aspect-square rounded-xl overflow-hidden relative group ${image.isNew ? 'border-2 border-yellow-500/50' : ''}`}>
+                                    <img
+                                      src={image.src}
+                                      alt={`Autenticación ${imgIndex + 1}`}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                    {image.isNew && (
+                                      <div className="absolute top-2 left-2 bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">
+                                        NUEVO
+                                      </div>
+                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (image.isNew) {
+                                          setAuthSelectedFiles(authSelectedFiles.filter((_, i) => i !== image.originalIndex));
+                                        } else {
+                                          setAuthImages(authImages.filter((_, i) => i !== image.originalIndex));
+                                        }
+                                      }}
+                                      className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  </div>
+                                ));
+                              })()}
                               <div className="aspect-square rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
                                 <input
                                   type="file"
                                   multiple
                                   onChange={(e) => {
-                                    if (e.target.files) setAuthSelectedFiles(Array.from(e.target.files));
+                                    if (e.target.files) setAuthSelectedFiles([...authSelectedFiles, ...Array.from(e.target.files)]);
                                   }}
                                   className="hidden"
                                   id="auth-upload"
