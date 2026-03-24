@@ -25,9 +25,9 @@
   /* Texto secundario: Gris medio */
   --muted-foreground: #64748b; 
   
-  /* Color Principal: Verde Esmeralda (Sólido y Profesional) */
-  --primary: #059669; 
-  --primary-hover: #047857; 
+  /* Color Principal: Azul Tecnológico (Sólido y Profesional) */
+  --primary: #2563eb; 
+  --primary-hover: #1d4ed8; 
   --on-primary: #ffffff; 
   
   /* Elementos UI */
@@ -43,9 +43,9 @@
   --foreground: #f1f5f9; /* Blanco hueso */
   --muted-foreground: #94a3b8;
   
-  /* Emerald sofisticado */
-  --primary: #34d399; 
-  --primary-hover: #10b981;
+  /* Azul Tecnológico sofisticado */
+  --primary: #3b82f6; 
+  --primary-hover: #2563eb;
   --on-primary: #020617;
   
   --border: #1e293b;
@@ -92,7 +92,7 @@ body {
   input:focus, textarea:focus, select:focus {
     outline: 2px solid var(--primary) !important;
     border-color: transparent !important;
-    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1) !important; /* Anillo suave verde */
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important; /* Anillo suave azul */
   }
 }
 
@@ -101,13 +101,13 @@ body {
    ========================================= */
 .text-gradient-primary {
   /* Título "Marlon Pecho" */
-  background: linear-gradient(to right, #059669, #10b981);
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .dark .text-gradient-primary {
-  background: linear-gradient(to right, #ffffff, #34d399);
+  background: linear-gradient(to right, #ffffff, #3b82f6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -129,7 +129,7 @@ a[class*="from-"],
 div[class*="from-green-500"],
 .bg-gradient-to-r { 
   background-image: none !important; /* ADIÓS DEGRADADO */
-  background-color: var(--primary) !important; /* HOLA VERDE SÓLIDO */
+  background-color: var(--primary) !important; /* HOLA AZUL SÓLIDO */
   color: var(--on-primary) !important;
   border: none !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -162,22 +162,22 @@ button[class*="border-"]:hover,
 button.group:hover {
   border-color: var(--primary) !important;
   color: var(--primary) !important;
-  background-color: rgba(5, 150, 105, 0.05) !important; /* Fondo verde MUY sutil */
+  background-color: rgba(37, 99, 235, 0.05) !important; /* Fondo azul MUY sutil */
 }
 
 /* C. CORRECCIONES PARA BADGES (Etiquetas pequeñas de tecnologías) */
 /* Evita que los badges se vean sólidos, los hace sutiles */
 span[class*="bg-emerald"], 
 span[class*="bg-green"] {
-  background-color: rgba(16, 185, 129, 0.15) !important; /* Verde transparente */
-  color: var(--primary) !important; /* Texto verde */
-  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  background-color: rgba(59, 130, 246, 0.15) !important; /* Azul transparente */
+  color: var(--primary) !important; /* Texto azul */
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
   background-image: none !important;
 }
 
 /* D. GLOW EFFECTS (Opcional, suave) */
 .glow {
-  filter: drop-shadow(0 0 8px rgba(5, 150, 105, 0.3));
+  filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.3));
 }
 
 /* =========================================

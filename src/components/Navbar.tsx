@@ -39,52 +39,51 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full ${theme === 'dark' ? 'bg-accent/80 backdrop-blur-md' : 'bg-white/80 backdrop-blur-md'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} z-50 shadow-lg`}>
+    <nav className="fixed top-0 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="#home" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-105">
-                <span className="text-white font-bold text-sm">&lt;/&gt;</span>
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-9 h-9 rounded-lg bg-cyan-400 text-slate-950 flex items-center justify-center shadow-lg shadow-cyan-400/20 group-hover:shadow-cyan-400/40 transition-all duration-300 group-hover:scale-105">
+                <span className="font-bold text-sm">&lt;/&gt;</span>
               </div>
               <div className="hidden sm:block">
-                <span className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-900'} font-bold text-lg group-hover:text-primary transition-colors`}>
+                <span className="text-slate-200 font-bold text-lg group-hover:text-cyan-400 transition-colors">
                   Marlon Pecho
                 </span>
-                <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'} -mt-0.5`}>
+                <p className="text-xs text-slate-400 -mt-0.5">
                   Full-Stack Developer
                 </p>
               </div>
             </Link>
           </div>
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="#home" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.nav.home}</a>
-            <a href="#about" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.nav.about}</a>
-            <a href="#services" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.nav.services}</a>
-            <a href="#projects" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.nav.projects}</a>
-            <a href="#contact" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary transition-colors`}>{t.nav.contact}</a>
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/" className="text-slate-300 hover:text-cyan-400 transition-colors">{t.nav.home}</Link>
+            <Link href="/sobre-mi" className="text-slate-300 hover:text-cyan-400 transition-colors">{t.nav.about}</Link>
+            <Link href="/proyectos" className="text-slate-300 hover:text-cyan-400 transition-colors">{t.nav.projects}</Link>
+            <Link href="/contacto" className="text-slate-300 hover:text-cyan-400 transition-colors">{t.nav.contact}</Link>
             
             {/* Language Selector */}
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => { setIsLangOpen(!isLangOpen); setIsThemeOpen(false); }}
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all duration-300`}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-900/40 backdrop-blur-md border border-slate-800 text-cyan-400 hover:border-cyan-400 transition-all duration-300"
               >
                 <Globe size={18} />
                 <span className="text-sm font-medium">{language.toUpperCase()}</span>
                 <ChevronDown size={14} className={`transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
               </button>
               {isLangOpen && (
-                <div className={`absolute right-0 mt-2 w-32 rounded-xl ${theme === 'dark' ? 'bg-[#1e2432] border-primary/30' : 'bg-white border-gray-200'} border shadow-xl overflow-hidden`}>
+                <div className="absolute right-0 mt-2 w-32 rounded-xl bg-slate-900/40 backdrop-blur-md border border-slate-800 shadow-xl overflow-hidden">
                   <button
                     onClick={() => { setLanguage('es'); setIsLangOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-sm ${language === 'es' ? 'bg-primary/20 text-primary' : theme === 'dark' ? 'text-white hover:bg-primary/10' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    className={`w-full px-4 py-2 text-left text-sm ${language === 'es' ? 'bg-cyan-400/20 text-cyan-400' : 'text-slate-300 hover:bg-cyan-400/10'} transition-colors flex items-center gap-2`}
                   >
                     🇪🇸 Español
                   </button>
                   <button
                     onClick={() => { setLanguage('en'); setIsLangOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-sm ${language === 'en' ? 'bg-primary/20 text-primary' : theme === 'dark' ? 'text-white hover:bg-primary/10' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    className={`w-full px-4 py-2 text-left text-sm ${language === 'en' ? 'bg-cyan-400/20 text-cyan-400' : 'text-slate-300 hover:bg-cyan-400/10'} transition-colors flex items-center gap-2`}
                   >
                     🇺🇸 English
                   </button>
@@ -96,22 +95,22 @@ const Navbar = () => {
             <div className="relative" ref={themeRef}>
               <button
                 onClick={() => { setIsThemeOpen(!isThemeOpen); setIsLangOpen(false); }}
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all duration-300`}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-900/40 backdrop-blur-md border border-slate-800 text-cyan-400 hover:border-cyan-400 transition-all duration-300"
               >
                 {theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
                 <ChevronDown size={14} className={`transition-transform ${isThemeOpen ? 'rotate-180' : ''}`} />
               </button>
               {isThemeOpen && (
-                <div className={`absolute right-0 mt-2 w-32 rounded-xl ${theme === 'dark' ? 'bg-[#1e2432] border-primary/30' : 'bg-white border-gray-200'} border shadow-xl overflow-hidden`}>
+                <div className="absolute right-0 mt-2 w-32 rounded-xl bg-slate-900/40 backdrop-blur-md border border-slate-800 shadow-xl overflow-hidden">
                   <button
                     onClick={() => { setTheme('light'); setIsThemeOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-sm ${theme === 'light' ? 'bg-primary/20 text-primary' : theme === 'dark' ? 'text-white hover:bg-primary/10' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    className={`w-full px-4 py-2 text-left text-sm ${theme === 'light' ? 'bg-cyan-400/20 text-cyan-400' : 'text-slate-300 hover:bg-cyan-400/10'} transition-colors flex items-center gap-2`}
                   >
                     <Sun size={16} /> {t.theme.light}
                   </button>
                   <button
                     onClick={() => { setTheme('dark'); setIsThemeOpen(false); }}
-                    className={`w-full px-4 py-2 text-left text-sm ${theme === 'dark' ? 'bg-primary/20 text-primary' : 'text-gray-700 hover:bg-gray-100'} transition-colors flex items-center gap-2`}
+                    className={`w-full px-4 py-2 text-left text-sm ${theme === 'dark' ? 'bg-cyan-400/20 text-cyan-400' : 'text-slate-300 hover:bg-cyan-400/10'} transition-colors flex items-center gap-2`}
                   >
                     <Moon size={16} /> {t.theme.dark}
                   </button>
@@ -125,20 +124,20 @@ const Navbar = () => {
             {/* Mobile Language */}
             <button
               onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
-              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all`}
+              className="p-2 rounded-lg bg-slate-900/40 backdrop-blur-md border border-slate-800 text-cyan-400 hover:border-cyan-400 transition-all"
             >
               <Globe size={20} />
             </button>
             {/* Mobile Theme */}
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-primary/10 hover:bg-primary/20' : 'bg-gray-100 hover:bg-gray-200'} text-primary transition-all`}
+              className="p-2 rounded-lg bg-slate-900/40 backdrop-blur-md border border-slate-800 text-cyan-400 hover:border-cyan-400 transition-all"
             >
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary`}
+              className="text-slate-300 hover:text-cyan-400"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -148,12 +147,11 @@ const Navbar = () => {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 ${theme === 'dark' ? 'bg-accent' : 'bg-white'} rounded-lg mt-2 border ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'}`}>
-              <a href="#home" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.home}</a>
-              <a href="#about" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.about}</a>
-              <a href="#services" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.services}</a>
-              <a href="#projects" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.projects}</a>
-              <a href="#contact" className={`${theme === 'dark' ? 'text-customWhite' : 'text-gray-700'} hover:text-primary block px-3 py-2 rounded-md text-base font-medium`} onClick={() => setIsMenuOpen(false)}>{t.nav.contact}</a>
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-slate-950/80 backdrop-blur-md rounded-lg mt-2 border border-slate-800">
+              <Link href="/" className="text-slate-300 hover:text-cyan-400 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>{t.nav.home}</Link>
+              <Link href="/sobre-mi" className="text-slate-300 hover:text-cyan-400 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>{t.nav.about}</Link>
+              <Link href="/proyectos" className="text-slate-300 hover:text-cyan-400 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>{t.nav.projects}</Link>
+              <Link href="/contacto" className="text-slate-300 hover:text-cyan-400 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>{t.nav.contact}</Link>
             </div>
           </div>
         )}
