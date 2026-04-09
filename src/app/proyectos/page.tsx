@@ -68,15 +68,15 @@ export default function Proyectos() {
   };
 
   return (
-    <div className="min-h-screen relative font-sans text-slate-200 selection:bg-cyan-500/30 bg-[#050B14]">
+    <div className="min-h-screen relative font-sans text-slate-200 selection:bg-cyan-500/30 bg-[#0a0f18]">
       
       {/* ================= ELEMENTOS DE FONDO TECNOLÓGICOS ================= */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Glow Principal (Cyan) más intenso pero concentrado */}
-        <div className="absolute top-[0%] left-[10%] w-[40vw] h-[40vw] bg-cyan-500/10 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-cyan-900/10 blur-[150px] rounded-full mix-blend-screen" />
         
         {/* Constelación / Nodos de fondo (Simulado con SVG para estética Tech) */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-5">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="tech-dots" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
@@ -89,30 +89,65 @@ export default function Proyectos() {
         </div>
 
         {/* Resplandor inferior (Azul profundo) */}
-        <div className="absolute bottom-[-20%] right-[10%] w-[50vw] h-[50vw] bg-blue-600/10 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[-20%] right-[10%] w-[50vw] h-[50vw] bg-blue-900/10 blur-[150px] rounded-full mix-blend-screen" />
       </div>
 
       <Navbar />
 
       <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
         
-        {/* HEADER */}
+        {/* ================= HEADER REDISEÑADO (LIMPIO Y TECNOLÓGICO) ================= */}
         <motion.div 
-          className="max-w-3xl mb-20"
+          className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24 mb-32"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold tracking-widest uppercase mb-6 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
-            <Rocket size={14} /> Portfolio
+          {/* Lado Izquierdo: Textos */}
+          <motion.div className="flex-1 z-10" variants={itemVariants}>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold tracking-widest uppercase mb-8 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
+              <Rocket size={14} /> Portfolio
+            </div>
+            
+            {/* TÍTULO - Un solo color vibrante (Cyan Tech) */}
+            <h1 className="text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-8 leading-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200 drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]">
+                Proyectos<br/>Destacados
+              </span>
+            </h1>
+            
+            {/* Párrafo limpio, sin cajas de color */}
+            <p className="text-xl md:text-2xl text-slate-400 leading-relaxed font-light max-w-xl">
+              Explora mi colección de trabajos. Desde arquitecturas de backend escalables hasta interfaces frontend inmersivas. Soluciones reales para problemas complejos.
+            </p>
           </motion.div>
-          <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-            Proyectos <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">Destacados</span>
-          </motion.h1>
-          <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate-300/90 leading-relaxed font-light">
-            Explora mi colección de trabajos. Desde arquitecturas de backend escalables hasta interfaces frontend inmersivas. Soluciones reales para problemas complejos.
-          </motion.p>
+
+          {/* Lado Derecho: Imagen del Setup (Limpia y Nítida) */}
+          <motion.div 
+            variants={itemVariants}
+            className="flex-1 w-full relative group"
+          >
+            {/* Contenedor principal: Solo un borde sutil, SIN colores de fondo sólidos */}
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-cyan-500/20 shadow-[0_0_40px_rgba(34,211,238,0.1)]">
+              
+              {/* LA IMAGEN: Clara, visible, solo con un levísimo oscurecimiento para no lastimar la vista */}
+              <img 
+                src="/setupweb.webp" 
+                alt="Mi entorno de desarrollo" 
+                className="w-full h-full object-cover transition-transform duration-[3s] ease-out group-hover:scale-105 opacity-80"
+              />
+              
+              {/* Borde interior oscuro sutil para enmarcar la foto, sin taparla */}
+              <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(10,15,24,1)] pointer-events-none"></div>
+
+            </div>
+            
+            {/* Decoraciones tech sutiles */}
+            <div className="absolute -bottom-4 -left-4 w-12 h-12 border border-cyan-500/30 rounded-full animate-[spin_8s_linear_infinite] pointer-events-none"></div>
+            <div className="absolute top-[10%] -right-2 w-3 h-3 bg-cyan-400 rounded-full shadow-[0_0_15px_rgba(34,211,238,1)] animate-pulse"></div>
+          </motion.div>
         </motion.div>
+        {/* ==================================================================== */}
 
         {/* LOADING STATE */}
         {isLoading && (
@@ -121,7 +156,7 @@ export default function Proyectos() {
           </div>
         )}
 
-        {/* GRID DE PROYECTOS (BENTO STYLE MEJORADO) */}
+        {/* GRID DE PROYECTOS (BENTO STYLE) */}
         {!isLoading && projects.length > 0 && (
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(400px,auto)]"
@@ -138,7 +173,7 @@ export default function Proyectos() {
                   key={project.id} 
                   variants={itemVariants}
                   // AJUSTE CLAVE: lg:col-span-2 (Ocupa 2 de las 3 columnas, no todo el ancho)
-                  className={`group relative rounded-[1.5rem] overflow-hidden bg-[#0a1017] border border-white/5 hover:border-cyan-500/30 transition-all duration-500 hover:shadow-[0_15px_40px_rgba(34,211,238,0.1)] hover:-translate-y-1.5 ${isHeroProject ? 'md:col-span-2 lg:col-span-2' : 'col-span-1'}`}
+                  className={`group relative rounded-[1.5rem] overflow-hidden bg-[#111827] border border-white/5 hover:border-cyan-500/30 transition-all duration-500 hover:shadow-[0_10px_30px_rgba(34,211,238,0.1)] hover:-translate-y-1 ${isHeroProject ? 'md:col-span-2 lg:col-span-2' : 'col-span-1'}`}
                 >
                   
                   {/* IMAGEN DE FONDO */}
@@ -147,30 +182,26 @@ export default function Proyectos() {
                       <img 
                         src={project.images[0].image} 
                         alt={project.title} 
-                        className="w-full h-full object-cover object-top transition-transform duration-[2s] ease-out group-hover:scale-110 opacity-40 group-hover:opacity-60 mix-blend-luminosity"
+                        className="w-full h-full object-cover object-top transition-transform duration-[2s] ease-out group-hover:scale-110 opacity-50 group-hover:opacity-70"
                       />
-                      
-                      {/* Gradiente para Legibilidad (Más oscuro abajo, fundido arriba) */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#050B14] via-[#050B14]/80 to-transparent"></div>
-                      
-                      {/* Tinte general para mantener la estética Tech oscura */}
-                      <div className="absolute inset-0 bg-[#0a1017]/40 mix-blend-multiply"></div>
+                      {/* Gradiente oscuro inferior para leer el texto */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-[#0a0f18]/80 to-transparent"></div>
                     </div>
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-900/40 to-[#050B14] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-900/40 to-[#0a0f18] flex items-center justify-center">
                       <Code2 size={48} className="text-white/5" />
                     </div>
                   )}
 
                   {/* CONTENIDO DE LA TARJETA */}
-                  <div className={`relative h-full flex flex-col justify-end z-10 p-8 ${isHeroProject ? 'md:p-12' : ''}`}>
+                  <div className={`relative h-full flex flex-col justify-end z-10 p-8 ${isHeroProject ? 'md:p-10' : ''}`}>
                     
                     {/* Header de la tarjeta (Badges) */}
                     <div className="flex justify-between items-start mb-auto pb-8">
                       <div className="flex flex-wrap items-center gap-3">
                         {isHeroProject && (
-                          <span className="flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md">
-                            <Star size={12} className="fill-cyan-400 text-cyan-400" /> Destacado
+                          <span className="flex items-center gap-2 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md">
+                            <Star size={12} className="fill-cyan-400" /> Destacado
                           </span>
                         )}
                         {getStatus(project) === 'completed' ? (
@@ -200,18 +231,18 @@ export default function Proyectos() {
                     </div>
 
                     {/* Textos */}
-                    <h3 className={`font-bold text-white mb-3 tracking-tight group-hover:text-cyan-400 transition-colors drop-shadow-lg ${isHeroProject ? 'text-4xl md:text-5xl' : 'text-2xl'}`}>
+                    <h3 className={`font-bold text-white mb-3 tracking-tight group-hover:text-cyan-400 transition-colors ${isHeroProject ? 'text-3xl md:text-4xl' : 'text-2xl'}`}>
                       {project.title}
                     </h3>
                     
-                    <p className={`text-slate-400 font-light leading-relaxed mb-6 drop-shadow-md ${isHeroProject ? 'text-lg line-clamp-3 max-w-xl' : 'text-sm line-clamp-3'}`}>
+                    <p className={`text-slate-400 font-light leading-relaxed mb-6 ${isHeroProject ? 'text-base line-clamp-3 max-w-xl' : 'text-sm line-clamp-3'}`}>
                       {project.description}
                     </p>
 
                     {/* Tecnologías */}
                     <div className="flex flex-wrap gap-2 relative z-20">
                       {Array.isArray(project.technologies) && project.technologies.slice(0, isHeroProject ? 6 : 3).map((tech, i) => (
-                        <span key={i} className="bg-[#050B14]/80 backdrop-blur-md border border-white/5 text-cyan-200/80 px-2.5 py-1 rounded text-[11px] font-mono tracking-wide group-hover:border-cyan-500/30 group-hover:text-cyan-300 transition-colors">
+                        <span key={i} className="bg-white/5 backdrop-blur-md border border-white/5 text-cyan-100 px-2.5 py-1 rounded text-[11px] font-mono tracking-wide group-hover:border-cyan-500/30 group-hover:text-cyan-300 transition-colors">
                           {tech}
                         </span>
                       ))}

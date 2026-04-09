@@ -1,7 +1,7 @@
 'use client';
 import Navbar from '@/components/Navbar';
 import ContactForm from '@/components/ContactForm';
-import { Mail, Smartphone, Github, ExternalLink } from 'lucide-react';
+import { Mail, Smartphone, Github, ExternalLink, MessageSquare, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Contacto() {
@@ -52,16 +52,6 @@ export default function Contacto() {
 
                 <div className="flex items-center gap-4 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300">
                   <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl">
-                    <Smartphone className="text-cyan-400" size={24} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-slate-400">Teléfono</p>
-                    <p className="text-slate-200 font-medium">+51 907-326-121</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300">
-                  <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl">
                     <Github className="text-cyan-400" size={24} />
                   </div>
                   <div>
@@ -73,6 +63,41 @@ export default function Contacto() {
                       className="text-slate-200 font-medium hover:text-cyan-400 transition-colors flex items-center gap-1"
                     >
                       MP-make
+                      <ExternalLink size={16} />
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300">
+                  <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl">
+                    <MessageSquare className="text-cyan-400" size={24} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-400">WhatsApp</p>
+                    <a
+                      href="https://wa.me/51907326121"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-slate-200 font-medium hover:text-cyan-400 transition-colors"
+                    >
+                      +51 907-326-121
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300">
+                  <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl">
+                    <Linkedin className="text-cyan-400" size={24} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-400">LinkedIn</p>
+                    <a
+                      href="https://www.linkedin.com/in/marlon-pecho-530443385/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-slate-200 font-medium hover:text-cyan-400 transition-colors flex items-center gap-1"
+                    >
+                      Marlon Pecho
                       <ExternalLink size={16} />
                     </a>
                   </div>
@@ -98,7 +123,15 @@ export default function Contacto() {
                     rel="noopener noreferrer"
                     className="p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-cyan-400 hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300 hover:scale-110"
                   >
-                    <ExternalLink size={24} />
+                    <Linkedin size={24} />
+                  </a>
+                  <a
+                    href="https://wa.me/51907326121"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-cyan-400 hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300 hover:scale-110"
+                  >
+                    <MessageSquare size={24} />
                   </a>
                 </div>
               </div>
