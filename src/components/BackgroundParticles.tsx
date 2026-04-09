@@ -47,7 +47,6 @@ const particlesOptions = {
       enable: true,
     },
     move: {
-      direction: "none",
       enable: true,
       outModes: {
         default: "bounce",
@@ -83,10 +82,10 @@ export default function BackgroundParticles() {
 
   return (
     <Particles
-      id="tsparticles"
-      init={particlesInit}
-      options={particlesOptions}
-      className="absolute inset-0 opacity-20 pointer-events-none"
+    id="tsparticles"
+    init={particlesInit}
+    options={particlesOptions as any}
+    className="absolute inset-0 opacity-20 pointer-events-none"
     />
   );
 }

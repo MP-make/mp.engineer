@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { ExternalLink, Github, Download } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface HeroImage {
   id: number;
@@ -18,57 +21,190 @@ interface HeroSectionProps {
 
 export default function HeroSection({ t, theme, currentSlide, heroImages, isImageOnLeft }: HeroSectionProps) {
   return (
-    <section id="home" className="min-h-[80vh] flex flex-col items-center justify-center text-center mx-auto relative z-10 px-6">
-      {/* Name with Glow Effect */}
-      <h1 className="text-5xl md:text-7xl font-bold text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.8)] mb-6">
-        Marlon
-      </h1>
-
-      {/* Title */}
-      <h2 className="text-2xl md:text-3xl font-semibold text-slate-200 mb-4">
-        Full-Stack Developer
-      </h2>
-
-      {/* Description */}
-      <p className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto mb-8">
-        {t.hero.slides[0]?.subtitle || "Estudiante de Ingeniería de Sistemas Avanzados especializado en desarrollo web moderno."}
-      </p>
-
-      {/* Availability Badge */}
-      <div className="mb-10">
-        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-slate-900/40 backdrop-blur-md border border-slate-800 hover:border-cyan-500/50 transition-all duration-300">
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
-          </span>
-          <span className="text-sm font-medium text-cyan-400">{t.hero.available}</span>
+    <section id="home" className="relative flex items-center justify-center mx-auto z-10 px-6 py-20 lg:py-32 w-full max-w-7xl">
+      
+      {/* ================= ELEMENTOS DE FONDO ================= */}
+      <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+        
+        {/* Floating Code Lines - Izquierda */}
+        <div className="hidden lg:block absolute top-10 left-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse">
+          {`const developer = {`}
         </div>
+        <div className="hidden lg:block absolute top-20 left-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-1000">
+          {`  name: 'Marlon Pecho',`}
+        </div>
+        <div className="hidden lg:block absolute top-32 left-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-2000">
+          {`  skills: ['React', 'Next.js', 'PostgreSQL']`}
+        </div>
+        <div className="hidden lg:block absolute top-44 left-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-3000">
+          {`};`}
+        </div>
+
+        {/* Right Side Code - Derecha */}
+        <div className="hidden lg:block absolute top-20 right-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-1500 text-right">
+          {`function buildIdeas() {`}
+        </div>
+        <div className="hidden lg:block absolute top-32 right-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-2500 text-right">
+          {`  return 'digital solutions';`}
+        </div>
+        <div className="hidden lg:block absolute top-44 right-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-3500 text-right">
+          {`}`}
+        </div>
+
+        {/* Formas Geométricas */}
+        <motion.div 
+          className="hidden md:block absolute top-1/4 left-10 w-24 h-24 border border-cyan-500/20 rounded-lg"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div 
+          className="hidden md:block absolute bottom-1/4 right-10 w-32 h-32 border border-emerald-500/10 rounded-full"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Central Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] max-w-[800px] h-[500px] bg-cyan-900/20 blur-[120px] rounded-full" />
       </div>
 
-      {/* Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <Link
-          href="/contacto"
-          className="bg-cyan-400 text-slate-950 font-semibold px-8 py-4 rounded-full hover:bg-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all duration-300 hover:scale-105 flex items-center gap-3"
+      {/* ================= CONTENIDO PRINCIPAL ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-center w-full relative z-10">
+        
+        {/* Left Side - Text Content */}
+        <motion.div 
+          className="flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1"
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          {t.hero.connect}
-          <ExternalLink size={20} />
-        </Link>
-        <a
-          href="/cv-marlon-pecho.pdf"
-          download
-          className="bg-transparent border border-slate-700 text-slate-300 px-8 py-4 rounded-full hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300 flex items-center gap-3"
+          {/* Badge de Disponibilidad */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_0_20px_rgba(34,211,238,0.05)]">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+              </span>
+              <span className="text-xs font-medium text-cyan-300 uppercase tracking-wider">
+                {t?.hero?.available || 'Disponible para proyectos'}
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Name with Enhanced Glow Effect - AHORA DICE MARLON PECHO */}
+          <motion.h1 
+            className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-cyan-300 via-cyan-400 to-blue-600 drop-shadow-[0_0_20px_rgba(34,211,238,0.3)] mb-4 tracking-tighter leading-tight"
+            animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            style={{ backgroundSize: "200% 200%" }}
+          >
+            Marlon Pecho
+          </motion.h1>
+
+          {/* Title */}
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 font-mono opacity-90">
+            &gt; Full-Stack Developer_
+          </h2>
+
+          {/* Description */}
+          <p className="text-lg text-slate-400 leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10 font-light">
+            {t?.hero?.slides?.[0]?.subtitle || "Donde las ideas complejas cobran vida a través de código limpio, arquitecturas escalables y experiencias digitales inmersivas."}
+          </p>
+
+          {/* Buttons */}
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full sm:w-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <Link
+              href="/contacto"
+              className="w-full sm:w-auto bg-cyan-400 text-slate-950 font-bold px-8 py-3.5 rounded-full hover:bg-cyan-300 shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-2"
+            >
+              {t?.hero?.connect || 'Conectemos'}
+              <ExternalLink size={18} />
+            </Link>
+            
+            <a
+              href="/cv-marlon-pecho.pdf"
+              download
+              className="w-full sm:w-auto bg-white/5 backdrop-blur-sm border border-white/10 text-slate-300 px-8 py-3.5 rounded-full hover:border-cyan-500/50 hover:bg-slate-800 transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-1"
+            >
+              Descargar CV
+              <Download size={18} />
+            </a>
+            <Link
+              href="/proyectos"
+              className="w-full sm:w-auto bg-transparent border border-slate-700 text-slate-300 px-8 py-4 rounded-full hover:border-cyan-500/50 hover:bg-slate-800 transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-1"
+            >
+              {t?.hero?.viewProjects || 'Ver Proyectos'}
+              <Github size={20} />
+            </Link>
+          </motion.div>
+        </motion.div>
+
+        {/* Right Side - Profile Image */}
+        <motion.div 
+          className="flex justify-center lg:justify-end order-1 lg:order-2"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
         >
-          Descargar CV
-          <Download size={20} />
-        </a>
-        <Link
-          href="/proyectos"
-          className="bg-transparent border border-slate-700 text-slate-300 px-8 py-4 rounded-full hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300 flex items-center gap-3"
-        >
-          {t.hero.viewProjects}
-          <Github size={20} />
-        </Link>
+          <div className="relative group w-64 h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px]">
+            
+            {/* Outer Glow Ring */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/30 via-blue-500/20 to-emerald-500/30 rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700" />
+            
+            {/* Inner Hexagonal/Gradient Border */}
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 via-slate-800 to-emerald-400 rounded-full p-1 shadow-2xl">
+              <div className="bg-[#0f1419] w-full h-full rounded-full p-1 relative overflow-hidden">
+                
+                {/* Contenedor de la Imagen */}
+                <div className="w-full h-full bg-slate-800 rounded-full overflow-hidden relative">
+                  
+                  {/* IMAGEN DE PERFIL REPOSICIONADA */}
+                  {/* CAMBIO CLAVE: object-top fuerza a que se alinee con el borde superior de la foto, revelando todo el cuerpo posible hacia abajo */}
+                  <img 
+                    src="/principalmarlonpecho.webp" 
+                    alt="Marlon Pecho" 
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                  />
+                  
+                  {/* Overlay Oscuro para Integrar (Hace la foto más "opaca/oscura") */}
+                  <div className="absolute inset-0 bg-slate-950/40 transition-colors duration-500 group-hover:bg-slate-950/10 pointer-events-none" />
+
+                  {/* Overlay Tint Effect (Tinte cyan ultra suave) */}
+                  <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-500 pointer-events-none" />
+                </div>
+
+              </div>
+            </div>
+            
+            {/* Floating Tech Badges */}
+            <motion.div 
+              className="absolute top-4 -right-2 w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.2)] z-20"
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <span className="text-cyan-400 text-xs font-bold font-mono">JS</span>
+            </motion.div>
+            
+            <motion.div 
+              className="absolute bottom-10 -left-4 w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)] z-20"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            >
+              <span className="text-emerald-400 text-xs font-bold font-mono">TS</span>
+            </motion.div>
+
+          </div>
+        </motion.div>
+
       </div>
     </section>
   );
