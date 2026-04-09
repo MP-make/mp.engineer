@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-// Navbar importado
 import Navbar from '@/components/Navbar'; 
 import { ExternalLink, Github, Code2, Rocket, Star } from 'lucide-react';
 
@@ -35,7 +34,6 @@ export default function Proyectos() {
       if (error) {
         console.error('Error fetching projects:', error);
       } else if (data) {
-        // LÓGICA CLAVE: Forzar a Ventify a ser el primero
         const sortedProjects = [...data].sort((a, b) => {
           const isAVentify = a.title.toLowerCase().includes('ventify');
           const isBVentify = b.title.toLowerCase().includes('ventify');
@@ -52,14 +50,15 @@ export default function Proyectos() {
     fetchProjects();
   }, []);
 
-  const containerVariants = {
+  // Tipado explícito para Framer Motion
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } // Se removió ease="easeOut" para evitar error de tipos
   };
 
   const getStatus = (project: Project) => {
@@ -79,9 +78,9 @@ export default function Proyectos() {
         <div className="absolute inset-0 opacity-5">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="tech-dots" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+              <pattern id="tech-dots" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
                 <circle cx="2" cy="2" r="1.5" fill="#22d3ee" opacity="0.5"/>
-                <path d="M 2 2 L 60 60" stroke="#22d3ee" strokeWidth="0.5" opacity="0.1" />
+                <path d="M 2 2 L 50 50" stroke="#22d3ee" strokeWidth="0.5" opacity="0.1" />
               </pattern>
             </defs>
             <rect x="0" y="0" width="100%" height="100%" fill="url(#tech-dots)" />
