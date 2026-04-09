@@ -4,20 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { useLanguage } from '@/contexts/LanguageContext';
-import Navbar from '@/components/Navbar';
-import { ExternalLink, Github, Code } from 'lucide-react';
+// Navbar importado (asumiendo que lo tienes configurado)
+import Navbar from '@/components/Navbar'; 
+import { ExternalLink, Github, Code2, Rocket, Star } from 'lucide-react';
 
 interface Project {
   id: number;
   title: string;
   description: string;
-  short_description?: string;
   link?: string;
-  demo_link?: string;
   github_link?: string;
   technologies: string[];
-  tags: string[];
   status: 'completed' | 'in-progress';
   created_at: string;
   images?: { image: string }[];
@@ -25,270 +22,231 @@ interface Project {
 
 export default function Proyectos() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const { t } = useLanguage();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('portfolio_project')
-        .select(`*, tags, images:portfolio_projectimage(image)`)
+        .select('*, images:portfolio_projectimage(image)')
         .order('created_at', { ascending: false });
-      
-      console.log("--- DEBUG DE PROYECTOS ---");
-      console.log("Error de Supabase:", error);
-      console.log("Total de proyectos recibidos:", data?.length);
-      console.log("Muestra de un proyecto:", data?.[0]);
-      console.log("--------------------------");
-      setProjects(data || []);
+
+      if (error) {
+        console.error('Error fetching projects:', error);
+      } else if (data) {
+        // LÓGICA CLAVE: Forzar a Ventify a ser el primero
+        const sortedProjects = [...data].sort((a, b) => {
+          const isAVentify = a.title.toLowerCase().includes('ventify');
+          const isBVentify = b.title.toLowerCase().includes('ventify');
+          
+          if (isAVentify && !isBVentify) return -1; // Mueve A arriba
+          if (!isAVentify && isBVentify) return 1;  // Mueve B arriba
+          return 0; // Mantiene el orden original para los demás
+        });
+        
+        setProjects(sortedProjects);
+      }
+      setIsLoading(false);
     };
     fetchProjects();
   }, []);
 
-  const professionalProjects = projects.filter(project => 
-    project.tags && Array.isArray(project.tags) && project.tags.some(tag => tag.toUpperCase().includes('CONSIGUEVENTAS'))
-  );
-  const personalProjects = projects.filter(project => 
-    !project.tags || !Array.isArray(project.tags) || !project.tags.some(tag => tag.toUpperCase().includes('CONSIGUEVENTAS'))
-  );
-
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6 }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
-
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
-  const wordpressIcon = (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 15l-3.5-9h2.1l2.55 6.9L13.45 8H15.5l-3.5 9h-1.5z" fill="currentColor"/>
-    </svg>
-  );
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
+
+  // Función para corregir status si es necesario
+  const getStatus = (project: Project) => {
+    if (project.title.toLowerCase().includes('ventify')) return 'completed';
+    return project.status;
+  };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#050B14] relative font-sans text-slate-200 selection:bg-cyan-500/30">
+      
+      {/* ================= ELEMENTOS DE FONDO INNOVADORES ================= */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Resplandor superior izquierdo (Cyan) */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-cyan-900/20 blur-[150px] rounded-full mix-blend-screen" />
+        
+        {/* Resplandor inferior derecho (Emerald) */}
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-emerald-900/10 blur-[150px] rounded-full mix-blend-screen" />
+        
+        {/* Patrón de Grid sutil para dar textura */}
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02] bg-repeat"></div>
+      </div>
+
       <Navbar />
-      <main className="pt-20 pb-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-200 mb-6">
-              Proyectos Destacados
-            </h1>
-            <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-              Explora mi colección de proyectos que demuestran mis habilidades en desarrollo web moderno,
-              desde aplicaciones full-stack hasta soluciones e-commerce personalizadas.
-            </p>
-          </motion.div>
 
-          {/* Sección Profesionales */}
-          <motion.section 
-            className="mb-16"
-            variants={sectionVariants}
+      <main className="relative z-10 pt-32 pb-24 px-6 max-w-7xl mx-auto">
+        
+        {/* HEADER */}
+        <motion.div 
+          className="max-w-3xl mb-20"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold tracking-widest uppercase mb-6 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+            <Rocket size={14} /> Portfolio
+          </motion.div>
+          <motion.h1 variants={itemVariants} className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white drop-shadow-md">
+            Proyectos <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">Destacados</span>
+          </motion.h1>
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate-400 leading-relaxed font-light">
+            Explora mi colección de trabajos. Desde arquitecturas de backend escalables hasta interfaces frontend inmersivas. Soluciones reales para problemas complejos.
+          </motion.p>
+        </motion.div>
+
+        {/* LOADING STATE */}
+        {isLoading && (
+          <div className="flex justify-center items-center py-20">
+             <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin"></div>
+          </div>
+        )}
+
+        {/* GRID DE PROYECTOS (BENTO STYLE) */}
+        {!isLoading && projects.length > 0 && (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-[minmax(380px,auto)]"
+            variants={containerVariants}
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            animate="visible"
           >
-            <h2 className="text-3xl font-bold text-slate-200 mb-8 text-center">
-              Proyectos Profesionales (Empresa: Consigueventas)
-            </h2>
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-12"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {professionalProjects.length === 0 ? (
-                <p className="text-slate-400 col-span-full text-center">No se encontraron proyectos con estos filtros. Revisa la consola del servidor.</p>
-              ) : (
-                professionalProjects.map((project) => (
-                  <motion.div 
-                    key={project.id} 
-                    className="group bg-slate-900/40 backdrop-blur-md rounded-2xl overflow-hidden border border-cyan-500/50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
-                    variants={cardVariants}
-                  >
-                    {/* Project Image */}
-                    <div className="aspect-video overflow-hidden">
-                      {project.images && project.images.length > 0 ? (
-                        <img 
-                          src={project.images[0].image} 
-                          alt={project.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                          {wordpressIcon}
-                        </div>
+            {projects.map((project, index) => {
+              // El primer proyecto (Ventify) será SIEMPRE el "Hero Project" ocupando todo el ancho superior
+              const isHeroProject = index === 0; 
+              
+              return (
+                <motion.article 
+                  key={project.id} 
+                  variants={itemVariants}
+                  // Si es el Hero Project, ocupa 100% del ancho en pantallas grandes. Si no, ocupa 1 columna normal.
+                  className={`group relative rounded-[2rem] overflow-hidden bg-slate-900/50 border border-white/10 hover:border-cyan-500/40 backdrop-blur-xl transition-all duration-500 hover:shadow-[0_10px_40px_rgba(34,211,238,0.15)] hover:-translate-y-1 ${isHeroProject ? 'md:col-span-2 lg:col-span-3 min-h-[500px]' : 'col-span-1'}`}
+                >
+                  
+                  {/* IMAGEN DE FONDO (Overlay Style) */}
+                  {project.images?.[0]?.image ? (
+                    <>
+                      <img 
+                        src={project.images[0].image} 
+                        alt={project.title} 
+                        className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                      />
+                      {/* Gradiente dramático: Negro fuerte abajo para leer el texto, casi transparente arriba */}
+                      <div className={`absolute inset-0 bg-gradient-to-t from-[#050B14] ${isHeroProject ? 'via-[#050B14]/70' : 'via-[#050B14]/80'} to-transparent transition-opacity duration-500`}></div>
+                      
+                      {/* Tinte de color suave para integrar la imagen con el diseño general */}
+                      <div className="absolute inset-0 bg-cyan-900/20 mix-blend-overlay opacity-50 group-hover:opacity-0 transition-opacity duration-500"></div>
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-[#050B14] flex items-center justify-center">
+                      <Code2 size={64} className="text-white/5" />
+                    </div>
+                  )}
+
+                  {/* CONTENIDO DE LA TARJETA */}
+                  <div className={`relative h-full flex flex-col justify-end z-10 ${isHeroProject ? 'p-10 md:p-14 lg:w-2/3' : 'p-8'}`}>
+                    
+                    {/* Header de la tarjeta */}
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center gap-3">
+                        {isHeroProject && (
+                          <span className="flex items-center gap-1.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                            <Star size={12} className="fill-amber-300" /> Top Project
+                          </span>
+                        )}
+                        {getStatus(project) === 'completed' ? (
+                          <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                            Completado
+                          </span>
+                        ) : (
+                           <span className="bg-blue-500/20 text-blue-300 border border-blue-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                            En Progreso
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Links Rápidos (Esquina superior derecha) */}
+                      <div className={`flex gap-3 transition-all duration-300 ${isHeroProject ? 'opacity-100' : 'opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'}`}>
+                         {project.github_link && (
+                          <a href={project.github_link} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-slate-900/80 border border-white/10 backdrop-blur-md flex items-center justify-center text-slate-300 hover:bg-white/10 hover:text-cyan-400 hover:border-cyan-500/50 transition-all z-20">
+                            <Github size={18} />
+                          </a>
+                        )}
+                        {project.link && (
+                          <a href={project.link} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-slate-900/80 border border-white/10 backdrop-blur-md flex items-center justify-center text-slate-300 hover:bg-white/10 hover:text-cyan-400 hover:border-cyan-500/50 transition-all z-20">
+                            <ExternalLink size={18} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Textos */}
+                    <h3 className={`font-extrabold text-white mb-4 tracking-tight group-hover:text-cyan-400 transition-colors drop-shadow-md ${isHeroProject ? 'text-4xl md:text-5xl lg:text-6xl' : 'text-3xl'}`}>
+                      {project.title}
+                    </h3>
+                    
+                    <p className={`text-slate-300 font-light leading-relaxed mb-8 drop-shadow-md ${isHeroProject ? 'text-lg md:text-xl line-clamp-4' : 'text-base line-clamp-3'}`}>
+                      {project.description}
+                    </p>
+
+                    {/* Tecnologías */}
+                    <div className="flex flex-wrap gap-2 mt-auto relative z-20">
+                      {Array.isArray(project.technologies) && project.technologies.slice(0, isHeroProject ? 8 : 4).map((tech, i) => (
+                        <span key={i} className="bg-slate-900/80 backdrop-blur-md border border-white/10 text-cyan-50 px-3 py-1.5 rounded-lg text-xs font-mono font-medium group-hover:border-cyan-500/30 transition-colors">
+                          {tech}
+                        </span>
+                      ))}
+                      {Array.isArray(project.technologies) && project.technologies.length > (isHeroProject ? 8 : 4) && (
+                        <span className="text-slate-400 text-xs font-mono py-1.5 px-2">+{project.technologies.length - (isHeroProject ? 8 : 4)}</span>
                       )}
                     </div>
+                    
+                    {/* Enlace invisible sobre toda la tarjeta (excepto botones superiores) */}
+                    <Link
+                      href={`/proyectos/${project.id}`}
+                      className="absolute inset-0 z-0"
+                      aria-label={`Ver detalles de ${project.title}`}
+                    >
+                      <span className="sr-only">Ver detalles</span>
+                    </Link>
 
-                    {/* Project Content */}
-                    <div className="p-6 space-y-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        {wordpressIcon}
-                        <span className="text-cyan-400 text-sm font-medium">WordPress</span>
-                      </div>
-                      <h3 className="text-2xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">
-                        {project.title}
-                      </h3>
-                      <p className="text-slate-300 text-sm leading-relaxed">
-                        {project.short_description || project.description.substring(0, 120) + '...'}
-                      </p>
-
-                      {/* Technologies */}
-                      <div className="pt-4 border-t border-slate-700">
-                        <div className="flex flex-wrap gap-2">
-                          {Array.isArray(project.technologies) && project.technologies.map((tech, i) => (
-                            <span key={i} className="bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 text-xs px-3 py-1 rounded-full font-medium">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Action Button */}
-                      <div className="pt-4">
-                        <Link
-                          href={`/proyectos/${project.id}`}
-                          className="w-full flex items-center justify-center gap-3 bg-cyan-500 text-slate-950 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:bg-cyan-400 hover:shadow-lg"
-                        >
-                          Ver Detalles
-                          {(project.demo_link || project.link) && <ExternalLink size={16} />}
-                          {project.github_link && <Github size={16} />}
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))
-              )}
-            </motion.div>
-          </motion.section>
-
-          {/* Sección Freelance & Personales */}
-          <motion.section 
-            className="mb-16"
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl font-bold text-slate-200 mb-8 text-center">
-              Proyectos Freelance & Personales
-            </h2>
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-12"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {personalProjects.length === 0 ? (
-                <p className="text-slate-400 col-span-full text-center">No se encontraron proyectos con estos filtros. Revisa la consola del servidor.</p>
-              ) : (
-                personalProjects.map((project) => (
-                  <motion.div 
-                    key={project.id} 
-                    className="group bg-slate-900/40 backdrop-blur-md rounded-2xl overflow-hidden border border-slate-800 hover:border-cyan-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
-                    variants={cardVariants}
-                  >
-                    {/* Project Image */}
-                    <div className="aspect-video overflow-hidden">
-                      {project.images && project.images.length > 0 ? (
-                        <img 
-                          src={project.images[0].image} 
-                          alt={project.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                          <Code size={48} className="text-slate-600" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Project Content */}
-                    <div className="p-6 space-y-4">
-                      <h3 className="text-2xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">
-                        {project.title}
-                      </h3>
-                      <p className="text-slate-300 text-sm leading-relaxed">
-                        {project.short_description || project.description.substring(0, 120) + '...'}
-                      </p>
-
-                      {/* Technologies */}
-                      <div className="pt-4 border-t border-slate-700">
-                        <div className="flex flex-wrap gap-2">
-                          {Array.isArray(project.technologies) && project.technologies.map((tech, i) => (
-                            <span key={i} className="bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 text-xs px-3 py-1 rounded-full font-medium">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Action Button */}
-                      <div className="pt-4">
-                        <Link
-                          href={`/proyectos/${project.id}`}
-                          className="w-full flex items-center justify-center gap-3 bg-cyan-500 text-slate-950 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:bg-cyan-400 hover:shadow-lg"
-                        >
-                          Ver Detalles
-                          {(project.demo_link || project.link) && <ExternalLink size={16} />}
-                          {project.github_link && <Github size={16} />}
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))
-              )}
-            </motion.div>
-          </motion.section>
-
-          {/* Footer */}
-          <motion.div 
-            className="mt-16 text-center"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-slate-400 mb-4">¿Quieres ver más proyectos?</p>
-            <a
-              href="https://github.com/MP-make"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-cyan-400 hover:text-slate-200 font-bold"
-            >
-              <Github size={20} />Visita mi GitHub<ExternalLink size={16} />
-            </a>
+                  </div>
+                </motion.article>
+              );
+            })}
           </motion.div>
-        </div>
+        )}
+
+        {/* FOOTER */}
+        <motion.div 
+          className="mt-32 text-center border-t border-white/5 pt-16"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <p className="text-slate-400 text-lg mb-6 font-light">¿Quieres explorar el código detrás de la magia?</p>
+          <a
+            href="https://github.com/MP-make"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/50 text-slate-200 transition-all duration-300"
+          >
+            <Github size={20} className="group-hover:text-cyan-400 transition-colors" />
+            <span className="font-bold tracking-wide">Visita mi GitHub</span>
+            <ExternalLink size={16} className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+          </a>
+        </motion.div>
+
       </main>
     </div>
   );

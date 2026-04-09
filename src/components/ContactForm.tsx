@@ -55,47 +55,50 @@ const ContactForm = () => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">Nombre</label>
+          <label htmlFor="name" className="block text-sm font-medium mb-2 text-slate-200">Nombre</label>
           <input
             type="text"
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-secondary border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Tu nombre completo"
+            className="w-full px-4 py-3 bg-slate-900/40 border border-white/10 text-slate-200 placeholder-slate-500 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none"
             required
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+          <label htmlFor="email" className="block text-sm font-medium mb-2 text-slate-200">Email</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-secondary border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="tu@email.com"
+            className="w-full px-4 py-3 bg-slate-900/40 border border-white/10 text-slate-200 placeholder-slate-500 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none"
             required
           />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-medium mb-1">Mensaje</label>
+          <label htmlFor="message" className="block text-sm font-medium mb-2 text-slate-200">Mensaje</label>
           <textarea
             id="message"
             name="message"
-            rows={4}
+            rows={5}
             value={formData.message}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-secondary border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Cuéntame sobre tu proyecto..."
+            className="w-full px-4 py-3 bg-slate-900/40 border border-white/10 text-slate-200 placeholder-slate-500 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none resize-none"
             required
           ></textarea>
         </div>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-gradient-to-r from-primary to-secondary disabled:bg-secondary text-accent px-4 py-2 rounded-md font-semibold transition-colors"
+          className="w-full bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 font-bold px-8 py-4 rounded-xl hover:shadow-[0_0_25px_rgba(34,211,238,0.4)] transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           {isSubmitting ? 'Enviando...' : 'Enviar Mensaje'}
         </button>

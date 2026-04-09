@@ -1,33 +1,47 @@
+'use client';
 import Navbar from '@/components/Navbar';
 import ContactForm from '@/components/ContactForm';
 import { Mail, Smartphone, Github, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Contacto() {
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#0f1419] relative overflow-hidden">
+      {/* Radial Glow Background */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-900/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+      
       <Navbar />
-      <main className="pt-20 pb-16 px-6">
-        <div className="max-w-4xl mx-auto">
+      <main className="pt-20 pb-16 px-6 relative z-10">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-200 mb-6">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-4xl md:text-6xl font-bold text-slate-200 mb-6 tracking-tight">
               Contacto
             </h1>
-            <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
               ¿Tienes un proyecto en mente o quieres colaborar? Estoy disponible para discutir
               oportunidades de desarrollo web y soluciones tecnológicas.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
             {/* Contact Info */}
-            <div>
-              <h2 className="text-2xl font-bold text-slate-200 mb-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-8">
                 Información de Contacto
               </h2>
               <div className="space-y-6">
-                <div className="flex items-center gap-4 p-4 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800">
-                  <div className="p-3 bg-cyan-400/10 rounded-xl">
+                <div className="flex items-center gap-4 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300">
+                  <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl">
                     <Mail className="text-cyan-400" size={24} />
                   </div>
                   <div>
@@ -36,8 +50,8 @@ export default function Contacto() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800">
-                  <div className="p-3 bg-cyan-400/10 rounded-xl">
+                <div className="flex items-center gap-4 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300">
+                  <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl">
                     <Smartphone className="text-cyan-400" size={24} />
                   </div>
                   <div>
@@ -46,8 +60,8 @@ export default function Contacto() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800">
-                  <div className="p-3 bg-cyan-400/10 rounded-xl">
+                <div className="flex items-center gap-4 p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300">
+                  <div className="p-3 bg-slate-900/50 border border-white/5 rounded-xl">
                     <Github className="text-cyan-400" size={24} />
                   </div>
                   <div>
@@ -65,8 +79,8 @@ export default function Contacto() {
                 </div>
               </div>
 
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold text-slate-200 mb-4">
+              <div className="mt-10">
+                <h3 className="text-lg font-semibold text-slate-200 mb-6">
                   Redes Sociales
                 </h3>
                 <div className="flex gap-4">
@@ -74,7 +88,7 @@ export default function Contacto() {
                     href="https://github.com/MP-make"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-xl bg-slate-900/40 backdrop-blur-md border border-slate-800 text-cyan-400 hover:border-cyan-400 transition-all hover:scale-110"
+                    className="p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-cyan-400 hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300 hover:scale-110"
                   >
                     <Github size={24} />
                   </a>
@@ -82,23 +96,27 @@ export default function Contacto() {
                     href="https://www.linkedin.com/in/marlon-pecho-530443385/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-xl bg-slate-900/40 backdrop-blur-md border border-slate-800 text-cyan-400 hover:border-cyan-400 transition-all hover:scale-110"
+                    className="p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-cyan-400 hover:border-cyan-500/30 hover:bg-white/[0.07] transition-all duration-300 hover:scale-110"
                   >
                     <ExternalLink size={24} />
                   </a>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Contact Form */}
-            <div>
-              <h2 className="text-2xl font-bold text-slate-200 mb-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-8">
                 Envía un Mensaje
               </h2>
-              <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800 p-8">
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
                 <ContactForm />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </main>
