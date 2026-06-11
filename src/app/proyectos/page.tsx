@@ -24,7 +24,7 @@ interface Project {
 export default function Proyectos() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'company' | 'personal'>('company');
+  const [activeTab, setActiveTab] = useState<'company' | 'personal'>('personal');
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -196,7 +196,7 @@ export default function Proyectos() {
         >
           <motion.div className="flex-1 z-10" variants={itemVariants}>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold tracking-widest uppercase mb-8 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
-              <Rocket size={14} /> Portfolio
+              <Rocket size={14} /> Portafolio
             </div>
             <h1 className="text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-8 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200 drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]">
@@ -239,24 +239,10 @@ export default function Proyectos() {
                 <div
                   className="absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_12px_rgba(34,211,238,0.3)] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   style={{
-                    left: activeTab === 'company' ? '4px' : 'calc(50% + 2px)',
+                    left: activeTab === 'personal' ? '4px' : 'calc(50% + 2px)',
                     width: 'calc(50% - 6px)'
                   }}
                 />
-                <button
-                  onClick={() => setActiveTab('company')}
-                  className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
-                >
-                  <Briefcase size={16} className="hidden sm:block" />
-                  <span className={activeTab === 'company' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}>
-                    {t.projects.company}
-                  </span>
-                  <span className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-full ${
-                    activeTab === 'company' ? 'bg-white/15 text-white' : 'bg-slate-800 text-slate-500'
-                  }`}>
-                    {companyProjects.length}
-                  </span>
-                </button>
                 <button
                   onClick={() => setActiveTab('personal')}
                   className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
@@ -271,6 +257,20 @@ export default function Proyectos() {
                     {personalProjects.length}
                   </span>
                 </button>
+                <button
+                  onClick={() => setActiveTab('company')}
+                  className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
+                >
+                  <Briefcase size={16} className="hidden sm:block" />
+                  <span className={activeTab === 'company' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}>
+                    {t.projects.company}
+                  </span>
+                  <span className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-full ${
+                    activeTab === 'company' ? 'bg-white/15 text-white' : 'bg-slate-800 text-slate-500'
+                  }`}>
+                    {companyProjects.length}
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -279,29 +279,29 @@ export default function Proyectos() {
               <motion.div
                 className="flex"
                 style={{ width: '200%' }}
-                animate={{ x: activeTab === 'company' ? '0%' : '-50%' }}
+                animate={{ x: activeTab === 'personal' ? '0%' : '-50%' }}
                 transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
               >
-                {/* Company panel */}
-                <div className="w-1/2 pr-3">
-                  {companyProjects.length > 0 ? (
-                    renderGrid(companyProjects)
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-slate-600">
-                      <Briefcase size={48} className="mb-4 opacity-30" />
-                      <p className="text-lg font-light">No hay proyectos de empresa aún.</p>
-                    </div>
-                  )}
-                </div>
-
                 {/* Personal panel */}
-                <div className="w-1/2 pl-3">
+                <div className="w-1/2 pr-3">
                   {personalProjects.length > 0 ? (
                     renderGrid(personalProjects)
                   ) : (
                     <div className="flex flex-col items-center justify-center py-20 text-slate-600">
                       <User size={48} className="mb-4 opacity-30" />
                       <p className="text-lg font-light">No hay proyectos personales aún.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Company panel */}
+                <div className="w-1/2 pl-3">
+                  {companyProjects.length > 0 ? (
+                    renderGrid(companyProjects)
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+                      <Briefcase size={48} className="mb-4 opacity-30" />
+                      <p className="text-lg font-light">No hay proyectos de empresa aún.</p>
                     </div>
                   )}
                 </div>

@@ -6,9 +6,8 @@ import Timeline from '@/components/Timeline';
 import ParticleBackground from '@/components/ParticleBackground';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { Code, Database, Globe, Smartphone, Zap, Users, Github, ExternalLink, Terminal } from 'lucide-react';
+import { Code, Database, Globe, Smartphone, Zap, Users, Github, ExternalLink } from 'lucide-react';
 
-// Información actualizada: Experiencia & Educación
 const timelineEvents = [
   {
     id: '1',
@@ -52,14 +51,14 @@ const timelineEvents = [
   },
 ];
 
-const stats = [
-  { icon: Zap, label: 'Años de Experiencia', value: '2' },
-  { icon: Globe, label: 'Proyectos Completados', value: '10' },
-  { icon: Users, label: 'Clientes Satisfechos', value: '9' },
-];
-
 export default function SobreMi() {
   const { t } = useLanguage();
+
+  const stats = [
+    { icon: Zap, label: t.aboutPage.yearsExp, value: '2' },
+    { icon: Globe, label: t.aboutPage.projectsCompleted, value: '10' },
+    { icon: Users, label: t.aboutPage.satisfiedClients, value: '9' },
+  ];
 
   return (
     <div className="min-h-screen relative font-sans text-slate-200 selection:bg-cyan-500/30 bg-[#0a0f18] z-0">
@@ -90,52 +89,50 @@ export default function SobreMi() {
 
       <Navbar />
 
-      <main className="pt-32 pb-24 px-6 relative z-10 max-w-7xl mx-auto">
+      <main className="pt-24 sm:pt-32 pb-24 px-4 sm:px-6 relative z-10 max-w-7xl mx-auto">
         
         {/* ================= HERO SECTION ================= */}
         <motion.div 
-          className="flex flex-col items-center text-center mb-28"
+          className="flex flex-col items-center text-center mb-20 sm:mb-28"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
           {/* Icono Principal Tech */}
           <motion.div
-            className="relative w-28 h-28 mx-auto mb-10 flex items-center justify-center group"
+            className="relative w-20 h-20 sm:w-28 sm:h-28 mx-auto mb-6 sm:mb-10 flex items-center justify-center group"
             whileHover={{ scale: 1.05 }}
           >
             <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full group-hover:bg-cyan-400/30 transition-all duration-500"></div>
             <div className="absolute inset-0 border border-cyan-500/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
             <div className="absolute inset-2 border border-blue-500/30 rounded-full animate-[spin_7s_linear_infinite_reverse]"></div>
-            <div className="relative w-16 h-16 bg-[#0a1017] border border-cyan-500/50 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center justify-center rotate-45 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] transition-shadow duration-500">
-              <Code size={32} className="text-cyan-400 -rotate-45" />
+            <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-[#0a1017] border border-cyan-500/50 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center justify-center rotate-45 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] transition-shadow duration-500">
+              <Code size={24} className="text-cyan-400 -rotate-45 sm:size-32" />
             </div>
           </motion.div>
           
           {/* Título Colosal - Blanco Sólido */}
           <motion.h1 
-            className="text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-8 leading-tight text-white drop-shadow-md"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-6 sm:mb-8 leading-tight text-white drop-shadow-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Sobre Mí
+            {t.aboutPage.title}
           </motion.h1>
           
-          {/* Descripción - Totalmente limpia y centrada */}
           <motion.p 
-            className="text-xl md:text-2xl text-slate-300 leading-relaxed font-light max-w-3xl mx-auto text-center"
+            className="text-base sm:text-xl md:text-2xl text-slate-300 leading-relaxed font-light max-w-3xl mx-auto text-center px-2 sm:px-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Soy Marlon Pecho, estudiante de Ingeniería de Sistemas Avanzados apasionado por el desarrollo web.
-            Me especializo en crear soluciones digitales innovadoras que combinan diseño moderno con funcionalidad robusta.
+            {t.aboutPage.description}
           </motion.p>
 
           {/* Botones de Acción Glassmorphism */}
           <motion.div 
-            className="flex flex-wrap justify-center gap-5 mt-12"
+            className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-5 mt-8 sm:mt-12 w-full sm:w-auto px-4 sm:px-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
@@ -144,26 +141,26 @@ export default function SobreMi() {
               href="https://github.com/MP-make"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-8 py-3.5 bg-[#0a1017] border border-white/10 rounded-full text-slate-300 hover:bg-white/5 hover:text-white hover:border-cyan-500/50 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(34,211,238,0.15)] group"
+              className="inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-3.5 bg-[#0a1017] border border-white/10 rounded-full text-slate-300 hover:bg-white/5 hover:text-white hover:border-cyan-500/50 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(34,211,238,0.15)] group text-sm sm:text-base"
             >
-              <Github size={20} className="group-hover:text-cyan-400 transition-colors" />
+              <Github size={18} className="group-hover:text-cyan-400 transition-colors shrink-0" />
               <span className="font-semibold tracking-wide">GitHub</span>
             </a>
             <a
               href="/cv-marlon-pecho.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-8 py-3.5 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-100 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] group"
+              className="inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-3.5 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-100 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] group text-sm sm:text-base"
             >
-              <ExternalLink size={20} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
-              <span className="font-semibold tracking-wide">Descargar CV</span>
+              <ExternalLink size={18} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <span className="font-semibold tracking-wide">{t.aboutPage.downloadCV}</span>
             </a>
           </motion.div>
         </motion.div>
 
         {/* ================= STATS SECTION ================= */}
         <motion.section 
-          className="mb-32 relative"
+          className="mb-20 sm:mb-32 relative"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -173,11 +170,11 @@ export default function SobreMi() {
           <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent -z-10 hidden md:block"></div>
           
           {/* Grid ajustado a 3 columnas */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto px-2 sm:px-0">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
-                className="relative group p-8 bg-[#0a1017]/80 backdrop-blur-md border border-white/5 rounded-3xl hover:border-cyan-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(34,211,238,0.05)] overflow-hidden"
+                className="relative group p-6 sm:p-8 bg-[#0a1017]/80 backdrop-blur-md border border-white/5 rounded-2xl sm:rounded-3xl hover:border-cyan-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(34,211,238,0.05)] overflow-hidden"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -187,13 +184,13 @@ export default function SobreMi() {
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div className="flex flex-col items-center text-center relative z-10">
-                  <div className="p-4 bg-cyan-950/30 rounded-2xl mb-5 group-hover:scale-110 transition-transform duration-500 border border-cyan-500/10 group-hover:border-cyan-500/30">
-                    <stat.icon className="w-8 h-8 text-cyan-400" />
+                  <div className="p-3 sm:p-4 bg-cyan-950/30 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-500 border border-cyan-500/10 group-hover:border-cyan-500/30">
+                    <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
                   </div>
-                  <div className="text-5xl font-black text-white mb-2 drop-shadow-md group-hover:text-transparent bg-clip-text bg-gradient-to-r group-hover:from-cyan-300 group-hover:to-cyan-100 transition-colors duration-300">
+                  <div className="text-3xl sm:text-5xl font-black text-white mb-1 sm:mb-2 drop-shadow-md group-hover:text-transparent bg-clip-text bg-gradient-to-r group-hover:from-cyan-300 group-hover:to-cyan-100 transition-colors duration-300">
                     {stat.value}
                   </div>
-                  <div className="text-sm font-medium text-slate-400 uppercase tracking-widest">{stat.label}</div>
+                  <div className="text-[10px] sm:text-sm font-medium text-slate-400 uppercase tracking-widest">{stat.label}</div>
                 </div>
               </motion.div>
             ))}
@@ -202,40 +199,40 @@ export default function SobreMi() {
 
         {/* ================= TIMELINE SECTION ================= */}
         <motion.section 
-          className="mb-32"
+          className="mb-20 sm:mb-32"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
-              Experiencia & <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">Educación</span>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 px-4">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">{t.aboutPage.experienceEducation}</span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 mx-auto rounded-full"></div>
+            <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 mx-auto rounded-full"></div>
           </div>
           
-          <div className="bg-[#0a1017]/50 p-8 md:p-12 rounded-[2.5rem] border border-white/5 shadow-2xl backdrop-blur-sm">
+          <div className="bg-[#0a1017]/50 p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-[2.5rem] border border-white/5 shadow-2xl backdrop-blur-sm">
             <Timeline events={timelineEvents} />
           </div>
         </motion.section>
 
         {/* ================= SKILLS SECTION ================= */}
         <motion.section
-          className="mb-20"
+          className="mb-16 sm:mb-20"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
-              Tecnologías & <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">Habilidades</span>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 px-4">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">{t.aboutPage.technologiesSkills}</span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 mx-auto rounded-full"></div>
+            <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[
               { name: 'React / Next.js', level: 'Avanzado', icon: Code },
               { name: 'Node.js / Python', level: 'Avanzado', icon: Database },
@@ -256,7 +253,7 @@ export default function SobreMi() {
               return (
                 <motion.div
                   key={index}
-                  className="bg-[#0a1017] rounded-3xl border border-white/5 p-8 hover:border-cyan-500/40 hover:bg-[#0d1522] transition-all duration-500 group relative overflow-hidden"
+                  className="bg-[#0a1017] rounded-2xl sm:rounded-3xl border border-white/5 p-5 sm:p-8 hover:border-cyan-500/40 hover:bg-[#0d1522] transition-all duration-500 group relative overflow-hidden"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -301,7 +298,7 @@ export default function SobreMi() {
 
         {/* ================= CALL TO ACTION ================= */}
         <motion.section 
-          className="text-center mt-32 py-16 px-6 relative rounded-[3rem] overflow-hidden border border-white/5 bg-[#0a1017]"
+          className="text-center mt-20 sm:mt-32 py-12 sm:py-16 px-4 sm:px-6 relative rounded-2xl sm:rounded-[3rem] overflow-hidden border border-white/5 bg-[#0a1017]"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -311,19 +308,19 @@ export default function SobreMi() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-2xl bg-cyan-900/20 blur-[100px] rounded-full pointer-events-none"></div>
 
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight">
-              ¿Listo para trabajar <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">juntos?</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 sm:mb-6 tracking-tight">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">{t.aboutPage.ctaTitle}</span>
             </h2>
-            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              Si tienes un proyecto en mente o quieres discutir oportunidades de colaboración para llevar tus ideas al siguiente nivel, no dudes en contactarme.
+            <p className="text-base sm:text-xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto font-light leading-relaxed px-2 sm:px-0">
+              {t.aboutPage.ctaDesc}
             </p>
             
             <Link 
               href="/contacto"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-lg hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] transition-all duration-300 hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-3 px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-base sm:text-lg hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] transition-all duration-300 hover:scale-105 active:scale-95"
             >
-              <Zap size={22} className="fill-white" />
-              Contactar Ahora
+              <Zap size={20} className="fill-white shrink-0" />
+              {t.aboutPage.contactNow}
             </Link>
           </div>
         </motion.section>

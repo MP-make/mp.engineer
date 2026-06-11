@@ -60,6 +60,27 @@ interface Translations {
     email: string;
     message: string;
     send: string;
+    contactInfo: string;
+    socialMedia: string;
+    sendMessage: string;
+    whatsapp: string;
+    github: string;
+    linkedin: string;
+    submitSuccess: string;
+    submitError: string;
+  };
+  aboutPage: {
+    title: string;
+    description: string;
+    downloadCV: string;
+    experienceEducation: string;
+    technologiesSkills: string;
+    ctaTitle: string;
+    ctaDesc: string;
+    contactNow: string;
+    yearsExp: string;
+    projectsCompleted: string;
+    satisfiedClients: string;
   };
   footer: {
     rights: string;
@@ -126,12 +147,12 @@ const translations: Record<Language, Translations> = {
       welcome: 'Bienvenido',
       greeting: 'Hola, soy',
       role: 'Desarrollador Full-Stack',
-      description: 'Transformando ideas en experiencias digitales excepcionales. Especializado en crear soluciones web modernas, escalables y centradas en el usuario.',
+      description: 'Creando arquitecturas escalables con lógica robusta en Java y Python, optimización de bases de datos relacionales y experiencias frontend modernas.',
       available: 'Disponible para proyectos',
       connect: 'Conectemos',
       viewProjects: 'Ver Proyectos',
       slides: [
-        { title: 'Bienvenido a mi Portafolio', subtitle: 'Donde las ideas cobran vida digital' },
+        { title: 'Bienvenido a mi Portafolio', subtitle: 'Creando arquitecturas escalables con Java, Python y bases de datos relacionales' },
         { title: 'Desarrollador Full-Stack', subtitle: 'Especializado en React, Next.js y Python' },
         { title: '+5 Proyectos Completados', subtitle: 'Soluciones web modernas y escalables' },
         { title: 'Basado en Perú', subtitle: 'Disponible para proyectos remotos en todo el mundo' },
@@ -180,6 +201,27 @@ const translations: Record<Language, Translations> = {
       email: 'Correo electrónico',
       message: 'Mensaje',
       send: 'Enviar mensaje',
+      contactInfo: 'Información de Contacto',
+      socialMedia: 'Redes Sociales',
+      sendMessage: 'Enviá un Mensaje',
+      whatsapp: 'WhatsApp',
+      github: 'GitHub',
+      linkedin: 'LinkedIn',
+      submitSuccess: 'Mensaje enviado correctamente. Te responderé pronto!',
+      submitError: 'Error al enviar. Por favor intenta nuevamente.',
+    },
+    aboutPage: {
+      title: 'Sobre Mí',
+      description: 'Soy Marlon Pecho, estudiante de Ingeniería de Sistemas Avanzados apasionado por el desarrollo web. Me especializo en crear soluciones digitales innovadoras que combinan diseño moderno con funcionalidad robusta.',
+      downloadCV: 'Descargar CV',
+      experienceEducation: 'Experiencia & Educación',
+      technologiesSkills: 'Tecnologías & Habilidades',
+      ctaTitle: '¿Listo para trabajar juntos?',
+      ctaDesc: 'Si tienes un proyecto en mente o quieres discutir oportunidades de colaboración para llevar tus ideas al siguiente nivel, no dudes en contactarme.',
+      contactNow: 'Contactar Ahora',
+      yearsExp: 'Años de Experiencia',
+      projectsCompleted: 'Proyectos Completados',
+      satisfiedClients: 'Clientes Satisfechos',
     },
     footer: {
       rights: 'Todos los derechos reservados.',
@@ -244,12 +286,12 @@ const translations: Record<Language, Translations> = {
       welcome: 'Welcome',
       greeting: "Hi, I'm",
       role: 'Full-Stack Developer',
-      description: 'Transforming ideas into exceptional digital experiences. Specialized in creating modern, scalable, and user-centered web solutions.',
+      description: 'Building scalable architectures with robust logic in Java and Python, relational database optimization, and modern frontend experiences.',
       available: 'Available for projects',
       connect: "Let's Connect",
       viewProjects: 'View Projects',
       slides: [
-        { title: 'Welcome to my Portfolio', subtitle: 'Where ideas come to digital life' },
+        { title: 'Welcome to my Portfolio', subtitle: 'Building scalable architectures with Java, Python and relational databases' },
         { title: 'Full-Stack Developer', subtitle: 'Specialized in React, Next.js and Python' },
         { title: '+5 Completed Projects', subtitle: 'Modern and scalable web solutions' },
         { title: 'Based in Peru', subtitle: 'Available for remote projects worldwide' },
@@ -298,6 +340,27 @@ const translations: Record<Language, Translations> = {
       email: 'Email',
       message: 'Message',
       send: 'Send message',
+      contactInfo: 'Contact Information',
+      socialMedia: 'Social Media',
+      sendMessage: 'Send a Message',
+      whatsapp: 'WhatsApp',
+      github: 'GitHub',
+      linkedin: 'LinkedIn',
+      submitSuccess: 'Message sent successfully. I will reply soon!',
+      submitError: 'Error sending. Please try again.',
+    },
+    aboutPage: {
+      title: 'About Me',
+      description: "I'm Marlon Pecho, an advanced Systems Engineering student passionate about web development. I specialize in creating innovative digital solutions that combine modern design with robust functionality.",
+      downloadCV: 'Download CV',
+      experienceEducation: 'Experience & Education',
+      technologiesSkills: 'Technologies & Skills',
+      ctaTitle: 'Ready to work together?',
+      ctaDesc: "If you have a project in mind or want to discuss collaboration opportunities to take your ideas to the next level, don't hesitate to contact me.",
+      contactNow: 'Contact Now',
+      yearsExp: 'Years of Experience',
+      projectsCompleted: 'Projects Completed',
+      satisfiedClients: 'Satisfied Clients',
     },
     footer: {
       rights: 'All rights reserved.',

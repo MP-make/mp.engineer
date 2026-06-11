@@ -28,27 +28,36 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
         
         {/* Floating Code Lines - Izquierda */}
         <div className="hidden lg:block absolute top-10 left-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse">
-          {`const developer = {`}
+          {`const fullStack = {`}
         </div>
         <div className="hidden lg:block absolute top-20 left-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-1000">
           {`  name: 'Marlon Pecho',`}
         </div>
         <div className="hidden lg:block absolute top-32 left-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-2000">
-          {`  skills: ['React', 'Next.js', 'PostgreSQL']`}
+          {`  frontend: ['React', 'Next.js', 'TS'],`}
         </div>
         <div className="hidden lg:block absolute top-44 left-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-3000">
+          {`  backend: ['Java', 'Python', 'Node'],`}
+        </div>
+        <div className="hidden lg:block absolute top-56 left-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-4000">
+          {`  database: ['PostgreSQL', 'SQL'],`}
+        </div>
+        <div className="hidden lg:block absolute top-68 left-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-5000">
           {`};`}
         </div>
 
         {/* Right Side Code - Derecha */}
-        <div className="hidden lg:block absolute top-20 right-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-1500 text-right">
-          {`function buildIdeas() {`}
+        <div className="hidden lg:block absolute top-16 right-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-1500 text-right">
+          {`import { Backend, Frontend }`}
         </div>
-        <div className="hidden lg:block absolute top-32 right-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-2500 text-right">
-          {`  return 'digital solutions';`}
+        <div className="hidden lg:block absolute top-28 right-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-2500 text-right">
+          {`  from 'fullstack-engineer';`}
         </div>
         <div className="hidden lg:block absolute top-44 right-0 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-3500 text-right">
-          {`}`}
+          {`const db = new PostgreSQL()`}
+        </div>
+        <div className="hidden lg:block absolute top-56 right-4 text-cyan-500/20 font-mono text-xs md:text-sm animate-pulse delay-4500 text-right">
+          {`db.query('SELECT * FROM ideas');`}
         </div>
 
         {/* Formas Geométricas */}
@@ -112,7 +121,7 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
 
           {/* Description */}
           <p className="text-lg text-slate-400 leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10 font-light">
-            {t?.hero?.slides?.[0]?.subtitle || "Donde las ideas complejas cobran vida a través de código limpio, arquitecturas escalables y experiencias digitales inmersivas."}
+            {t?.hero?.slides?.[0]?.subtitle || "Creando arquitecturas escalables con lógica robusta en Java y Python, optimización de bases de datos relacionales y experiencias frontend modernas."}
           </p>
 
           {/* Buttons */}
@@ -187,7 +196,7 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
             
             {/* Floating Tech Badges */}
             <motion.div 
-              className="absolute top-4 -right-2 w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.2)] z-20"
+              className="absolute -top-2 left-2 w-10 h-10 bg-slate-900/90 backdrop-blur rounded-full flex items-center justify-center border border-cyan-500/60 shadow-[0_0_15px_rgba(34,211,238,0.3)] z-20"
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -195,11 +204,47 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
             </motion.div>
             
             <motion.div 
-              className="absolute bottom-10 -left-4 w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)] z-20"
+              className="absolute bottom-14 -left-5 w-10 h-10 bg-slate-900/90 backdrop-blur rounded-full flex items-center justify-center border border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.3)] z-20"
               animate={{ y: [0, 10, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             >
               <span className="text-emerald-400 text-xs font-bold font-mono">TS</span>
+            </motion.div>
+
+            {/* PY Badge - Python */}
+            <motion.div 
+              className="absolute top-10 -right-4 w-10 h-10 bg-slate-900/90 backdrop-blur rounded-full flex items-center justify-center border border-yellow-500/60 shadow-[0_0_15px_rgba(234,179,8,0.3)] z-20"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            >
+              <span className="text-yellow-400 text-xs font-bold font-mono">PY</span>
+            </motion.div>
+
+            {/* JV Badge - Java */}
+            <motion.div 
+              className="absolute bottom-10 -right-5 w-10 h-10 bg-slate-900/90 backdrop-blur rounded-full flex items-center justify-center border border-orange-500/60 shadow-[0_0_15px_rgba(249,115,22,0.3)] z-20"
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            >
+              <span className="text-orange-400 text-xs font-bold font-mono">JV</span>
+            </motion.div>
+
+            {/* PSQL Badge - PostgreSQL */}
+            <motion.div 
+              className="absolute -top-1 -right-5 w-11 h-10 bg-slate-900/90 backdrop-blur rounded-full flex items-center justify-center border border-blue-500/60 shadow-[0_0_15px_rgba(59,130,246,0.3)] z-20"
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+            >
+              <span className="text-blue-400 text-[10px] font-bold font-mono">PSQL</span>
+            </motion.div>
+
+            {/* React Badge */}
+            <motion.div 
+              className="absolute -bottom-2 left-10 w-10 h-10 bg-slate-900/90 backdrop-blur rounded-full flex items-center justify-center border border-sky-400/60 shadow-[0_0_15px_rgba(56,189,248,0.3)] z-20"
+              animate={{ y: [0, -7, 0] }}
+              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
+            >
+              <span className="text-sky-400 text-xs font-bold font-mono">RC</span>
             </motion.div>
 
           </div>
