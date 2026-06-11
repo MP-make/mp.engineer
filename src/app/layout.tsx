@@ -20,8 +20,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable}`}>
-      <body className="font-sans antialiased bg-transparent text-slate-200 relative overflow-x-hidden">
+    <html lang="es" className={`${inter.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              try {
+                var theme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.classList.add(theme);
+              } catch(e) {}
+            })();
+          `
+        }} />
+      </head>
+      <body className="font-sans antialiased relative overflow-x-hidden">
         <ClientProviders>
           {children}
         </ClientProviders>

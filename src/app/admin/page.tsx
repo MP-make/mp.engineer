@@ -17,6 +17,7 @@ interface Project {
   github_link?: string;
   technologies: string[];
   status: 'completed' | 'in-progress';
+  project_type: 'personal' | 'company';
   created_at: string;
   images?: { image: string }[];
   is_full_page?: boolean;
@@ -66,6 +67,7 @@ export default function AdminPage() {
     github_link: '',
     technologies: '',
     status: 'completed',
+    project_type: 'personal' as 'personal' | 'company',
     is_full_page: false,
     content_structure: {}
   });
@@ -307,6 +309,7 @@ export default function AdminPage() {
             github_link: formData.github_link || null,
             technologies: techArray,
             status: formData.status,
+            project_type: formData.project_type,
             is_full_page: formData.is_full_page,
             content_structure: contentStructure
           })
@@ -326,6 +329,7 @@ export default function AdminPage() {
             github_link: formData.github_link || null,
             technologies: techArray,
             status: formData.status,
+            project_type: formData.project_type,
             is_full_page: formData.is_full_page,
             content_structure: contentStructure,
             created_at: new Date().toISOString()
@@ -364,7 +368,7 @@ export default function AdminPage() {
         }
       }
 
-      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', is_full_page: false, content_structure: {} });
+      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', is_full_page: false, content_structure: {} });
       setImageUrls([]);
       setSelectedFiles([]);
       setEditingId(null);
@@ -406,6 +410,7 @@ export default function AdminPage() {
       github_link: project.github_link || '',
       technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
       status: project.status,
+      project_type: project.project_type || 'personal',
       is_full_page: project.is_full_page || false,
       content_structure: project.content_structure || {}
     });
@@ -900,6 +905,21 @@ export default function AdminPage() {
                   </div>
 
                   <div>
+                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                      <FolderOpen size={16} className="text-primary" />
+                      Tipo de Proyecto
+                    </label>
+                    <select
+                      value={formData.project_type}
+                      onChange={(e) => setFormData({ ...formData, project_type: e.target.value as 'personal' | 'company' })}
+                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                    >
+                      <option value="personal">Personal</option>
+                      <option value="company">Empresa</option>
+                    </select>
+                  </div>
+
+                  <div>
                     <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes del Proyecto</label>
                     {imageUrls.length > 0 && <Carousel images={imageUrls} />}
                     <div className="space-y-3">
@@ -975,7 +995,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', is_full_page: false, content_structure: {} });
+      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', is_full_page: false, content_structure: {} });
                           setImageUrls([]);
                           setSelectedFiles([]);
                           setEditingId(null);
@@ -997,7 +1017,14 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
-                      {project.is_full_page && <span className="px-2 py-1 bg-blue-500 text-white text-xs rounded">Página Completa</span>}
+                      <div className="flex items-center gap-2">
+                        {project.project_type === 'company' ? (
+                          <span className="px-2 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs rounded font-medium">Empresa</span>
+                        ) : (
+                          <span className="px-2 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-xs rounded font-medium">Personal</span>
+                        )}
+                        {project.is_full_page && <span className="px-2 py-1 bg-blue-500 text-white text-xs rounded">Página Completa</span>}
+                      </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -1710,7 +1737,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', is_full_page: false, content_structure: {} });
+                        setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', is_full_page: false, content_structure: {} });
                         setImageUrls([]);
                         setSelectedFiles([]);
                         setEditingId(null);

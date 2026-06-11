@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, short_description, link, github_link, technologies, status, is_full_page, content_structure, created_at } = body;
+    const { title, description, short_description, link, github_link, technologies, status, is_full_page, content_structure, project_type, created_at } = body;
 
     const { data, error } = await supabase
       .from('portfolio_project')
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
         status,
         is_full_page,
         content_structure,
+        project_type: project_type || 'personal',
         created_at: created_at || new Date().toISOString()
       }])
       .select();
@@ -50,7 +51,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, title, description, short_description, link, github_link, technologies, status, is_full_page, content_structure } = body;
+    const { id, title, description, short_description, link, github_link, technologies, status, is_full_page, content_structure, project_type } = body;
 
     const { data, error } = await supabase
       .from('portfolio_project')
@@ -63,7 +64,8 @@ export async function PUT(request: NextRequest) {
         technologies,
         status,
         is_full_page,
-        content_structure
+        content_structure,
+        project_type: project_type || 'personal'
       })
       .eq('id', id)
       .select();

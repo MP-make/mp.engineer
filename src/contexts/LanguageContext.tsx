@@ -42,6 +42,8 @@ interface Translations {
   projects: {
     title: string;
     subtitle: string;
+    personal: string;
+    company: string;
     completed: string;
     inProgress: string;
     techStack: string;
@@ -160,6 +162,8 @@ const translations: Record<Language, Translations> = {
     projects: {
       title: 'Proyectos',
       subtitle: 'Soluciones innovadoras construidas con las últimas tecnologías',
+      personal: 'Proyectos Personales',
+      company: 'Proyectos de Empresa',
       completed: 'COMPLETADO',
       inProgress: 'EN DESARROLLO',
       techStack: 'Stack Tecnológico',
@@ -276,6 +280,8 @@ const translations: Record<Language, Translations> = {
     projects: {
       title: 'Projects',
       subtitle: 'Innovative solutions built with the latest technologies',
+      personal: 'Personal Projects',
+      company: 'Company Projects',
       completed: 'COMPLETED',
       inProgress: 'IN PROGRESS',
       techStack: 'Tech Stack',
