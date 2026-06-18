@@ -16,13 +16,14 @@ interface Project {
   link?: string;
   github_link?: string;
   technologies: string[];
-  status: 'completed' | 'in-progress';
+  status: 'COMPLETADO' | 'EN DESARROLLO';
   project_type: 'personal' | 'company';
   company?: string;
   created_at: string;
   images?: { image: string }[];
   is_full_page?: boolean;
   content_structure?: any;
+  featured?: boolean;
 }
 
 interface Contact {
@@ -108,11 +109,12 @@ export default function AdminPage() {
     link: '',
     github_link: '',
     technologies: '',
-    status: 'completed',
+    status: 'COMPLETADO',
     project_type: 'personal' as 'personal' | 'company',
     company: '',
     is_full_page: false,
-    content_structure: {}
+    featured: false,
+    content_structure: {} as any,
   });
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -377,6 +379,7 @@ export default function AdminPage() {
             project_type: formData.project_type,
             company: formData.project_type === 'company' ? formData.company : null,
             is_full_page: formData.is_full_page,
+            featured: formData.featured,
             content_structure: contentStructure
           })
         });
@@ -398,6 +401,7 @@ export default function AdminPage() {
             project_type: formData.project_type,
             company: formData.project_type === 'company' ? formData.company : null,
             is_full_page: formData.is_full_page,
+            featured: formData.featured,
             content_structure: contentStructure,
             created_at: new Date().toISOString()
           })
@@ -435,7 +439,7 @@ export default function AdminPage() {
         }
       }
 
-      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'COMPLETADO', project_type: 'personal', company: '', is_full_page: false, featured: false, content_structure: {} });
       setImageUrls([]);
       setSelectedFiles([]);
       setEditingId(null);
@@ -481,6 +485,7 @@ export default function AdminPage() {
       project_type: project.project_type || 'personal',
       company: project.company || '',
       is_full_page: project.is_full_page || false,
+      featured: project.featured || false,
       content_structure: project.content_structure || {}
     });
     setEditingId(project.id);
@@ -881,7 +886,7 @@ export default function AdminPage() {
               <button
                 onClick={() => {
                   setEditingId(null);
-                  setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+                  setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'COMPLETADO', project_type: 'personal', company: '', is_full_page: false, featured: false, content_structure: {} });
                   setImageUrls([]);
                   setSelectedFiles([]);
                   setShowModal(true);
@@ -911,7 +916,7 @@ export default function AdminPage() {
                     onClick={() => {
                       setShowModal(false);
                       setEditingId(null);
-                      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+                      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'COMPLETADO', project_type: 'personal', company: '', is_full_page: false, featured: false, content_structure: {} });
                       setImageUrls([]);
                       setSelectedFiles([]);
                     }}
@@ -1013,7 +1018,7 @@ export default function AdminPage() {
                         className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                       >
                         <option value="completed">Completado</option>
-                        <option value="in-progress">En Progreso</option>
+                        <option value="EN DESARROLLO">En Progreso</option>
                       </select>
                     </div>
 
@@ -1120,6 +1125,16 @@ export default function AdminPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={formData.featured}
+                        onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                        className="form-checkbox h-5 w-5 text-amber-400 transition-all duration-300"
+                      />
+                      <label className={`font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Destacado</label>
+                    </div>
+
+                    <div className="flex items-center gap-3">
                       <button
                         type="submit"
                         className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
@@ -1130,7 +1145,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+                            setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'COMPLETADO', project_type: 'personal', company: '', is_full_page: false, featured: false, content_structure: {} });
                             setImageUrls([]);
                             setSelectedFiles([]);
                             setEditingId(null);
@@ -1892,7 +1907,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+                        setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'COMPLETADO', project_type: 'personal', company: '', is_full_page: false, featured: false, content_structure: {} });
                         setImageUrls([]);
                         setSelectedFiles([]);
                         setEditingId(null);

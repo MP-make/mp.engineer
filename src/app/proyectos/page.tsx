@@ -15,11 +15,12 @@ interface Project {
   link?: string;
   github_link?: string;
   technologies: string[];
-  status: 'completed' | 'in-progress';
+  status: 'COMPLETADO' | 'EN DESARROLLO';
   project_type: 'personal' | 'company';
   company?: string;
   created_at: string;
   images?: { image: string }[];
+  featured?: boolean;
 }
 
 export default function Proyectos() {
@@ -29,6 +30,7 @@ export default function Proyectos() {
   const { t } = useLanguage();
 
   useEffect(() => {
+    let ignore = false;
     const fetchProjects = async () => {
       setIsLoading(true);
       const { data, error } = await supabase
@@ -38,12 +40,24 @@ export default function Proyectos() {
 
       if (error) {
         console.error('Error fetching projects:', error);
-      } else       if (data) {
-        setProjects(data);
+      } else if (data && !ignore) {
+        const sorted = [...data].sort((a, b) => {
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+        setProjects(sorted);
       }
       setIsLoading(false);
     };
     fetchProjects();
+
+    const onFocus = () => { fetchProjects(); };
+    window.addEventListener('focus', onFocus);
+    return () => {
+      ignore = true;
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   const personalProjects = projects.filter(p => p.project_type === 'personal' || !p.project_type);
@@ -90,7 +104,7 @@ export default function Proyectos() {
                 <Star size={12} className="fill-cyan-400" /> Destacado
               </span>
             )}
-            {getStatus(project) === 'completed' ? (
+            {getStatus(project) === 'COMPLETADO' ? (
               <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md">
                 {t.projects.completed}
               </span>
@@ -150,16 +164,20 @@ export default function Proyectos() {
     </motion.article>
   );
 
-  const renderGrid = (items: Project[]) => (
-    <motion.div
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(400px,auto)]"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {items.map((project, index) => renderProjectCard(project, index, items.length > 1 && index === 0))}
-    </motion.div>
-  );
+  const renderGrid = (items: Project[]) => {
+    const featuredIndex = items.findIndex(p => p.featured);
+    const heroIdx = featuredIndex >= 0 ? featuredIndex : 0;
+    return (
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(400px,auto)]"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {items.map((project, index) => renderProjectCard(project, index, items.length > 1 && index === heroIdx))}
+      </motion.div>
+    );
+  };
 
   return (
     <div className="min-h-screen relative font-sans text-text-secondary selection:bg-cyan-500/30 bg-surface">
@@ -243,8 +261,8 @@ export default function Proyectos() {
                   onClick={() => setActiveTab('personal')}
                   className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
                 >
-                  <User size={16} className="hidden sm:block" />
-                  <span className={`gradient-title ${activeTab !== 'personal' ? 'opacity-60' : ''}`}>
+                  <User size={22} className="hidden sm:block" />
+                  <span className={activeTab === 'personal' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}>
                     {t.projects.personal}
                   </span>
                   <span className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-full ${
@@ -257,8 +275,8 @@ export default function Proyectos() {
                   onClick={() => setActiveTab('company')}
                   className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
                 >
-                  <Briefcase size={16} className="hidden sm:block" />
-                  <span className={`gradient-title ${activeTab !== 'company' ? 'opacity-60' : ''}`}>
+                  <Briefcase size={22} className="hidden sm:block" />
+                  <span className={activeTab === 'company' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}>
                     {t.projects.company}
                   </span>
                   <span className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-full ${

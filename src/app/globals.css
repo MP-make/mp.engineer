@@ -45,8 +45,8 @@ html {
   --background: #f8fafc;
   --foreground: #0f172a;
   --muted-foreground: #334155;
-  --primary: #008B8B;
-  --primary-hover: #006666;
+  --primary: #22d3ee;
+  --primary-hover: #0ea5e9;
   --on-primary: #ffffff;
   --border: #cbd5e1;
   --input: #e2e8f0;
@@ -83,8 +83,8 @@ html {
   --background: #f8fafc;
   --foreground: #0f172a;
   --muted-foreground: #334155;
-  --primary: #008B8B;
-  --primary-hover: #006666;
+  --primary: #22d3ee;
+  --primary-hover: #0ea5e9;
   --on-primary: #ffffff;
   --border: #cbd5e1;
   --input: #e2e8f0;
@@ -119,8 +119,8 @@ html {
   --background: #020617;
   --foreground: #f1f5f9;
   --muted-foreground: #94a3b8;
-  --primary: #008B8B;
-  --primary-hover: #009999;
+  --primary: #22d3ee;
+  --primary-hover: #0ea5e9;
   --on-primary: #ffffff;
   --border: #1e293b;
   --input: #1e293b;
@@ -260,13 +260,13 @@ body {
    3. UTILIDADES DE TEXTO
    ========================================= */
 .text-gradient-primary {
-  background: linear-gradient(to right, #008B8B, #00B8B8);
+  background: linear-gradient(to right, #22d3ee, #67e8f9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .dark .text-gradient-primary {
-  background: linear-gradient(to right, #00D4D4, #008B8B);
+  background: linear-gradient(to right, #67e8f9, #22d3ee);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
