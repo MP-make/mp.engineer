@@ -3,17 +3,19 @@ import { useCallback } from "react";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import type { Engine } from "tsparticles-engine";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ParticleBackground() {
+  const { theme } = useTheme();
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadSlim(engine);
   }, []);
 
   return (
-    // Aseguramos que el contenedor no bloquee clics accidentales si sobresale, 
-    // pero el canvas interno sí detectará el hover gracias a la config de tsParticles
-    <div className="fixed inset-0 -z-10 bg-[#020617] pointer-events-none">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617] -z-10"></div>
+    <div className={`fixed inset-0 -z-10 pointer-events-none ${theme === 'dark' ? 'bg-[#020617]' : 'bg-surface'}`}>
+      {theme === 'dark' && (
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/40 via-[#020617] to-[#020617] -z-10"></div>
+      )}
       
       <Particles
         id="tsparticles"

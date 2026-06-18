@@ -33,11 +33,11 @@ export default function RootLayout({
           `
         }} />
       </head>
-      <body className="font-sans antialiased relative overflow-x-hidden">
+      <body className="font-sans antialiased relative overflow-x-hidden bg-background">
         <ClientProviders>
           {children}
+          <ParticleBackground />
         </ClientProviders>
-        <ParticleBackground />
       </body>
     </html>
   );

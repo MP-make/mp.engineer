@@ -46,7 +46,7 @@ export default function ProjectDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-surface flex items-center justify-center">
         <div className="text-cyan-400">Cargando...</div>
       </div>
     );
@@ -54,10 +54,10 @@ export default function ProjectDetail() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-surface flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-200 mb-4">Proyecto no encontrado</h1>
-          <Link href="/proyectos" className="text-cyan-400 hover:text-slate-200">
+          <h1 className="text-2xl font-bold text-text-secondary mb-4">Proyecto no encontrado</h1>
+          <Link href="/proyectos" className="text-cyan-400 hover:text-text-secondary">
             ← Volver a Proyectos
           </Link>
         </div>
@@ -66,14 +66,14 @@ export default function ProjectDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-surface">
       <Navbar />
       <main className="pt-20 pb-16 px-6">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <Link
             href="/proyectos"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-cyan-400 mb-8 transition-colors"
+            className="inline-flex items-center gap-2 text-text-muted hover:text-cyan-400 mb-8 transition-colors"
           >
             <ArrowLeft size={20} />
             Volver a Proyectos
@@ -82,14 +82,14 @@ export default function ProjectDetail() {
           {/* Project Header */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-200 mb-4 md:mb-0">
+              <h1 className="text-4xl md:text-5xl font-bold text-text-secondary mb-4 md:mb-0">
                 {project.title}
               </h1>
               <div className={`${project.status === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'} text-sm font-bold flex items-center gap-2 px-4 py-2 rounded-full border w-fit`}>
                 {project.status === 'completed' ? <><CheckCircle size={16} />Completado</> : <><Clock size={16} />En Progreso</>}
               </div>
             </div>
-            <p className="text-lg text-slate-400 leading-relaxed">
+            <p className="text-lg text-text-muted leading-relaxed">
               {project.description}
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function ProjectDetail() {
 
           {/* Technologies */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-200 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-text-secondary mb-4 flex items-center gap-2">
               <Code size={24} className="text-cyan-400" />
               Tecnologías Utilizadas
             </h2>
@@ -121,8 +121,8 @@ export default function ProjectDetail() {
           {/* Full Page Content */}
           {project.is_full_page && project.content_structure && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-slate-200 mb-6">Detalles del Proyecto</h2>
-              <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800 p-8">
+              <h2 className="text-2xl font-bold text-text-secondary mb-6">Detalles del Proyecto</h2>
+              <div className="bg-card-bg/40 backdrop-blur-md rounded-2xl border border-border-color p-8">
                 {/* Render content_structure here - assuming it's HTML or JSON */}
                 <div dangerouslySetInnerHTML={{ __html: project.content_structure }} />
               </div>
@@ -146,7 +146,7 @@ export default function ProjectDetail() {
                 href={project.github_link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 bg-slate-900/40 backdrop-blur-md border border-slate-800 text-cyan-400 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:border-cyan-400"
+                className="flex-1 flex items-center justify-center gap-2 bg-tag-bg backdrop-blur-md border border-border-color text-cyan-400 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:border-cyan-400"
               >
                 <Github size={20} />Ver Código en GitHub
               </a>

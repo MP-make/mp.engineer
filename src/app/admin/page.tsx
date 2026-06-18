@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github, Users } from 'lucide-react';
+import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github, Users, ChevronDown } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
 import Carousel from '@/components/Carousel';
@@ -18,6 +18,7 @@ interface Project {
   technologies: string[];
   status: 'completed' | 'in-progress';
   project_type: 'personal' | 'company';
+  company?: string;
   created_at: string;
   images?: { image: string }[];
   is_full_page?: boolean;
@@ -46,6 +47,23 @@ interface HeroImage {
   order: number;
 }
 
+interface Testimonial {
+  id: number;
+  name: string;
+  role: string;
+  company: string;
+  message: string;
+  rating: number;
+  image: string;
+  is_visible: boolean;
+  created_at: string;
+}
+
+interface Company {
+  id: number;
+  name: string;
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -56,8 +74,32 @@ export default function AdminPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills' | 'hero' | 'pages'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills' | 'hero' | 'pages' | 'companies' | 'testimonials'>('projects');
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+
+  const toggleCard = (id: number) => {
+    setExpandedCards(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Testimonial form states
+  const [testimonialForm, setTestimonialForm] = useState({
+    name: '',
+    role: '',
+    company: '',
+    message: '',
+    rating: 5,
+    image: '',
+    is_visible: true
+  });
+  const [editingTestimonialId, setEditingTestimonialId] = useState<number | null>(null);
+  const [showTestimonialModal, setShowTestimonialModal] = useState(false);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -68,13 +110,17 @@ export default function AdminPage() {
     technologies: '',
     status: 'completed',
     project_type: 'personal' as 'personal' | 'company',
+    company: '',
     is_full_page: false,
     content_structure: {}
   });
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [newCompany, setNewCompany] = useState('');
 
   // Section builder states
   const [landingText, setLandingText] = useState('');
@@ -149,6 +195,25 @@ export default function AdminPage() {
     setContacts(contactsData || []);
     setSkills(skillsData || []);
     setHeroImages(heroData || []);
+    
+    try {
+      const companiesRes = await fetch('/api/companies');
+      if (companiesRes.ok) {
+        setCompanies(await companiesRes.json());
+      }
+    } catch (e) {
+      console.error('Error loading companies:', e);
+    }
+
+    try {
+      const testimonialsRes = await fetch('/api/testimonials');
+      if (testimonialsRes.ok) {
+        setTestimonials(await testimonialsRes.json());
+      }
+    } catch (e) {
+      console.error('Error loading testimonials:', e);
+    }
+    
     setLoading(false);
   };
 
@@ -310,6 +375,7 @@ export default function AdminPage() {
             technologies: techArray,
             status: formData.status,
             project_type: formData.project_type,
+            company: formData.project_type === 'company' ? formData.company : null,
             is_full_page: formData.is_full_page,
             content_structure: contentStructure
           })
@@ -330,6 +396,7 @@ export default function AdminPage() {
             technologies: techArray,
             status: formData.status,
             project_type: formData.project_type,
+            company: formData.project_type === 'company' ? formData.company : null,
             is_full_page: formData.is_full_page,
             content_structure: contentStructure,
             created_at: new Date().toISOString()
@@ -368,10 +435,11 @@ export default function AdminPage() {
         }
       }
 
-      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', is_full_page: false, content_structure: {} });
+      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
       setImageUrls([]);
       setSelectedFiles([]);
       setEditingId(null);
+      setShowModal(false);
       // Reset section states
       setLandingText('');
       setLandingDesktopImage('');
@@ -411,10 +479,12 @@ export default function AdminPage() {
       technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
       status: project.status,
       project_type: project.project_type || 'personal',
+      company: project.company || '',
       is_full_page: project.is_full_page || false,
       content_structure: project.content_structure || {}
     });
     setEditingId(project.id);
+    setShowModal(true);
 
     const { data: images } = await supabase
       .from('portfolio_projectimage')
@@ -777,7 +847,9 @@ export default function AdminPage() {
             { id: 'pages', icon: FolderOpen, label: 'Páginas', count: projects.filter(p => p.is_full_page).length },
             { id: 'contacts', icon: MessageSquare, label: 'Mensajes', count: contacts.length },
             { id: 'skills', icon: Award, label: 'Habilidades', count: skills.length },
-            { id: 'hero', icon: Home, label: 'Hero Images', count: heroImages.length }
+            { id: 'hero', icon: Home, label: 'Hero Images', count: heroImages.length },
+            { id: 'companies', icon: Users, label: 'Empresas', count: companies.length },
+            { id: 'testimonials', icon: MessageSquare, label: 'Recomendaciones', count: testimonials.length }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -803,276 +875,359 @@ export default function AdminPage() {
 
         {/* Projects Tab */}
         {activeTab === 'projects' && (
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
-            {/* Form */}
-            <div className="lg:col-span-2 order-2 lg:order-1">
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl lg:sticky lg:top-32`}>
-                <div className="flex items-center gap-3 mb-6">
-                  {editingId ? (
-                    <>
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
-                        <Edit2 size={20} className="text-white" />
-                      </div>
-                      <h2 className="text-2xl font-bold">Editar Proyecto</h2>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                        <Plus size={20} className="text-white" />
-                      </div>
-                      <h2 className="text-2xl font-bold">Nuevo Proyecto</h2>
-                    </>
-                  )}
-                </div>
-                
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
-                      <Tag size={16} className="text-primary" />
-                      Título
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                      placeholder="Nombre del proyecto"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                      rows={4}
-                      placeholder="Describe tu proyecto..."
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
-                      <ExternalLink size={16} className="text-primary" />
-                      Link (opcional)
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.link}
-                      onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                      placeholder="https://ejemplo.com"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
-                      <Github size={16} className="text-primary" />
-                      Link de GitHub (opcional)
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.github_link}
-                      onChange={(e) => setFormData({ ...formData, github_link: e.target.value })}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                      placeholder="https://github.com/username/repo"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tecnologías</label>
-                    <input
-                      type="text"
-                      value={formData.technologies}
-                      onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                      placeholder="React, Node.js, PostgreSQL"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Estado</label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                    >
-                      <option value="completed">Completado</option>
-                      <option value="in-progress">En Progreso</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
-                      <FolderOpen size={16} className="text-primary" />
-                      Tipo de Proyecto
-                    </label>
-                    <select
-                      value={formData.project_type}
-                      onChange={(e) => setFormData({ ...formData, project_type: e.target.value as 'personal' | 'company' })}
-                      className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                    >
-                      <option value="personal">Personal</option>
-                      <option value="company">Empresa</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes del Proyecto</label>
-                    {imageUrls.length > 0 && <Carousel images={imageUrls} />}
-                    <div className="space-y-3">
-                      {imageUrls.map((url, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
-                          <button
-                            type="button"
-                            onClick={() => removeImageUrl(index)}
-                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                          >
-                            <Trash2 size={16} className="text-red-400" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-3 mt-3">
-                      <input
-                        type="url"
-                        value={newImageUrl}
-                        onChange={(e) => setNewImageUrl(e.target.value)}
-                        placeholder="https://ejemplo.com/imagen.jpg"
-                        className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={addImageUrl}
-                        className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
-                      >
-                        <Plus size={16} className="text-primary" />
-                      </button>
-                    </div>
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleFileSelect}
-                      className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                    />
-                    <div className="space-y-3 mt-3">
-                      {selectedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeSelectedFile(index)}
-                            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                          >
-                            <Trash2 size={16} className="text-red-400" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={formData.is_full_page}
-                      onChange={(e) => setFormData({ ...formData, is_full_page: e.target.checked })}
-                      className="form-checkbox h-5 w-5 text-primary transition-all duration-300"
-                    />
-                    <label className={`font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>¿Es una página completa?</label>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="submit"
-                      className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
-                    >
-                      {editingId ? 'Guardar Cambios' : 'Crear Proyecto'}
-                    </button>
-                    {editingId && (
-                      <button
-                        type="button"
-                        onClick={() => {
-      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', is_full_page: false, content_structure: {} });
-                          setImageUrls([]);
-                          setSelectedFiles([]);
-                          setEditingId(null);
-                        }}
-                        className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-                      >
-                        <X size={16} className="text-red-400" />
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </div>
+          <div>
+            {/* New Project Button */}
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={() => {
+                  setEditingId(null);
+                  setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+                  setImageUrls([]);
+                  setSelectedFiles([]);
+                  setShowModal(true);
+                }}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
+              >
+                <Plus size={20} />
+                Nuevo Proyecto
+              </button>
             </div>
 
-            {/* Projects List */}
-            <div className="lg:col-span-3 order-1 lg:order-2 space-y-6">
-              {projects.map((project) => (
-                <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
-                      <div className="flex items-center gap-2">
-                        {project.project_type === 'company' ? (
-                          <span className="px-2 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs rounded font-medium">Empresa</span>
-                        ) : (
-                          <span className="px-2 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-xs rounded font-medium">Personal</span>
-                        )}
-                        {project.is_full_page && <span className="px-2 py-1 bg-blue-500 text-white text-xs rounded">Página Completa</span>}
+            {/* Modal */}
+            {showModal && (
+              <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-20 overflow-y-auto bg-black/60 backdrop-blur-sm"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) {
+                    setShowModal(false);
+                    setEditingId(null);
+                  }
+                }}
+              >
+                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Close button */}
+                  <button
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditingId(null);
+                      setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+                      setImageUrls([]);
+                      setSelectedFiles([]);
+                    }}
+                    className="absolute top-4 right-4 p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                  >
+                    <X size={20} className="text-red-400" />
+                  </button>
+
+                  <div className="flex items-center gap-3 mb-6 pr-12">
+                    {editingId ? (
+                      <>
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shrink-0">
+                          <Edit2 size={20} className="text-white" />
+                        </div>
+                        <h2 className="text-2xl font-bold">Editar Proyecto</h2>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0">
+                          <Plus size={20} className="text-white" />
+                        </div>
+                        <h2 className="text-2xl font-bold">Nuevo Proyecto</h2>
+                      </>
+                    )}
+                  </div>
+                  
+                  <form onSubmit={handleSubmit} className="space-y-5 max-h-[70vh] overflow-y-auto pr-2">
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                        <Tag size={16} className="text-primary" />
+                        Título
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="Nombre del proyecto"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        rows={4}
+                        placeholder="Describe tu proyecto..."
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                        <ExternalLink size={16} className="text-primary" />
+                        Link (opcional)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.link}
+                        onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="https://ejemplo.com"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                        <Github size={16} className="text-primary" />
+                        Link de GitHub (opcional)
+                      </label>
+                      <input
+                        type="url"
+                        value={formData.github_link}
+                        onChange={(e) => setFormData({ ...formData, github_link: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="https://github.com/username/repo"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tecnologías</label>
+                      <input
+                        type="text"
+                        value={formData.technologies}
+                        onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="React, Node.js, PostgreSQL"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Estado</label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                      >
+                        <option value="completed">Completado</option>
+                        <option value="in-progress">En Progreso</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                        <FolderOpen size={16} className="text-primary" />
+                        Tipo de Proyecto
+                      </label>
+                      <select
+                        value={formData.project_type}
+                        onChange={(e) => setFormData({ ...formData, project_type: e.target.value as 'personal' | 'company' })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                      >
+                        <option value="personal">Personal</option>
+                        <option value="company">Empresa</option>
+                      </select>
+                    </div>
+
+                    {formData.project_type === 'company' && (
+                      <div>
+                        <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} flex items-center gap-2`}>
+                          <Users size={16} className="text-primary" />
+                          Empresa
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.company}
+                          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                          list="companies-list"
+                          className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                          placeholder="Nombre de la empresa"
+                        />
+                    <datalist id="companies-list">
+                      {companies.map((c) => (
+                        <option key={c.id} value={c.name} />
+                      ))}
+                    </datalist>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Imágenes del Proyecto</label>
+                      {imageUrls.length > 0 && <Carousel images={imageUrls} />}
+                      <div className="space-y-3">
+                        {imageUrls.map((url, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <img src={url} alt={`Imagen ${index + 1}`} className="w-20 h-20 object-cover rounded-lg border-2 border-primary/30" />
+                            <button
+                              type="button"
+                              onClick={() => removeImageUrl(index)}
+                              className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                            >
+                              <Trash2 size={16} className="text-red-400" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-3 mt-3">
+                        <input
+                          type="url"
+                          value={newImageUrl}
+                          onChange={(e) => setNewImageUrl(e.target.value)}
+                          placeholder="https://ejemplo.com/imagen.jpg"
+                          className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        />
+                        <button
+                          type="button"
+                          onClick={addImageUrl}
+                          className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300"
+                        >
+                          <Plus size={16} className="text-primary" />
+                        </button>
+                      </div>
+                      <input
+                        type="file"
+                        multiple
+                        onChange={handleFileSelect}
+                        className={`w-full px-4 py-3 mt-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                      />
+                      <div className="space-y-3 mt-3">
+                        {selectedFiles.map((file, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <span className={`flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeSelectedFile(index)}
+                              className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                            >
+                              <Trash2 size={16} className="text-red-400" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     </div>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_full_page}
+                        onChange={(e) => setFormData({ ...formData, is_full_page: e.target.checked })}
+                        className="form-checkbox h-5 w-5 text-primary transition-all duration-300"
+                      />
+                      <label className={`font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>¿Es una página completa?</label>
+                    </div>
+
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => handleEdit(project)}
-                        className="p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300"
+                        type="submit"
+                        className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
                       >
-                        <Edit2 size={16} className="text-yellow-400" />
+                        {editingId ? 'Guardar Cambios' : 'Crear Proyecto'}
+                      </button>
+                      {editingId && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
+                            setImageUrls([]);
+                            setSelectedFiles([]);
+                            setEditingId(null);
+                            setShowModal(false);
+                          }}
+                          className="p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                        >
+                          <X size={16} className="text-red-400" />
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Projects List */}
+            <div className="space-y-6">
+              {projects.map((project) => {
+                const isExpanded = expandedCards.has(project.id);
+                return (
+                <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-4 sm:p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                      <h3 className={`text-base sm:text-xl font-bold truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
+                      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                        {project.project_type === 'company' ? (
+                          <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 text-[10px] sm:text-xs rounded font-medium whitespace-nowrap">Empresa</span>
+                        ) : (
+                          <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] sm:text-xs rounded font-medium whitespace-nowrap">Personal</span>
+                        )}
+                        {project.is_full_page && <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-500 text-white text-[10px] sm:text-xs rounded whitespace-nowrap">Completa</span>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                      <button
+                        onClick={() => handleEdit(project)}
+                        className="p-1.5 sm:p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300"
+                      >
+                        <Edit2 size={14} className="sm:size-4 text-yellow-400" />
                       </button>
                       <button
                         onClick={() => handleDelete(project.id)}
-                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                        className="p-1.5 sm:p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
                       >
-                        <Trash2 size={16} className="text-red-400" />
+                        <Trash2 size={14} className="sm:size-4 text-red-400" />
+                      </button>
+                      <button
+                        onClick={() => toggleCard(project.id)}
+                        className="p-1.5 sm:p-2 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 sm:hidden"
+                      >
+                        <ChevronDown size={14} className={`text-primary transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                       </button>
                     </div>
                   </div>
-                  <p className={`mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{project.description}</p>
-                  <div className="flex items-center gap-3 mb-4">
-                    {project.technologies.map((tech, index) => (
-                      <span key={index} className="bg-primary/10 text-primary border border-primary/10 px-4 py-2 rounded-full text-sm font-medium">{tech}</span>
-                    ))}
+                  <div className={`${isExpanded ? 'block' : 'hidden'} sm:block`}>
+                    <p className={`mb-3 sm:mb-4 text-sm sm:text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{project.description}</p>
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                      {project.technologies.map((tech, index) => (
+                        <span key={index} className="bg-primary/10 text-primary border border-primary/10 px-2 sm:px-4 py-1 sm:py-2 rounded-full text-[10px] sm:text-sm font-medium">{tech}</span>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      {project.link && (
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium text-xs sm:text-sm"
+                        >
+                          <ExternalLink size={14} className="sm:size-4" />
+                          <span>Ver Proyecto</span>
+                        </a>
+                      )}
+                      {project.github_link && (
+                        <a
+                          href={project.github_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium text-xs sm:text-sm"
+                        >
+                          <Github size={14} className="sm:size-4" />
+                          <span>Ver Código</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {project.link && (
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium"
-                      >
-                        <ExternalLink size={16} />
-                        <span>Ver Proyecto</span>
-                      </a>
-                    )}
-                    {project.github_link && (
-                      <a
-                        href={project.github_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium"
-                      >
-                        <Github size={16} />
-                        <span>Ver Código</span>
-                      </a>
-                    )}
-                  </div>
+                  {!isExpanded && (
+                    <button
+                      onClick={() => toggleCard(project.id)}
+                      className="w-full mt-2 py-2 text-xs text-primary font-medium sm:hidden flex items-center justify-center gap-1 bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors"
+                    >
+                      Ver más <ChevronDown size={12} />
+                    </button>
+                  )}
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         )}
@@ -1737,7 +1892,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', is_full_page: false, content_structure: {} });
+                        setFormData({ title: '', description: '', link: '', github_link: '', technologies: '', status: 'completed', project_type: 'personal', company: '', is_full_page: false, content_structure: {} });
                         setImageUrls([]);
                         setSelectedFiles([]);
                         setEditingId(null);
@@ -1800,6 +1955,257 @@ export default function AdminPage() {
                 </a>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Companies Tab */}
+        {activeTab === 'companies' && (
+          <div className="space-y-6">
+            <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <Users size={20} className="text-white" />
+                </div>
+                <h2 className="text-2xl font-bold">Gestionar Empresas</h2>
+              </div>
+
+              <div className="flex items-center gap-3 mb-6">
+                <input
+                  type="text"
+                  value={newCompany}
+                  onChange={(e) => setNewCompany(e.target.value)}
+                  placeholder="Nombre de la empresa"
+                  className={`flex-1 px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                />
+                <button
+                  onClick={async () => {
+                    if (!newCompany.trim()) return;
+                    try {
+                      const res = await fetch('/api/companies', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: newCompany.trim() })
+                      });
+                      if (res.ok) {
+                        const data = await res.json();
+                        setCompanies([...companies, data[0]]);
+                        setNewCompany('');
+                      } else {
+                        const err = await res.json();
+                        alert('Error: ' + (err.error || 'No se pudo guardar'));
+                      }
+                    } catch (e) {
+                      alert('Error de red: ' + (e instanceof Error ? e.message : 'desconocido'));
+                    }
+                  }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/80 transition-all duration-300"
+                >
+                  <Plus size={20} />
+                  Agregar
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {companies.length === 0 ? (
+                  <p className={`text-center py-8 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                    No hay empresas registradas. Agrega la primera empresa arriba.
+                  </p>
+                ) : (
+                  companies.map((company) => (
+                    <div key={company.id} className={`flex items-center justify-between p-4 rounded-xl ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                      <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{company.name}</span>
+                      <button
+                        onClick={async () => {
+                          await fetch(`/api/companies?id=${company.id}`, { method: 'DELETE' });
+                          setCompanies(companies.filter(c => c.id !== company.id));
+                        }}
+                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                      >
+                        <Trash2 size={16} className="text-red-400" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Testimonials Tab */}
+        {activeTab === 'testimonials' && (
+          <div className="space-y-6">
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={() => {
+                  setEditingTestimonialId(null);
+                  setTestimonialForm({ name: '', role: '', company: '', message: '', rating: 5, image: '', is_visible: true });
+                  setShowTestimonialModal(true);
+                }}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
+              >
+                <Plus size={20} />
+                Nueva Recomendación
+              </button>
+            </div>
+
+            {showTestimonialModal && (
+              <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-20 overflow-y-auto bg-black/60 backdrop-blur-sm"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) {
+                    setShowTestimonialModal(false);
+                    setEditingTestimonialId(null);
+                  }
+                }}
+              >
+                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => { setShowTestimonialModal(false); setEditingTestimonialId(null); }}
+                    className="absolute top-4 right-4 p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                  >
+                    <X size={20} className="text-red-400" />
+                  </button>
+
+                  <div className="flex items-center gap-3 mb-6 pr-12">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shrink-0">
+                      <MessageSquare size={20} className="text-white" />
+                    </div>
+                    <h2 className="text-2xl font-bold">{editingTestimonialId ? 'Editar Recomendación' : 'Nueva Recomendación'}</h2>
+                  </div>
+
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const method = editingTestimonialId ? 'PUT' : 'POST';
+                    const url = '/api/testimonials';
+                    const body = editingTestimonialId
+                      ? { id: editingTestimonialId, ...testimonialForm }
+                      : testimonialForm;
+
+                    const res = await fetch(url, {
+                      method,
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(body)
+                    });
+
+                    if (res.ok) {
+                      setShowTestimonialModal(false);
+                      setEditingTestimonialId(null);
+                      setTestimonialForm({ name: '', role: '', company: '', message: '', rating: 5, image: '', is_visible: true });
+                      loadData();
+                    }
+                  }} className="space-y-5 max-h-[70vh] overflow-y-auto pr-2">
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Nombre</label>
+                      <input type="text" value={testimonialForm.name}
+                        onChange={(e) => setTestimonialForm({ ...testimonialForm, name: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="Nombre de la persona" required />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Cargo / Rol</label>
+                      <input type="text" value={testimonialForm.role}
+                        onChange={(e) => setTestimonialForm({ ...testimonialForm, role: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="CEO, Gerente, etc." />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Empresa</label>
+                      <input type="text" value={testimonialForm.company}
+                        onChange={(e) => setTestimonialForm({ ...testimonialForm, company: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="Nombre de la empresa" />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Mensaje / Recomendación</label>
+                      <textarea value={testimonialForm.message}
+                        onChange={(e) => setTestimonialForm({ ...testimonialForm, message: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        rows={4} placeholder="Escribe la recomendación..." required />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Rating (1-5)</label>
+                      <select value={testimonialForm.rating}
+                        onChange={(e) => setTestimonialForm({ ...testimonialForm, rating: parseInt(e.target.value) })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} {n === 1 ? 'Estrella' : 'Estrellas'}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>URL de Foto (opcional)</label>
+                      <input type="url" value={testimonialForm.image}
+                        onChange={(e) => setTestimonialForm({ ...testimonialForm, image: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="https://ejemplo.com/foto.jpg" />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" checked={testimonialForm.is_visible}
+                        onChange={(e) => setTestimonialForm({ ...testimonialForm, is_visible: e.target.checked })}
+                        className="form-checkbox h-5 w-5 text-primary" />
+                      <label className={`font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Visible en la página</label>
+                    </div>
+                    <div className="flex items-center gap-3 pt-4">
+                      <button type="submit" className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300">
+                        {editingTestimonialId ? 'Guardar Cambios' : 'Crear Recomendación'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {testimonials.length === 0 ? (
+                <div className={`text-center py-16 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <MessageSquare size={48} className="mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-light">No hay recomendaciones aún.</p>
+                </div>
+              ) : (
+                testimonials.map((t) => (
+                  <div key={t.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        {t.image ? (
+                          <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="text-primary font-bold text-lg">{t.name.charAt(0)}</span>
+                          </div>
+                        )}
+                        <div>
+                          <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{t.name}</h3>
+                          <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{[t.role, t.company].filter(Boolean).join(' — ')}</p>
+                          <div className="flex gap-0.5 mt-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span key={i} className={i < t.rating ? 'text-yellow-400' : 'text-gray-500/30'}>★</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`px-2 py-0.5 text-[10px] rounded font-medium ${t.is_visible ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          {t.is_visible ? 'Visible' : 'Oculta'}
+                        </span>
+                        <button onClick={() => {
+                          setEditingTestimonialId(t.id);
+                          setTestimonialForm({ name: t.name, role: t.role || '', company: t.company || '', message: t.message, rating: t.rating, image: t.image || '', is_visible: t.is_visible });
+                          setShowTestimonialModal(true);
+                        }} className="p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300">
+                          <Edit2 size={16} className="text-yellow-400" />
+                        </button>
+                        <button onClick={async () => {
+                          await fetch(`/api/testimonials?id=${t.id}`, { method: 'DELETE' });
+                          loadData();
+                        }} className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300">
+                          <Trash2 size={16} className="text-red-400" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} italic leading-relaxed`}>"{t.message}"</p>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         )}
       </div>

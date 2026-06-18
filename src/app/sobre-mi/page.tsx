@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Timeline from '@/components/Timeline';
 import ParticleBackground from '@/components/ParticleBackground';
+import TestimonialsCarousel from '@/components/TestimonialsCarousel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Code, Database, Globe, Smartphone, Zap, Users, Github, ExternalLink } from 'lucide-react';
@@ -61,7 +62,7 @@ export default function SobreMi() {
   ];
 
   return (
-    <div className="min-h-screen relative font-sans text-slate-200 selection:bg-cyan-500/30 bg-[#0a0f18] z-0">
+    <div className="min-h-screen relative font-sans text-text-secondary selection:bg-cyan-500/30 bg-surface z-0">
       
       {/* ================= ELEMENTOS DE FONDO TECNOLÓGICOS ================= */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -106,14 +107,14 @@ export default function SobreMi() {
             <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full group-hover:bg-cyan-400/30 transition-all duration-500"></div>
             <div className="absolute inset-0 border border-cyan-500/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
             <div className="absolute inset-2 border border-blue-500/30 rounded-full animate-[spin_7s_linear_infinite_reverse]"></div>
-            <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-[#0a1017] border border-cyan-500/50 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center justify-center rotate-45 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] transition-shadow duration-500">
+            <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-card-bg border border-cyan-500/50 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center justify-center rotate-45 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] transition-shadow duration-500">
               <Code size={24} className="text-cyan-400 -rotate-45 sm:size-32" />
             </div>
           </motion.div>
           
           {/* Título Colosal - Blanco Sólido */}
           <motion.h1 
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-6 sm:mb-8 leading-tight text-white drop-shadow-md"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-6 sm:mb-8 leading-tight gradient-title"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -122,7 +123,7 @@ export default function SobreMi() {
           </motion.h1>
           
           <motion.p 
-            className="text-base sm:text-xl md:text-2xl text-slate-300 leading-relaxed font-light max-w-3xl mx-auto text-center px-2 sm:px-0"
+            className="text-base sm:text-xl md:text-2xl text-text-secondary leading-relaxed font-light max-w-3xl mx-auto text-center px-2 sm:px-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -141,7 +142,7 @@ export default function SobreMi() {
               href="https://github.com/MP-make"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-3.5 bg-[#0a1017] border border-white/10 rounded-full text-slate-300 hover:bg-white/5 hover:text-white hover:border-cyan-500/50 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(34,211,238,0.15)] group text-sm sm:text-base"
+              className="inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-3.5 bg-card-bg border border-border-color rounded-full text-text-secondary hover:bg-hover-bg hover:text-text-primary hover:border-cyan-500/50 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(34,211,238,0.15)] group text-sm sm:text-base"
             >
               <Github size={18} className="group-hover:text-cyan-400 transition-colors shrink-0" />
               <span className="font-semibold tracking-wide">GitHub</span>
@@ -174,7 +175,7 @@ export default function SobreMi() {
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
-                className="relative group p-6 sm:p-8 bg-[#0a1017]/80 backdrop-blur-md border border-white/5 rounded-2xl sm:rounded-3xl hover:border-cyan-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(34,211,238,0.05)] overflow-hidden"
+                className="relative group p-6 sm:p-8 bg-card-bg/80 backdrop-blur-md border border-border-subtle rounded-2xl sm:rounded-3xl hover:border-cyan-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(34,211,238,0.05)] overflow-hidden"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -184,13 +185,13 @@ export default function SobreMi() {
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div className="flex flex-col items-center text-center relative z-10">
-                  <div className="p-3 sm:p-4 bg-cyan-950/30 rounded-xl sm:rounded-2xl mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-500 border border-cyan-500/10 group-hover:border-cyan-500/30">
+                  <div className="p-3 sm:p-4 bg-primary-dim rounded-xl sm:rounded-2xl mb-4 sm:mb-5 group-hover:scale-110 transition-transform duration-500 border border-cyan-500/10 group-hover:border-cyan-500/30">
                     <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
                   </div>
-                  <div className="text-3xl sm:text-5xl font-black text-white mb-1 sm:mb-2 drop-shadow-md group-hover:text-transparent bg-clip-text bg-gradient-to-r group-hover:from-cyan-300 group-hover:to-cyan-100 transition-colors duration-300">
+                  <div className="text-3xl sm:text-5xl font-black text-text-primary mb-1 sm:mb-2 drop-shadow-md group-hover:text-transparent bg-clip-text bg-gradient-to-r group-hover:from-cyan-300 group-hover:to-cyan-100 transition-colors duration-300">
                     {stat.value}
                   </div>
-                  <div className="text-[10px] sm:text-sm font-medium text-slate-400 uppercase tracking-widest">{stat.label}</div>
+                  <div className="text-[10px] sm:text-sm font-medium text-text-muted uppercase tracking-widest">{stat.label}</div>
                 </div>
               </motion.div>
             ))}
@@ -206,13 +207,13 @@ export default function SobreMi() {
           viewport={{ once: true }}
         >
           <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 px-4">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">{t.aboutPage.experienceEducation}</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight mb-4 px-4">
+              <span className="gradient-title drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">{t.aboutPage.experienceEducation}</span>
             </h2>
             <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 mx-auto rounded-full"></div>
           </div>
           
-          <div className="bg-[#0a1017]/50 p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-[2.5rem] border border-white/5 shadow-2xl backdrop-blur-sm">
+          <div className="bg-card-bg p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-[2.5rem] border border-border-color shadow-2xl">
             <Timeline events={timelineEvents} />
           </div>
         </motion.section>
@@ -226,8 +227,8 @@ export default function SobreMi() {
           viewport={{ once: true }}
         >
           <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 px-4">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">{t.aboutPage.technologiesSkills}</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary tracking-tight mb-4 px-4">
+              <span className="gradient-title drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">{t.aboutPage.technologiesSkills}</span>
             </h2>
             <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 mx-auto rounded-full"></div>
           </div>
@@ -253,7 +254,7 @@ export default function SobreMi() {
               return (
                 <motion.div
                   key={index}
-                  className="bg-[#0a1017] rounded-2xl sm:rounded-3xl border border-white/5 p-5 sm:p-8 hover:border-cyan-500/40 hover:bg-[#0d1522] transition-all duration-500 group relative overflow-hidden"
+                  className="bg-card-bg rounded-2xl sm:rounded-3xl border border-border-subtle p-5 sm:p-8 hover:border-cyan-500/40 hover:bg-hover-bg transition-all duration-500 group relative overflow-hidden"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -263,20 +264,20 @@ export default function SobreMi() {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl rounded-full group-hover:bg-cyan-500/10 transition-colors duration-500"></div>
 
                   <div className="flex items-center gap-5 mb-8 relative z-10">
-                    <div className="p-3.5 bg-slate-900/80 border border-white/5 rounded-xl group-hover:border-cyan-500/30 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all duration-300">
+                    <div className="p-3.5 bg-tag-bg border border-border-subtle rounded-xl group-hover:border-cyan-500/30 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all duration-300">
                       <skill.icon className="text-cyan-400" size={24} />
                     </div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-cyan-100 transition-colors">{skill.name}</h3>
+                    <h3 className="text-xl font-bold text-text-primary group-hover:text-cyan-100 transition-colors">{skill.name}</h3>
                   </div>
 
                   <div className="space-y-4 relative z-10">
                     <div className="flex justify-between items-end">
-                      <span className="text-xs font-medium text-slate-400 uppercase tracking-widest">Nivel</span>
+                      <span className="text-xs font-medium text-text-muted uppercase tracking-widest">Nivel</span>
                       <span className="text-sm font-bold text-cyan-400 bg-cyan-950/50 px-3 py-1 rounded-full border border-cyan-500/20">{skill.level}</span>
                     </div>
                     
                     {/* Barra de progreso Tech */}
-                    <div className="w-full bg-[#050B14] rounded-full h-2.5 overflow-hidden border border-white/5 shadow-inner">
+                    <div className="w-full bg-code-bg rounded-full h-2.5 overflow-hidden border border-border-subtle shadow-inner">
                       <motion.div 
                         className="h-full rounded-full bg-gradient-to-r from-blue-600 via-cyan-500 to-cyan-300 relative" 
                         style={{ width: getProgressWidth(skill.level) }}
@@ -296,9 +297,11 @@ export default function SobreMi() {
           </div>
         </motion.section>
 
+        <TestimonialsCarousel />
+
         {/* ================= CALL TO ACTION ================= */}
         <motion.section 
-          className="text-center mt-20 sm:mt-32 py-12 sm:py-16 px-4 sm:px-6 relative rounded-2xl sm:rounded-[3rem] overflow-hidden border border-white/5 bg-[#0a1017]"
+          className="text-center mt-20 sm:mt-32 py-12 sm:py-16 px-4 sm:px-6 relative rounded-2xl sm:rounded-[3rem] overflow-hidden border border-border-subtle bg-card-bg"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -308,10 +311,10 @@ export default function SobreMi() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-2xl bg-cyan-900/20 blur-[100px] rounded-full pointer-events-none"></div>
 
           <div className="relative z-10">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 sm:mb-6 tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">{t.aboutPage.ctaTitle}</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-text-primary mb-4 sm:mb-6 tracking-tight">
+              <span className="gradient-title">{t.aboutPage.ctaTitle}</span>
             </h2>
-            <p className="text-base sm:text-xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto font-light leading-relaxed px-2 sm:px-0">
+            <p className="text-base sm:text-xl text-text-muted mb-8 sm:mb-10 max-w-2xl mx-auto font-light leading-relaxed px-2 sm:px-0">
               {t.aboutPage.ctaDesc}
             </p>
             

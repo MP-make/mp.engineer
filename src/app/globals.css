@@ -13,45 +13,186 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Escala global: 100% en móvil, 150% en desktop */
+html {
+  font-size: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 125%;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 150%;
+  }
+}
+
 /* =========================================
    1. VARIABLES DE COLOR (PALETA SUAVE)
    ========================================= */
+
+.gradient-title {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to bottom right, var(--grad-title-from), var(--grad-title-via), var(--grad-title-to));
+}
 :root {
   /* --- MODO CLARO (Optimizado para la vista) --- */
-  /* Fondo: Gris azulado muy pálido (evita el brillo del blanco puro) */
-  --background: #f8fafc; 
-  /* Texto: Gris oscuro (Slate 800), más suave que el negro */
-  --foreground: #1e293b; 
-  /* Texto secundario: Gris medio */
-  --muted-foreground: #64748b; 
-  
-  /* Color Principal: Azul Tecnológico (Sólido y Profesional) */
-  --primary: #2563eb; 
-  --primary-hover: #1d4ed8; 
-  --on-primary: #ffffff; 
-  
-  /* Elementos UI */
-  --border: #cbd5e1; /* Bordes suaves */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --muted-foreground: #334155;
+  --primary: #008B8B;
+  --primary-hover: #006666;
+  --on-primary: #ffffff;
+  --border: #cbd5e1;
   --input: #e2e8f0;
-  --card: #ffffff; /* Las tarjetas sí son blancas para resaltar sobre el fondo gris */
+  --card: #ffffff;
   --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+
+  /* --- VARIABLES ADICIONALES PARA TODOS LOS COMPONENTES --- */
+  --surface: #f1f5f9;
+  --surface-alt: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #1e293b;
+  --text-muted: #334155;
+  --border-color: #cbd5e1;
+  --border-subtle: #e2e8f0;
+  --card-bg: #ffffff;
+  --nav-bg: rgba(248, 250, 252, 0.8);
+  --nav-border: #cbd5e1;
+  --overlay: rgba(0, 0, 0, 0.05);
+  --code-bg: #f1f5f9;
+  --badge-bg: rgba(37, 99, 235, 0.1);
+  --tag-bg: rgba(0, 0, 0, 0.05);
+  --tag-border: rgba(0, 0, 0, 0.08);
+  --tag-text: #1e293b;
+  --glow-bg: rgba(34, 211, 238, 0.05);
+  --primary-dim: rgba(37, 99, 235, 0.15);
+  --hover-bg: rgba(0, 0, 0, 0.08);
+  --grad-title-from: #67e8f9;
+  --grad-title-via: #22d3ee;
+  --grad-title-to: #2563eb;
+}
+
+.light {
+  /* --- MODO CLARO (Explícito) --- */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --muted-foreground: #334155;
+  --primary: #008B8B;
+  --primary-hover: #006666;
+  --on-primary: #ffffff;
+  --border: #cbd5e1;
+  --input: #e2e8f0;
+  --card: #ffffff;
+  --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --surface: #f1f5f9;
+  --surface-alt: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #1e293b;
+  --text-muted: #334155;
+  --border-color: #cbd5e1;
+  --border-subtle: #e2e8f0;
+  --card-bg: #ffffff;
+  --nav-bg: rgba(248, 250, 252, 0.8);
+  --nav-border: #cbd5e1;
+  --overlay: rgba(0, 0, 0, 0.05);
+  --code-bg: #f1f5f9;
+  --badge-bg: rgba(37, 99, 235, 0.1);
+  --tag-bg: rgba(0, 0, 0, 0.05);
+  --tag-border: rgba(0, 0, 0, 0.08);
+  --tag-text: #1e293b;
+  --glow-bg: rgba(34, 211, 238, 0.05);
+  --primary-dim: rgba(37, 99, 235, 0.15);
+  --hover-bg: rgba(0, 0, 0, 0.08);
+  --grad-title-from: #67e8f9;
+  --grad-title-via: #22d3ee;
+  --grad-title-to: #2563eb;
 }
 
 .dark {
   /* --- MODO OSCURO (Profundo) --- */
-  --background: #020617; /* Slate-950 profundo */
-  --foreground: #f1f5f9; /* Blanco hueso */
+  --background: #020617;
+  --foreground: #f1f5f9;
   --muted-foreground: #94a3b8;
-  
-  /* Azul Tecnológico sofisticado */
-  --primary: #3b82f6; 
-  --primary-hover: #2563eb;
-  --on-primary: #020617;
-  
+  --primary: #008B8B;
+  --primary-hover: #009999;
+  --on-primary: #ffffff;
   --border: #1e293b;
   --input: #1e293b;
-  --card: #111827; /* Tarjetas oscuras */
+  --card: #111827;
   --card-shadow: none;
+
+  /* --- VARIABLES ADICIONALES PARA TODOS LOS COMPONENTES --- */
+  --surface: #0a0f18;
+  --surface-alt: #0f1419;
+  --text-primary: #ffffff;
+  --text-secondary: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border-color: #1e293b;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --card-bg: #111827;
+  --nav-bg: rgba(2, 6, 23, 0.8);
+  --nav-border: #1e293b;
+  --overlay: rgba(0, 0, 0, 0.4);
+  --code-bg: #020617;
+  --badge-bg: rgba(59, 130, 246, 0.15);
+  --tag-bg: rgba(255, 255, 255, 0.05);
+  --tag-border: rgba(255, 255, 255, 0.1);
+  --tag-text: #94a3b8;
+  --glow-bg: rgba(34, 211, 238, 0.1);
+  --primary-dim: rgba(59, 130, 246, 0.15);
+  --hover-bg: #1e293b;
+  --grad-title-from: #67e8f9;
+  --grad-title-via: #22d3ee;
+  --grad-title-to: #2563eb;
+}
+
+/* Override para MODO CLARO - corrige colores hardcodeados oscuros */
+.light .text-cyan-300,
+.light .text-cyan-400 {
+  color: #0f766e !important;
+}
+.light .text-cyan-200 {
+  color: #115e59 !important;
+}
+.light .text-emerald-400 {
+  color: #047857 !important;
+}
+.light .text-amber-400 {
+  color: #92400e !important;
+}
+.light .text-purple-400 {
+  color: #6b21a8 !important;
+}
+
+/* Forzar textos oscuros en modo claro */
+.light .text-gray-400,
+.light .text-gray-500,
+.light .text-gray-600,
+.light .text-slate-400,
+.light .text-slate-500 {
+  color: #334155 !important;
+}
+.light .text-gray-300 {
+  color: #1e293b !important;
+}
+
+
+
+/* Badges oscuros (bg-cyan-950/50) en modo claro */
+.light .bg-cyan-950\/50 {
+  background-color: rgba(0, 139, 139, 0.1) !important;
+  border-color: rgba(0, 139, 139, 0.25) !important;
+}
+
+/* Gradiente decorativo via-slate-800 en modo claro */
+.light .via-slate-800 {
+  --tw-gradient-via: #cbd5e1 !important;
 }
 
 /* Configuración de Tailwind v4 (Theme Inline) */
@@ -65,6 +206,25 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-card: var(--card);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border-color: var(--border-color);
+  --color-border-subtle: var(--border-subtle);
+  --color-card-bg: var(--card-bg);
+  --color-nav-bg: var(--nav-bg);
+  --color-nav-border: var(--nav-border);
+  --color-overlay: var(--overlay);
+  --color-code-bg: var(--code-bg);
+  --color-badge-bg: var(--badge-bg);
+  --color-tag-bg: var(--tag-bg);
+  --color-tag-border: var(--tag-border);
+  --color-tag-text: var(--tag-text);
+  --color-glow-bg: var(--glow-bg);
+  --color-primary-dim: var(--primary-dim);
+  --color-hover-bg: var(--hover-bg);
   --font-sans: 'Inter', sans-serif;
   --font-heading: 'Space Grotesk', sans-serif;
 }
@@ -100,14 +260,13 @@ body {
    3. UTILIDADES DE TEXTO
    ========================================= */
 .text-gradient-primary {
-  /* Título "Marlon Pecho" */
-  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  background: linear-gradient(to right, #008B8B, #00B8B8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .dark .text-gradient-primary {
-  background: linear-gradient(to right, #ffffff, #3b82f6);
+  background: linear-gradient(to right, #00D4D4, #008B8B);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

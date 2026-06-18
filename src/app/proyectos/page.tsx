@@ -17,6 +17,7 @@ interface Project {
   technologies: string[];
   status: 'completed' | 'in-progress';
   project_type: 'personal' | 'company';
+  company?: string;
   created_at: string;
   images?: { image: string }[];
 }
@@ -37,15 +38,8 @@ export default function Proyectos() {
 
       if (error) {
         console.error('Error fetching projects:', error);
-      } else if (data) {
-        const sortedProjects = [...data].sort((a, b) => {
-          const isAVentify = a.title.toLowerCase().includes('ventify');
-          const isBVentify = b.title.toLowerCase().includes('ventify');
-          if (isAVentify && !isBVentify) return -1;
-          if (!isAVentify && isBVentify) return 1;
-          return 0;
-        });
-        setProjects(sortedProjects);
+      } else       if (data) {
+        setProjects(data);
       }
       setIsLoading(false);
     };
@@ -65,16 +59,13 @@ export default function Proyectos() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
 
-  const getStatus = (project: Project) => {
-    if (project.title.toLowerCase().includes('ventify')) return 'completed';
-    return project.status;
-  };
+  const getStatus = (project: Project) => project.status;
 
   const renderProjectCard = (project: Project, index: number, isHero: boolean) => (
     <motion.article
       key={project.id}
       variants={itemVariants}
-      className={`group relative rounded-[1.5rem] overflow-hidden bg-[#111827] border border-white/5 hover:border-cyan-500/30 transition-all duration-500 hover:shadow-[0_10px_30px_rgba(34,211,238,0.1)] hover:-translate-y-1 ${isHero ? 'md:col-span-2 lg:col-span-2' : 'col-span-1'}`}
+      className={`group relative rounded-[1.5rem] overflow-hidden bg-card-bg border border-border-subtle hover:border-cyan-500/30 transition-all duration-500 hover:shadow-[0_10px_30px_rgba(34,211,238,0.1)] hover:-translate-y-1 ${isHero ? 'md:col-span-2 lg:col-span-2' : 'col-span-1'}`}
     >
       {project.images?.[0]?.image ? (
         <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -83,10 +74,10 @@ export default function Proyectos() {
             alt={project.title}
             className="w-full h-full object-cover object-top transition-transform duration-[2s] ease-out group-hover:scale-110 opacity-50 group-hover:opacity-70"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f18] via-[#0a0f18]/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent"></div>
         </div>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/40 to-[#0a0f18] flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-card-bg/40 to-surface flex items-center justify-center">
           <Code2 size={48} className="text-white/5" />
         </div>
       )}
@@ -108,33 +99,38 @@ export default function Proyectos() {
                 {t.projects.inProgress}
               </span>
             )}
+            {project.company && (
+              <span className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md">
+                {project.company}
+              </span>
+            )}
           </div>
 
           <div className={`flex gap-2 transition-all duration-300 ${isHero ? 'opacity-100' : 'opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'}`}>
             {project.github_link && (
-              <a href={project.github_link} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-white/5 border border-white/10 backdrop-blur-md flex items-center justify-center text-slate-400 hover:bg-cyan-500/20 hover:text-cyan-400 transition-all z-20">
+              <a href={project.github_link} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-tag-bg border border-border-color backdrop-blur-md flex items-center justify-center text-text-muted hover:bg-primary-dim hover:text-cyan-400 transition-all z-20">
                 <Github size={16} />
               </a>
             )}
             {project.link && (
-              <a href={project.link} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-white/5 border border-white/10 backdrop-blur-md flex items-center justify-center text-slate-400 hover:bg-cyan-500/20 hover:text-cyan-400 transition-all z-20">
+              <a href={project.link} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-tag-bg border border-border-color backdrop-blur-md flex items-center justify-center text-text-muted hover:bg-primary-dim hover:text-cyan-400 transition-all z-20">
                 <ExternalLink size={16} />
               </a>
             )}
           </div>
         </div>
 
-        <h3 className={`font-bold text-white mb-3 tracking-tight group-hover:text-cyan-400 transition-colors ${isHero ? 'text-3xl md:text-4xl' : 'text-2xl'}`}>
+        <h3 className={`font-bold text-text-primary mb-3 tracking-tight group-hover:text-cyan-400 transition-colors ${isHero ? 'text-3xl md:text-4xl' : 'text-2xl'}`}>
           {project.title}
         </h3>
 
-        <p className={`text-slate-400 font-light leading-relaxed mb-6 ${isHero ? 'text-base line-clamp-3 max-w-xl' : 'text-sm line-clamp-3'}`}>
+        <p className={`text-text-muted font-light leading-relaxed mb-6 ${isHero ? 'text-base line-clamp-3 max-w-xl' : 'text-sm line-clamp-3'}`}>
           {project.description}
         </p>
 
         <div className="flex flex-wrap gap-2 relative z-20">
           {Array.isArray(project.technologies) && project.technologies.slice(0, isHero ? 6 : 3).map((tech, i) => (
-            <span key={i} className="bg-white/5 backdrop-blur-md border border-white/5 text-cyan-100 px-2.5 py-1 rounded text-[11px] font-mono tracking-wide group-hover:border-cyan-500/30 group-hover:text-cyan-300 transition-colors">
+            <span key={i} className="bg-tag-bg backdrop-blur-md border border-border-subtle text-text-secondary px-2.5 py-1 rounded text-[11px] font-mono tracking-wide group-hover:border-cyan-500/30 group-hover:text-cyan-300 transition-colors">
               {tech}
             </span>
           ))}
@@ -166,7 +162,7 @@ export default function Proyectos() {
   );
 
   return (
-    <div className="min-h-screen relative font-sans text-slate-200 selection:bg-cyan-500/30 bg-[#0a0f18]">
+    <div className="min-h-screen relative font-sans text-text-secondary selection:bg-cyan-500/30 bg-surface">
 
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-cyan-900/10 blur-[150px] rounded-full mix-blend-screen" />
@@ -199,11 +195,11 @@ export default function Proyectos() {
               <Rocket size={14} /> Portafolio
             </div>
             <h1 className="text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-8 leading-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-200 drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]">
+              <span className="gradient-title drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]">
                 {t.projects.title}<br/>Destacados
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-slate-400 leading-relaxed font-light max-w-xl">
+            <p className="text-xl md:text-2xl text-text-muted leading-relaxed font-light max-w-xl">
               {t.projects.subtitle}
             </p>
           </motion.div>
@@ -235,7 +231,7 @@ export default function Proyectos() {
           <>
             {/* Tabs - Capsule Segmented Control */}
             <div className="flex items-center justify-center mb-14">
-              <div className="relative flex p-1 rounded-full bg-slate-900/60 border border-slate-800 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] w-full max-w-md mx-auto">
+              <div className="relative flex p-1 rounded-full bg-card-bg/60 border border-border-color shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] w-full max-w-md mx-auto">
                 <div
                   className="absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_12px_rgba(34,211,238,0.3)] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                   style={{
@@ -248,11 +244,11 @@ export default function Proyectos() {
                   className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
                 >
                   <User size={16} className="hidden sm:block" />
-                  <span className={activeTab === 'personal' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}>
+                  <span className={`gradient-title ${activeTab !== 'personal' ? 'opacity-60' : ''}`}>
                     {t.projects.personal}
                   </span>
                   <span className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-full ${
-                    activeTab === 'personal' ? 'bg-white/15 text-white' : 'bg-slate-800 text-slate-500'
+                    activeTab === 'personal' ? 'bg-white/15 text-text-primary' : 'bg-hover-bg text-text-muted'
                   }`}>
                     {personalProjects.length}
                   </span>
@@ -262,11 +258,11 @@ export default function Proyectos() {
                   className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
                 >
                   <Briefcase size={16} className="hidden sm:block" />
-                  <span className={activeTab === 'company' ? 'text-white' : 'text-slate-500 hover:text-slate-300'}>
+                  <span className={`gradient-title ${activeTab !== 'company' ? 'opacity-60' : ''}`}>
                     {t.projects.company}
                   </span>
                   <span className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-full ${
-                    activeTab === 'company' ? 'bg-white/15 text-white' : 'bg-slate-800 text-slate-500'
+                    activeTab === 'company' ? 'bg-white/15 text-text-primary' : 'bg-hover-bg text-text-muted'
                   }`}>
                     {companyProjects.length}
                   </span>
@@ -287,7 +283,7 @@ export default function Proyectos() {
                   {personalProjects.length > 0 ? (
                     renderGrid(personalProjects)
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+                    <div className="flex flex-col items-center justify-center py-20 text-text-muted">
                       <User size={48} className="mb-4 opacity-30" />
                       <p className="text-lg font-light">No hay proyectos personales aún.</p>
                     </div>
@@ -299,7 +295,7 @@ export default function Proyectos() {
                   {companyProjects.length > 0 ? (
                     renderGrid(companyProjects)
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-slate-600">
+                    <div className="flex flex-col items-center justify-center py-20 text-text-muted">
                       <Briefcase size={48} className="mb-4 opacity-30" />
                       <p className="text-lg font-light">No hay proyectos de empresa aún.</p>
                     </div>
@@ -315,18 +311,18 @@ export default function Proyectos() {
         )}
 
         <motion.div
-          className="mt-20 text-center border-t border-white/5 pt-16"
+          className="mt-20 text-center border-t border-border-subtle pt-16"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <p className="text-slate-500 text-sm mb-6 font-light">{t.projects.viewMore}</p>
+          <p className="text-text-muted text-sm mb-6 font-light">{t.projects.viewMore}</p>
           <a
             href="https://github.com/MP-make"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 border border-white/5 hover:bg-cyan-500/10 hover:border-cyan-500/30 text-slate-300 transition-all duration-300"
+            className="group inline-flex items-center gap-3 px-6 py-3 rounded-full bg-tag-bg border border-border-subtle hover:bg-primary-dim hover:border-cyan-500/30 text-text-secondary transition-all duration-300"
           >
             <Github size={18} className="group-hover:text-cyan-400 transition-colors" />
             <span className="font-semibold text-sm tracking-wide group-hover:text-white transition-colors">{t.projects.visitGithub}</span>

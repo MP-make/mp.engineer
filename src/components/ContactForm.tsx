@@ -59,7 +59,7 @@ const ContactForm = () => {
     <div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-2 text-slate-200">{t.contact.name}</label>
+          <label htmlFor="name" className="block text-sm font-medium mb-2 text-text-secondary">{t.contact.name}</label>
           <input
             type="text"
             id="name"
@@ -67,12 +67,12 @@ const ContactForm = () => {
             value={formData.name}
             onChange={handleChange}
             placeholder={t.contact.name}
-            className="w-full px-4 py-3 bg-slate-900/40 border border-white/10 text-slate-200 placeholder-slate-500 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none"
+            className="w-full px-4 py-3 bg-input border border-border text-foreground placeholder-text-muted rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none"
             required
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-2 text-slate-200">{t.contact.email}</label>
+          <label htmlFor="email" className="block text-sm font-medium mb-2 text-text-secondary">{t.contact.email}</label>
           <input
             type="email"
             id="email"
@@ -80,12 +80,12 @@ const ContactForm = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder={t.contact.email}
-            className="w-full px-4 py-3 bg-slate-900/40 border border-white/10 text-slate-200 placeholder-slate-500 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none"
+            className="w-full px-4 py-3 bg-input border border-border text-foreground placeholder-text-muted rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none"
             required
           />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-medium mb-2 text-slate-200">{t.contact.message}</label>
+          <label htmlFor="message" className="block text-sm font-medium mb-2 text-text-secondary">{t.contact.message}</label>
           <textarea
             id="message"
             name="message"
@@ -93,7 +93,7 @@ const ContactForm = () => {
             value={formData.message}
             onChange={handleChange}
             placeholder={t.contact.message}
-            className="w-full px-4 py-3 bg-slate-900/40 border border-white/10 text-slate-200 placeholder-slate-500 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none resize-none"
+            className="w-full px-4 py-3 bg-input border border-border text-foreground placeholder-text-muted rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all outline-none resize-none"
             required
           ></textarea>
         </div>
