@@ -42,7 +42,18 @@ export default function LoginPage() {
   const [showLaugh, setShowLaugh] = useState(false);
   const router = useRouter();
 
+  const logIntrusion = async (path: string) => {
+    try {
+      await fetch('/api/admin/intrusion-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path }),
+      });
+    } catch {}
+  };
+
   useEffect(() => {
+    logIntrusion('/admin/login');
     if (lockSequenceStarted) return;
     lockSequenceStarted = true;
 
@@ -134,6 +145,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        logIntrusion('/admin/login?failed=true');
         if (newAttempts >= 3) {
           localStorage.setItem('lockUntil', String(Date.now() + 15 * 60 * 1000));
           startLockSequence();

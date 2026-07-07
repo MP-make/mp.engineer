@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github, Users, ChevronDown, FileText, Briefcase, GraduationCap, Menu } from 'lucide-react';
+import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github, Users, ChevronDown, FileText, Briefcase, GraduationCap, Menu, ShieldAlert } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
 import Carousel from '@/components/Carousel';
@@ -65,6 +65,24 @@ interface Company {
   name: string;
 }
 
+interface IntrusionLog {
+  id: number;
+  ip: string;
+  user_agent: string;
+  path: string;
+  location: {
+    country?: string;
+    region?: string;
+    city?: string;
+    isp?: string;
+    org?: string;
+    as?: string;
+    lat?: number;
+    lon?: number;
+  } | null;
+  created_at: string;
+}
+
 interface TimelineEvent {
   id: number;
   title: string;
@@ -87,8 +105,9 @@ export default function AdminPage() {
   const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const [intrusionLogs, setIntrusionLogs] = useState<IntrusionLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'projects' | 'contacts' | 'skills' | 'hero' | 'pages' | 'companies' | 'testimonials' | 'experience' | 'cv'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'projects' | 'contacts' | 'skills' | 'hero' | 'pages' | 'companies' | 'testimonials' | 'experience' | 'cv' | 'intrusiones'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
 
@@ -262,6 +281,17 @@ export default function AdminPage() {
       }
     } catch (e) {
       console.error('Error loading CV:', e);
+    }
+
+    try {
+      const { data: intrusionData } = await supabase
+        .from('admin_intrusion_log')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      setIntrusionLogs(intrusionData || []);
+    } catch (e) {
+      console.error('Error loading intrusion logs:', e);
     }
     
     setLoading(false);
@@ -805,6 +835,7 @@ export default function AdminPage() {
     { id: 'companies', icon: Users, label: 'Empresas', count: companies.length },
     { id: 'testimonials', icon: MessageSquare, label: 'Recomendaciones', count: testimonials.length },
     { id: 'cv', icon: FileText, label: 'CV', count: 1 },
+    { id: 'intrusiones', icon: ShieldAlert, label: 'Intrusiones', count: intrusionLogs.length },
   ] as const;
 
   return (
@@ -996,6 +1027,10 @@ export default function AdminPage() {
               <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
                 <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Proyectos Destacados</p>
                 <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{projects.filter(p => p.featured).length}</p>
+              </div>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-red-500/30' : 'border-red-300'} shadow-xl`}>
+                <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Intrusiones</p>
+                <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{intrusionLogs.length}</p>
               </div>
             </div>
           </div>
@@ -2527,6 +2562,79 @@ export default function AdminPage() {
                 ))
               )}
             </div>
+          </div>
+        )}
+
+        {/* Intrusiones Tab */}
+        {activeTab === 'intrusiones' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className={`text-2xl font-bold mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Registro de Intrusiones</h2>
+              <p className={`text-sm mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Accesos no autorizados al panel de administración.
+              </p>
+            </div>
+
+            {intrusionLogs.length === 0 ? (
+              <div className={`text-center py-16 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                <ShieldAlert size={48} className="mx-auto mb-4 opacity-30" />
+                <p className="text-lg font-light">No hay intrusiones registradas.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className={`w-full text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <thead>
+                    <tr className={`${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-gray-100'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-300'}`}>
+                      <th className="px-4 py-3 text-left font-semibold">IP</th>
+                      <th className="px-4 py-3 text-left font-semibold">Ubicación</th>
+                      <th className="px-4 py-3 text-left font-semibold hidden md:table-cell">Path</th>
+                      <th className="px-4 py-3 text-left font-semibold hidden lg:table-cell">User-Agent</th>
+                      <th className="px-4 py-3 text-right font-semibold">Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {intrusionLogs.map((log) => (
+                      <tr
+                        key={log.id}
+                        className={`border-b ${theme === 'dark' ? 'border-primary/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
+                      >
+                        <td className="px-4 py-3 font-mono text-xs">{log.ip}</td>
+                        <td className="px-4 py-3 text-xs">
+                          {log.location ? (
+                            <span>
+                              {[log.location.city, log.location.region, log.location.country].filter(Boolean).join(', ')}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs hidden md:table-cell">
+                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+                            log.path.includes('failed')
+                              ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                          }`}>
+                            {log.path.replace('/admin', '') || '/'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500 truncate max-w-[200px] hidden lg:table-cell" title={log.user_agent}>
+                          {log.user_agent || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right text-xs text-gray-500 whitespace-nowrap">
+                          {new Date(log.created_at).toLocaleString('es-ES', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
