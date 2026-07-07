@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import React from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github, Users, ChevronDown, FileText, Briefcase, GraduationCap, Menu, ShieldAlert } from 'lucide-react';
@@ -110,6 +111,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'projects' | 'contacts' | 'skills' | 'hero' | 'pages' | 'companies' | 'testimonials' | 'experience' | 'cv' | 'intrusiones'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+  const [expandedIntrusion, setExpandedIntrusion] = useState<number | null>(null);
 
   const toggleCard = (id: number) => {
     setExpandedCards(prev => {
@@ -2590,13 +2592,14 @@ export default function AdminPage() {
                       <th className="px-4 py-3 text-left font-semibold hidden md:table-cell">Path</th>
                       <th className="px-4 py-3 text-left font-semibold hidden lg:table-cell">User-Agent</th>
                       <th className="px-4 py-3 text-right font-semibold">Fecha</th>
+                      <th className="px-4 py-3 text-right font-semibold w-10"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {intrusionLogs.map((log) => (
+                      <React.Fragment key={log.id}>
                       <tr
-                        key={log.id}
-                        className={`border-b ${theme === 'dark' ? 'border-primary/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
+                        className={`border-b ${theme === 'dark' ? 'border-primary/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'} transition-colors ${expandedIntrusion === log.id ? theme === 'dark' ? 'bg-white/5' : 'bg-gray-50' : ''}`}
                       >
                         <td className="px-4 py-3 font-mono text-xs">{log.ip}</td>
                         <td className="px-4 py-3 text-xs">
@@ -2629,7 +2632,76 @@ export default function AdminPage() {
                             minute: '2-digit',
                           })}
                         </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            onClick={() => setExpandedIntrusion(expandedIntrusion === log.id ? null : log.id)}
+                            className="p-1.5 rounded-lg hover:bg-primary/10 transition-colors"
+                          >
+                            <ChevronDown size={14} className={`text-primary transition-transform duration-200 ${expandedIntrusion === log.id ? 'rotate-180' : ''}`} />
+                          </button>
+                        </td>
                       </tr>
+                      {expandedIntrusion === log.id && (
+                        <tr className={`${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-gray-50'} border-b ${theme === 'dark' ? 'border-primary/10' : 'border-gray-200'}`}>
+                          <td colSpan={6} className="px-4 py-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                              <div>
+                                <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>IP</p>
+                                <p className={`font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{log.ip}</p>
+                              </div>
+                              <div>
+                                <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Path</p>
+                                <p className={`font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{log.path}</p>
+                              </div>
+                              <div>
+                                <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fecha</p>
+                                <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{new Date(log.created_at).toLocaleString('es-ES')}</p>
+                              </div>
+                              <div className="sm:col-span-2 lg:col-span-3">
+                                <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>User-Agent</p>
+                                <p className={`font-mono text-xs break-all ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{log.user_agent || '—'}</p>
+                              </div>
+                              {log.location && (
+                                <>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>País</p>
+                                    <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{log.location.country || '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Región</p>
+                                    <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{log.location.region || '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Ciudad</p>
+                                    <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{log.location.city || '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>ISP</p>
+                                    <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{log.location.isp || '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Org</p>
+                                    <p className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>{log.location.org || '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>AS</p>
+                                    <p className={`font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{log.location.as || '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Lat</p>
+                                    <p className={`font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{log.location.lat ?? '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className={`font-semibold mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Lon</p>
+                                    <p className={`font-mono ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{log.location.lon ?? '—'}</p>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>
