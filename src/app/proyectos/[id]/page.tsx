@@ -16,7 +16,7 @@ interface Project {
   demo_link?: string;
   github_link?: string;
   technologies: string[];
-  status: 'completed' | 'in-progress';
+  status: 'COMPLETADO' | 'EN DESARROLLO';
   created_at: string;
   is_full_page: boolean;
   content_structure?: any;
@@ -85,8 +85,8 @@ export default function ProjectDetail() {
               <h1 className="text-4xl md:text-5xl font-bold text-text-secondary mb-4 md:mb-0">
                 {project.title}
               </h1>
-              <div className={`${project.status === 'completed' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'} text-sm font-bold flex items-center gap-2 px-4 py-2 rounded-full border w-fit`}>
-                {project.status === 'completed' ? <><CheckCircle size={16} />Completado</> : <><Clock size={16} />En Progreso</>}
+              <div className={`${project.status === 'COMPLETADO' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'} text-sm font-bold flex items-center gap-2 px-4 py-2 rounded-full border w-fit`}>
+                {project.status === 'COMPLETADO' ? <><CheckCircle size={16} />Completado</> : <><Clock size={16} />En Progreso</>}
               </div>
             </div>
             <p className="text-lg text-text-muted leading-relaxed">

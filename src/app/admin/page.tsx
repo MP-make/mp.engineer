@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github, Users, ChevronDown } from 'lucide-react';
+import { Trash2, Edit2, Save, X, Plus, FolderOpen, MessageSquare, ExternalLink, Calendar, Tag, Sun, Moon, Upload, Image as ImageIcon, Award, LogOut, TrendingUp, Eye, CheckCircle2, Home, Github, Users, ChevronDown, FileText, Briefcase, GraduationCap, Menu } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
 import Carousel from '@/components/Carousel';
@@ -65,6 +65,16 @@ interface Company {
   name: string;
 }
 
+interface TimelineEvent {
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  date: string;
+  type: 'work' | 'education';
+  sort_order: number;
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -76,8 +86,10 @@ export default function AdminPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'projects' | 'contacts' | 'skills' | 'hero' | 'pages' | 'companies' | 'testimonials'>('projects');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'projects' | 'contacts' | 'skills' | 'hero' | 'pages' | 'companies' | 'testimonials' | 'experience' | 'cv'>('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
 
   const toggleCard = (id: number) => {
@@ -101,6 +113,23 @@ export default function AdminPage() {
   });
   const [editingTestimonialId, setEditingTestimonialId] = useState<number | null>(null);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+
+  // Timeline form states
+  const [timelineForm, setTimelineForm] = useState({
+    title: '',
+    subtitle: '',
+    description: '',
+    date: '',
+    type: 'work' as 'work' | 'education',
+    sort_order: 0
+  });
+  const [editingTimelineId, setEditingTimelineId] = useState<number | null>(null);
+  const [showTimelineModal, setShowTimelineModal] = useState(false);
+
+  // CV state
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvUploading, setCvUploading] = useState(false);
+  const [currentCvUrl, setCurrentCvUrl] = useState('/cv-marlon-pecho.pdf');
 
   // Form states
   const [formData, setFormData] = useState({
@@ -214,6 +243,25 @@ export default function AdminPage() {
       }
     } catch (e) {
       console.error('Error loading testimonials:', e);
+    }
+
+    try {
+      const timelineRes = await fetch('/api/timeline');
+      if (timelineRes.ok) {
+        setTimelineEvents(await timelineRes.json());
+      }
+    } catch (e) {
+      console.error('Error loading timeline:', e);
+    }
+
+    try {
+      const cvRes = await fetch('/api/cv');
+      if (cvRes.ok) {
+        const cvData = await cvRes.json();
+        if (cvData?.url) setCurrentCvUrl(cvData.url);
+      }
+    } catch (e) {
+      console.error('Error loading CV:', e);
     }
     
     setLoading(false);
@@ -475,13 +523,19 @@ export default function AdminPage() {
   };
 
   const handleEdit = async (project: Project) => {
+    const normalizeStatus = (s: string) => {
+      if (s === 'COMPLETADO' || s === 'EN DESARROLLO') return s;
+      if (s === 'completed') return 'COMPLETADO';
+      if (s === 'in-progress' || s === 'in_progress') return 'EN DESARROLLO';
+      return 'EN DESARROLLO';
+    };
     setFormData({
       title: project.title,
       description: project.description,
       link: project.link || '',
       github_link: project.github_link || '',
       technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
-      status: project.status,
+      status: normalizeStatus(project.status),
       project_type: project.project_type || 'personal',
       company: project.company || '',
       is_full_page: project.is_full_page || false,
@@ -739,6 +793,20 @@ export default function AdminPage() {
     );
   }
 
+  // Sidebar nav items
+  const navItems = [
+    { id: 'dashboard', icon: TrendingUp, label: 'Dashboard', count: 0 },
+    { id: 'projects', icon: FolderOpen, label: 'Proyectos', count: projects.length },
+    { id: 'pages', icon: FileText, label: 'Páginas', count: projects.filter(p => p.is_full_page).length },
+    { id: 'contacts', icon: MessageSquare, label: 'Mensajes', count: contacts.length },
+    { id: 'skills', icon: Award, label: 'Habilidades', count: skills.length },
+    { id: 'hero', icon: Home, label: 'Hero', count: heroImages.length },
+    { id: 'experience', icon: Calendar, label: 'Experiencia', count: timelineEvents.length },
+    { id: 'companies', icon: Users, label: 'Empresas', count: companies.length },
+    { id: 'testimonials', icon: MessageSquare, label: 'Recomendaciones', count: testimonials.length },
+    { id: 'cv', icon: FileText, label: 'CV', count: 1 },
+  ] as const;
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e]' : 'bg-gradient-to-br from-gray-100 via-white to-gray-200'}`}>
       {/* Animated Background */}
@@ -747,136 +815,191 @@ export default function AdminPage() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
 
-      {/* Header */}
-      <header className={`sticky top-0 z-50 backdrop-blur-xl ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} shadow-2xl`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo & Title */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-2xl blur-xl opacity-50 animate-pulse"></div>
-                <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
-                  <FolderOpen size={28} className="text-white" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-                  Panel de Control
-                </h1>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Bienvenido, {session?.user?.name || 'Admin'}</p>
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed top-0 left-0 z-50 h-full w-72 transform transition-all duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 flex flex-col ${
+          theme === 'dark' ? 'bg-[#0f1419] border-r border-primary/20' : 'bg-white border-r border-gray-200'
+        } shadow-2xl`}
+      >
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between p-5 border-b border-border-color">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-2xl blur-xl opacity-50 animate-pulse"></div>
+              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
+                <FolderOpen size={24} className="text-white" />
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={toggleTheme}
-                className="relative group p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/10 group-hover:to-secondary/10 rounded-xl transition-all duration-300"></div>
-                {theme === 'dark' ? <Sun size={20} className="text-primary relative z-10" /> : <Moon size={20} className="text-primary relative z-10" />}
-              </button>
-
-              <button 
-                onClick={() => router.push('/')}
-                className="relative group px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/50 transition-all duration-300 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 group-hover:from-primary/10 group-hover:via-primary/20 group-hover:to-primary/10 transition-all duration-500"></div>
-                <div className="relative z-10 flex items-center space-x-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'} font-medium">
-                  <ExternalLink size={18} className="group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="hidden sm:inline">Ver Sitio</span>
-                </div>
-              </button>
-
-              <button
-                onClick={handleLogout}
-                className="relative group p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
-              >
-                <LogOut size={20} className="text-red-400 group-hover:translate-x-0.5 transition-transform duration-300" />
-              </button>
+            <div>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">Panel</h1>
+              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{session?.user?.name || 'Admin'}</p>
             </div>
           </div>
-        </div>
-      </header>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
-            <div className="relative p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <FolderOpen size={24} className="text-primary" />
-                </div>
-                <TrendingUp size={20} className="text-green-400" />
-              </div>
-              <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Proyectos Totales</p>
-              <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{projects.length}</p>
-            </div>
-          </div>
-
-          <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/0 to-secondary/0 group-hover:from-secondary/5 group-hover:to-secondary/10 transition-all duration-500"></div>
-            <div className="relative p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <MessageSquare size={24} className="text-secondary" />
-                </div>
-                <Eye size={20} className="text-blue-400" />
-              </div>
-              <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Mensajes Nuevos</p>
-              <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{contacts.length}</p>
-            </div>
-          </div>
-
-          <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
-            <div className="relative p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Award size={24} className="text-primary" />
-                </div>
-                <CheckCircle2 size={20} className="text-primary" />
-              </div>
-              <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Habilidades</p>
-              <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{skills.length}</p>
-            </div>
-          </div>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <X size={20} className="text-gray-400" />
+          </button>
         </div>
 
-        {/* Tabs - Modern Design */}
-        <div className={`flex flex-wrap gap-3 mb-8 p-2 ${theme === 'dark' ? 'bg-[#0f1419]/50' : 'bg-white/50'} backdrop-blur-xl rounded-2xl border ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
-          {[
-            { id: 'projects', icon: FolderOpen, label: 'Proyectos', count: projects.length },
-            { id: 'pages', icon: FolderOpen, label: 'Páginas', count: projects.filter(p => p.is_full_page).length },
-            { id: 'contacts', icon: MessageSquare, label: 'Mensajes', count: contacts.length },
-            { id: 'skills', icon: Award, label: 'Habilidades', count: skills.length },
-            { id: 'hero', icon: Home, label: 'Hero Images', count: heroImages.length },
-            { id: 'companies', icon: Users, label: 'Empresas', count: companies.length },
-            { id: 'testimonials', icon: MessageSquare, label: 'Recomendaciones', count: testimonials.length }
-          ].map((tab) => (
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1 no-scrollbar">
+          {navItems.map((item) => (
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex-1 relative group px-6 py-4 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30'
-                  : `${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'}`
+              key={item.id}
+              onClick={() => {
+                setActiveTab(item.id as typeof activeTab);
+                setSidebarOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                activeTab === item.id
+                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/30'
+                  : `${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`
               }`}
             >
-              <div className="relative z-10 flex items-center justify-center space-x-3">
-                <tab.icon size={20} />
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                  activeTab === tab.id ? 'bg-white/20' : 'bg-primary/20 text-primary'
-                }`}>
-                  {tab.count}
-                </span>
-              </div>
+              <item.icon size={20} />
+              <span className="flex-1 text-left text-sm">{item.label}</span>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                activeTab === item.id ? 'bg-white/20' : 'bg-primary/20 text-primary'
+              }`}>
+                {item.count}
+              </span>
             </button>
           ))}
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className={`p-4 border-t ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} space-y-2`}>
+          <button
+            onClick={toggleTheme}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+              theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            <span className="text-sm">{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
+          </button>
+          <button
+            onClick={() => router.push('/')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+              theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            <ExternalLink size={20} />
+            <span className="text-sm">Ver Sitio</span>
+          </button>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-400 hover:bg-red-500/10 transition-all duration-200"
+          >
+            <LogOut size={20} />
+            <span className="text-sm">Cerrar Sesión</span>
+          </button>
         </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className={`lg:pl-72 transition-all duration-300`}>
+        {/* Mobile top bar */}
+        <div className={`lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 ${
+          theme === 'dark' ? 'bg-[#0f1419]/90 backdrop-blur-xl border-b border-primary/20' : 'bg-white/90 backdrop-blur-xl border-b border-gray-200'
+        }`}>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <Menu size={24} className={theme === 'dark' ? 'text-white' : 'text-gray-900'} />
+          </button>
+          <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Panel de Control</h1>
+          <div className="w-10" />
+        </div>
+
+        <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto no-scrollbar">
+        {/* Dashboard Tab */}
+        {activeTab === 'dashboard' && (
+          <div className="space-y-8">
+            <div>
+              <h2 className={`text-2xl font-bold mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Dashboard</h2>
+              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Resumen general del panel de control</p>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
+                <div className="relative p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <FolderOpen size={24} className="text-primary" />
+                    </div>
+                    <TrendingUp size={20} className="text-green-400" />
+                  </div>
+                  <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Proyectos Totales</p>
+                  <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{projects.length}</p>
+                </div>
+              </div>
+
+              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-secondary/0 to-secondary/0 group-hover:from-secondary/5 group-hover:to-secondary/10 transition-all duration-500"></div>
+                <div className="relative p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <MessageSquare size={24} className="text-secondary" />
+                    </div>
+                    <Eye size={20} className="text-blue-400" />
+                  </div>
+                  <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Mensajes Nuevos</p>
+                  <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{contacts.length}</p>
+                </div>
+              </div>
+
+              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
+                <div className="relative p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <Award size={24} className="text-primary" />
+                    </div>
+                    <CheckCircle2 size={20} className="text-primary" />
+                  </div>
+                  <p className={`text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Habilidades</p>
+                  <p className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{skills.length}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Extra dashboard info */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+                <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Empresas</p>
+                <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{companies.length}</p>
+              </div>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+                <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Recomendaciones</p>
+                <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{testimonials.length}</p>
+              </div>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+                <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Experiencia</p>
+                <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{timelineEvents.length}</p>
+              </div>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+                <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Proyectos Destacados</p>
+                <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{projects.filter(p => p.featured).length}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Projects Tab */}
         {activeTab === 'projects' && (
@@ -900,7 +1023,7 @@ export default function AdminPage() {
 
             {/* Modal */}
             {showModal && (
-              <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-20 overflow-y-auto bg-black/60 backdrop-blur-sm"
+              <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 pt-16 sm:pt-20 overflow-y-auto bg-black/60 backdrop-blur-sm"
                 onClick={(e) => {
                   if (e.target === e.currentTarget) {
                     setShowModal(false);
@@ -1017,7 +1140,7 @@ export default function AdminPage() {
                         onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                         className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                       >
-                        <option value="completed">Completado</option>
+                        <option value="COMPLETADO">Completado</option>
                         <option value="EN DESARROLLO">En Progreso</option>
                       </select>
                     </div>
@@ -1178,6 +1301,9 @@ export default function AdminPage() {
                           <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] sm:text-xs rounded font-medium whitespace-nowrap">Personal</span>
                         )}
                         {project.is_full_page && <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-500 text-white text-[10px] sm:text-xs rounded whitespace-nowrap">Completa</span>}
+                        <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded font-medium whitespace-nowrap font-mono ${project.status === 'COMPLETADO' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`}>
+                          {project.status === 'COMPLETADO' ? '✔ Completado' : project.status}
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -2064,7 +2190,7 @@ export default function AdminPage() {
             </div>
 
             {showTestimonialModal && (
-              <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-20 overflow-y-auto bg-black/60 backdrop-blur-sm"
+              <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 pt-16 sm:pt-20 overflow-y-auto bg-black/60 backdrop-blur-sm"
                 onClick={(e) => {
                   if (e.target === e.currentTarget) {
                     setShowTestimonialModal(false);
@@ -2223,6 +2349,295 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* Experience Tab */}
+        {activeTab === 'experience' && (
+          <div className="space-y-6">
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={() => {
+                  setEditingTimelineId(null);
+                  setTimelineForm({ title: '', subtitle: '', description: '', date: '', type: 'work', sort_order: timelineEvents.length + 1 });
+                  setShowTimelineModal(true);
+                }}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300"
+              >
+                <Plus size={20} />
+                Nueva Entrada
+              </button>
+            </div>
+
+            {showTimelineModal && (
+              <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 pt-16 sm:pt-20 overflow-y-auto bg-black/60 backdrop-blur-sm"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) {
+                    setShowTimelineModal(false);
+                    setEditingTimelineId(null);
+                  }
+                }}
+              >
+                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => { setShowTimelineModal(false); setEditingTimelineId(null); }}
+                    className="absolute top-4 right-4 p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300"
+                  >
+                    <X size={20} className="text-red-400" />
+                  </button>
+
+                  <div className="flex items-center gap-3 mb-6 pr-12">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${timelineForm.type === 'work' ? 'bg-gradient-to-br from-cyan-500 to-blue-600' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}>
+                      {timelineForm.type === 'work' ? <Briefcase size={20} className="text-white" /> : <GraduationCap size={20} className="text-white" />}
+                    </div>
+                    <h2 className="text-2xl font-bold">{editingTimelineId ? 'Editar Entrada' : 'Nueva Entrada'}</h2>
+                  </div>
+
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const method = editingTimelineId ? 'PUT' : 'POST';
+                    const url = '/api/timeline';
+                    const body = editingTimelineId
+                      ? { id: editingTimelineId, ...timelineForm }
+                      : timelineForm;
+
+                    const res = await fetch(url, {
+                      method,
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(body)
+                    });
+
+                    if (res.ok) {
+                      setShowTimelineModal(false);
+                      setEditingTimelineId(null);
+                      setTimelineForm({ title: '', subtitle: '', description: '', date: '', type: 'work', sort_order: 0 });
+                      loadData();
+                    }
+                  }} className="space-y-5 max-h-[70vh] overflow-y-auto pr-2">
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Título</label>
+                      <input type="text" value={timelineForm.title}
+                        onChange={(e) => setTimelineForm({ ...timelineForm, title: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="Desarrollador Full-Stack" required />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Subtítulo / Empresa</label>
+                      <input type="text" value={timelineForm.subtitle}
+                        onChange={(e) => setTimelineForm({ ...timelineForm, subtitle: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="Empresa - Cargo" required />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
+                      <textarea value={timelineForm.description}
+                        onChange={(e) => setTimelineForm({ ...timelineForm, description: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        rows={4} placeholder="Describe tu experiencia..." />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Fecha</label>
+                      <input type="text" value={timelineForm.date}
+                        onChange={(e) => setTimelineForm({ ...timelineForm, date: e.target.value })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        placeholder="2025 — Presente" required />
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Tipo</label>
+                      <select value={timelineForm.type}
+                        onChange={(e) => setTimelineForm({ ...timelineForm, type: e.target.value as 'work' | 'education' })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                        <option value="work">Trabajo / Experiencia</option>
+                        <option value="education">Educación</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Orden</label>
+                      <input type="number" value={timelineForm.sort_order}
+                        onChange={(e) => setTimelineForm({ ...timelineForm, sort_order: parseInt(e.target.value) || 0 })}
+                        className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        min={0} />
+                    </div>
+                    <div className="flex items-center gap-3 pt-4">
+                      <button type="submit" className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300">
+                        {editingTimelineId ? 'Guardar Cambios' : 'Crear Entrada'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {timelineEvents.length === 0 ? (
+                <div className={`text-center py-16 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <Calendar size={48} className="mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-light">No hay entradas en la línea de tiempo.</p>
+                </div>
+              ) : (
+                timelineEvents.map((event) => (
+                  <div key={event.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${event.type === 'work' ? 'bg-cyan-500/20' : 'bg-purple-500/20'}`}>
+                          {event.type === 'work' ? <Briefcase size={24} className="text-cyan-400" /> : <GraduationCap size={24} className="text-purple-400" />}
+                        </div>
+                        <div>
+                          <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{event.title}</h3>
+                          <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{event.subtitle}</p>
+                          <span className={`inline-flex items-center gap-1 mt-1 text-xs px-2 py-0.5 rounded-full ${
+                            event.type === 'work'
+                              ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                              : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                          }`}>
+                            {event.type === 'work' ? 'Experiencia' : 'Educación'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className={`text-xs font-mono ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{event.date}</span>
+                        <button onClick={() => {
+                          setEditingTimelineId(event.id);
+                          setTimelineForm({
+                            title: event.title,
+                            subtitle: event.subtitle,
+                            description: event.description || '',
+                            date: event.date,
+                            type: event.type,
+                            sort_order: event.sort_order
+                          });
+                          setShowTimelineModal(true);
+                        }} className="p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-300">
+                          <Edit2 size={16} className="text-yellow-400" />
+                        </button>
+                        <button onClick={async () => {
+                          if (confirm('¿Estás seguro de eliminar esta entrada?')) {
+                            await fetch(`/api/timeline?id=${event.id}`, { method: 'DELETE' });
+                            loadData();
+                          }
+                        }} className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300">
+                          <Trash2 size={16} className="text-red-400" />
+                        </button>
+                      </div>
+                    </div>
+                    {event.description && (
+                      <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm leading-relaxed`}>{event.description}</p>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* CV Tab */}
+        {activeTab === 'cv' && (
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
+                  <FileText size={24} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold">Actualizar CV</h2>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Sube un nuevo archivo PDF para tu currículum</p>
+                </div>
+              </div>
+
+              {currentCvUrl && (
+                <div className="mb-6">
+                  <p className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>CV actual:</p>
+                  <a
+                    href={currentCvUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/50 transition-all duration-300 text-primary font-medium text-sm"
+                  >
+                    <FileText size={16} />
+                    Ver CV actual
+                  </a>
+                </div>
+              )}
+
+              <div className="space-y-5">
+                <div>
+                  <label className={`block mb-2 font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Seleccionar archivo PDF</label>
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={(e) => setCvFile(e.target.files?.[0] || null)}
+                    className={`w-full px-4 py-3 ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border-2 border-primary/30 rounded-xl focus:outline-none focus:border-primary transition-all duration-300 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
+                  />
+                  {cvFile && (
+                    <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                      {cvFile.name} ({(cvFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  onClick={async () => {
+                    if (!cvFile) {
+                      alert('Por favor selecciona un archivo PDF');
+                      return;
+                    }
+
+                    if (cvFile.type !== 'application/pdf') {
+                      alert('Solo se permiten archivos PDF');
+                      return;
+                    }
+
+                    if (cvFile.size > 10 * 1024 * 1024) {
+                      alert('El archivo es demasiado grande. Máximo 10MB.');
+                      return;
+                    }
+
+                    setCvUploading(true);
+                    try {
+                      const formData = new FormData();
+                      formData.append('file', cvFile);
+
+                      const res = await fetch('/api/cv', {
+                        method: 'POST',
+                        body: formData
+                      });
+
+                      if (res.ok) {
+                        const data = await res.json();
+                        setCurrentCvUrl(data.url);
+                        setCvFile(null);
+                        loadData();
+                        alert('✅ CV actualizado exitosamente!');
+                      } else {
+                        const err = await res.json();
+                        alert('❌ Error: ' + (err.error || 'No se pudo actualizar el CV'));
+                      }
+                    } catch (e) {
+                      alert('❌ Error de red al actualizar el CV');
+                    } finally {
+                      setCvUploading(false);
+                    }
+                  }}
+                  disabled={cvUploading}
+                  className="flex items-center justify-center gap-2 w-full px-6 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300 disabled:opacity-50"
+                >
+                  {cvUploading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Subiendo...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={20} />
+                      Subir CV
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
       </div>
     </div>
   );

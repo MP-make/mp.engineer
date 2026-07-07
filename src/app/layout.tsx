@@ -3,11 +3,12 @@ import { Inter } from 'next/font/google';
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
 import ParticleBackground from "@/components/ParticleBackground";
+import LockoutGuard from "@/components/LockoutGuard";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: "MP.Engineer - Portafolio",
+  title: "Marlon Pecho - Portafolio",
   description: "Portafolio profesional Marlon Pecho, Estudiante de Ingeniería de Sistemas Avanzados y Desarrollador Full-Stack.",
   icons: {
     icon: '/faviconlimpio.png',
@@ -35,7 +36,9 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased relative overflow-x-hidden bg-background">
         <ClientProviders>
-          {children}
+          <LockoutGuard>
+            {children}
+          </LockoutGuard>
           <ParticleBackground />
         </ClientProviders>
       </body>

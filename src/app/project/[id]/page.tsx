@@ -25,7 +25,7 @@ interface Project {
   link?: string;
   github_link?: string;
   technologies: string[];
-  status: 'completed' | 'in-progress';
+  status: 'COMPLETADO' | 'EN DESARROLLO';
   created_at: string;
   images?: { image: string }[];
   is_full_page?: boolean;

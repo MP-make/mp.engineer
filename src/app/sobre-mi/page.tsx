@@ -1,59 +1,63 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Timeline from '@/components/Timeline';
 import ParticleBackground from '@/components/ParticleBackground';
 import TestimonialsCarousel from '@/components/TestimonialsCarousel';
+import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { motion } from 'framer-motion';
-import { Code, Database, Globe, Smartphone, Zap, Users, Github, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Code, Database, Globe, Smartphone, Zap, Users, Github, ExternalLink, Briefcase, GraduationCap } from 'lucide-react';
 
-const timelineEvents = [
-  {
-    id: '1',
-    title: 'Desarrollador Full-Stack',
-    subtitle: 'Consigueventas - Agencia de Marketing Digital',
-    description: 'Lidero el desarrollo y mantenimiento de ecosistemas web profesionales, desde sitios corporativos hasta e-commerce complejos. Mi enfoque principal es la optimización de performance y la creación de interfaces modernas que impulsan la conversión de clientes. Proyectos clave: pvelectronica.com.pe, effetha.com, consigueventas.com. Stack: Next.js, React, WordPress Avanzado.',
-    date: '2025 — Presente',
-    type: 'work' as const,
-  },
-  {
-    id: '2',
-    title: 'Co-Founder & Desarrollador Principal',
-    subtitle: 'Ventify - Plataforma SaaS de Gestión de Ventas',
-    description: 'Diseño y mantengo la arquitectura técnica de una solución SaaS que automatiza inventarios y ventas. He logrado que negocios locales incrementen su eficiencia operativa y sus ventas significativamente mediante la digitalización. Impacto: Arquitectura escalable y gestión de flujos de pago integrados. Stack: React, Firebase, Stripe, PostgreSQL.',
-    date: '2024 — Presente',
-    type: 'work' as const,
-  },
-  {
-    id: '3',
-    title: 'Voluntario de Sistemas',
-    subtitle: 'Poder Judicial de Ica',
-    description: 'Apoyo técnico especializado en el área de sistemas, colaborando en la gestión de infraestructura digital y soporte técnico dentro de la institución para optimizar los procesos judiciales electrónicos. Enfoque: Soporte de sistemas, gestión de redes y software institucional.',
-    date: '2025 (Periodo de 6 meses)',
-    type: 'work' as const,
-  },
-  {
-    id: '4',
-    title: 'Desarrollador Web Freelance',
-    subtitle: 'Proyectos Independientes',
-    description: 'Cuatro años brindando soluciones digitales a medida para pymes y emprendedores. Especializado en el despliegue rápido de sitios web funcionales, seguros y optimizados para SEO. Experiencia: Más de 10 proyectos entregados con éxito en diversos sectores.',
-    date: '2021 — Presente',
-    type: 'work' as const,
-  },
-  {
-    id: '5',
-    title: 'Ingeniería de Sistemas e Informática',
-    subtitle: 'Universidad Tecnológica del Perú (UTP)',
-    description: 'Formación técnica sólida con énfasis en ingeniería de software, seguridad de la información y gestión de proyectos tecnológicos en el Perú.',
-    date: 'En curso (Ciclo Final)',
-    type: 'education' as const,
-  },
-];
+interface TimelineEvent {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  date: string;
+  type: 'work' | 'education';
+}
 
 export default function SobreMi() {
   const { t } = useLanguage();
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const [activeType, setActiveType] = useState<'work' | 'education'>('work');
+  const [loading, setLoading] = useState(true);
+  const [cvUrl, setCvUrl] = useState('/cv-marlon-pecho.pdf');
+
+  useEffect(() => {
+    const fetchCv = async () => {
+      const { data, error } = await supabase
+        .from('portfolio_cv')
+        .select('url')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (!error && data) {
+        setCvUrl(data.url);
+      }
+    };
+    fetchCv();
+  }, []);
+
+  useEffect(() => {
+    const fetchTimeline = async () => {
+      const { data, error } = await supabase
+        .from('portfolio_timeline')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+      if (!error && data) {
+        setTimelineEvents(data as TimelineEvent[]);
+      }
+      setLoading(false);
+    };
+    fetchTimeline();
+  }, []);
+
+  const filteredEvents = timelineEvents.filter(e => e.type === activeType);
 
   const stats = [
     { icon: Zap, label: t.aboutPage.yearsExp, value: '2' },
@@ -148,7 +152,7 @@ export default function SobreMi() {
               <span className="font-semibold tracking-wide">GitHub</span>
             </a>
             <a
-              href="/cv-marlon-pecho.pdf"
+              href={cvUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-3.5 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400 hover:text-cyan-100 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] group text-sm sm:text-base"
@@ -212,9 +216,56 @@ export default function SobreMi() {
             </h2>
             <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-cyan-500 to-blue-600 mx-auto rounded-full"></div>
           </div>
+
+          {/* Tabs */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="relative flex p-1 rounded-full bg-card-bg/60 border border-border-color shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] w-full max-w-xs mx-auto">
+              <div
+                className="absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_12px_rgba(34,211,238,0.3)] transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                style={{
+                  left: activeType === 'work' ? '4px' : 'calc(50% + 2px)',
+                  width: 'calc(50% - 6px)'
+                }}
+              />
+              <button
+                onClick={() => setActiveType('work')}
+                className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
+              >
+                <Briefcase size={18} />
+                <span className={activeType === 'work' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}>
+                  Experiencia
+                </span>
+              </button>
+              <button
+                onClick={() => setActiveType('education')}
+                className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
+              >
+                <GraduationCap size={18} />
+                <span className={activeType === 'education' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}>
+                  Educación
+                </span>
+              </button>
+            </div>
+          </div>
           
           <div className="bg-card-bg p-4 sm:p-8 md:p-12 rounded-2xl sm:rounded-[2.5rem] border border-border-color shadow-2xl">
-            <Timeline events={timelineEvents} />
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+              </div>
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeType}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Timeline events={filteredEvents} />
+                </motion.div>
+              </AnimatePresence>
+            )}
           </div>
         </motion.section>
 
