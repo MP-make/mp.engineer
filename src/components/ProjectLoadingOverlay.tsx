@@ -85,7 +85,7 @@ export default function ProjectLoadingOverlay({ t }: Props) {
                   <linearGradient id="loadingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stopColor="#22d3ee" />
                     <stop offset="50%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#a855f7" />
+                    <stop offset="100%" stopColor="#4f46e5" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -108,7 +108,7 @@ export default function ProjectLoadingOverlay({ t }: Props) {
             {/* Mini progress bar */}
             <div className="mt-6 w-48 h-[2px] rounded-full bg-border-color/20 overflow-hidden">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500"
+                className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500"
                 initial={{ scaleX: 0, transformOrigin: 'left' }}
                 animate={{ scaleX: progress / 100, transformOrigin: 'left' }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}

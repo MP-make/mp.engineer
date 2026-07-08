@@ -50,7 +50,7 @@ export default function RouteLoadingBar() {
           exit={{ opacity: 0, transition: { duration: 0.3 } }}
         >
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500"
+            className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500"
             initial={{ scaleX: 0, transformOrigin: 'left' }}
             animate={{ scaleX: 1, transformOrigin: 'left' }}
             exit={{ scaleX: 0, transformOrigin: 'right', transition: { duration: 0.4 } }}
