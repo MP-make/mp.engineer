@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter } from 'next/font/google';
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
@@ -23,19 +24,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${inter.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{
-          __html: `
+      <head />
+      <body className="font-sans antialiased relative overflow-x-hidden bg-background">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
             (function() {
               try {
                 var theme = localStorage.getItem('theme') || 'dark';
                 document.documentElement.classList.add(theme);
               } catch(e) {}
             })();
-          `
-        }} />
-      </head>
-      <body className="font-sans antialiased relative overflow-x-hidden bg-background">
+          `}
+        </Script>
         <ClientProviders>
           <RouteLoadingBar />
           <LockoutGuard>

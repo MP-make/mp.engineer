@@ -68,6 +68,10 @@ venv/
 .vscode/
 .idea/
 
+# Cypress
+cypress/screenshots/
+cypress/videos/
+
 # OS
 .DS_Store
 Thumbs.db
