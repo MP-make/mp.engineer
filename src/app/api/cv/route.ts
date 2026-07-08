@@ -31,6 +31,30 @@ export async function POST(request: NextRequest) {
   const supabase = createClient();
 
   try {
+    const contentType = request.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      const { url } = await request.json();
+      if (!url) {
+        return NextResponse.json({ error: 'No URL provided' }, { status: 400 });
+      }
+
+      const { data, error: dbError } = await supabase
+        .from('portfolio_cv')
+        .insert([{ url }])
+        .select()
+        .single();
+
+      if (dbError) {
+        if (dbError.code === '42P01') {
+          return NextResponse.json({ url, warning: 'DB table missing' });
+        }
+        return NextResponse.json({ error: dbError.message }, { status: 500 });
+      }
+
+      return NextResponse.json(data);
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 

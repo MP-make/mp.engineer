@@ -47,6 +47,7 @@ html {
   --muted-foreground: #334155;
   --primary: #22d3ee;
   --primary-hover: #0ea5e9;
+  --secondary: #3b82f6;
   --on-primary: #ffffff;
   --border: #cbd5e1;
   --input: #e2e8f0;
@@ -85,6 +86,7 @@ html {
   --muted-foreground: #334155;
   --primary: #22d3ee;
   --primary-hover: #0ea5e9;
+  --secondary: #3b82f6;
   --on-primary: #ffffff;
   --border: #cbd5e1;
   --input: #e2e8f0;
@@ -121,6 +123,7 @@ html {
   --muted-foreground: #94a3b8;
   --primary: #22d3ee;
   --primary-hover: #0ea5e9;
+  --secondary: #60a5fa;
   --on-primary: #ffffff;
   --border: #1e293b;
   --input: #1e293b;
@@ -348,4 +351,40 @@ span[class*="bg-green"] {
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+/* =========================================
+   6. ADMIN PANEL LIGHT MODE IMPROVEMENTS
+   ========================================= */
+.light .admin-bg-decorator {
+  opacity: 0.3;
+}
+
+.light .admin-sidebar {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.light .admin-card {
+  background: linear-gradient(135deg, #ffffff, #f0f5ff);
+  border-color: #bfdbfe;
+}
+
+.light .admin-input {
+  background-color: #ffffff;
+  border-color: #bfdbfe;
+}
+
+.light .admin-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
+}
+
+.light .admin-table-row:hover {
+  background-color: #f0f7ff;
+}
+
+/* Modal overlay improvement */
+.light .fixed.inset-0.z-\[60\] {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(8px);
 }

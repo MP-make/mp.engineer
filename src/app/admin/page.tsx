@@ -811,7 +811,7 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#0f1419]' : 'bg-gradient-to-br from-gray-100 via-white to-gray-200'} flex items-center justify-center`}>
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#0f1419]' : 'bg-gradient-to-br from-blue-50/40 via-white to-blue-50/20'} flex items-center justify-center`}>
         <div className="text-center">
           <div className="relative">
             <div className="inline-block animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-primary"></div>
@@ -841,7 +841,7 @@ export default function AdminPage() {
   ] as const;
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e]' : 'bg-gradient-to-br from-gray-100 via-white to-gray-200'}`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-[#0a0e1a] via-[#0f1419] to-[#1a1f2e]' : 'bg-gradient-to-br from-blue-50/40 via-white to-blue-50/20'}`}>
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
@@ -861,7 +861,7 @@ export default function AdminPage() {
         className={`fixed top-0 left-0 z-50 h-full w-72 transform transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 flex flex-col ${
-          theme === 'dark' ? 'bg-[#0f1419] border-r border-primary/20' : 'bg-white border-r border-gray-200'
+          theme === 'dark' ? 'bg-[#0f1419] border-r border-primary/20' : 'bg-white border-r border-blue-100'
         } shadow-2xl`}
       >
         {/* Sidebar Header */}
@@ -874,7 +874,7 @@ export default function AdminPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-lg font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">Panel</h1>
+              <h1 className="text-lg font-bold bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, var(--primary), var(--secondary), var(--primary))' }}>Panel</h1>
               <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{session?.user?.name || 'Admin'}</p>
             </div>
           </div>
@@ -898,7 +898,7 @@ export default function AdminPage() {
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                 activeTab === item.id
                   ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/30'
-                  : `${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`
+                  : `${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-blue-50'}`
               }`}
             >
               <item.icon size={20} />
@@ -913,11 +913,11 @@ export default function AdminPage() {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className={`p-4 border-t ${theme === 'dark' ? 'border-primary/20' : 'border-gray-200'} space-y-2`}>
+        <div className={`p-4 border-t ${theme === 'dark' ? 'border-primary/20' : 'border-blue-100'} space-y-2`}>
           <button
             onClick={toggleTheme}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-              theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-blue-50'
             }`}
           >
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -926,7 +926,7 @@ export default function AdminPage() {
           <button
             onClick={() => router.push('/')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-              theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-gray-900 hover:bg-blue-50'
             }`}
           >
             <ExternalLink size={20} />
@@ -946,7 +946,7 @@ export default function AdminPage() {
       <div className={`lg:pl-72 transition-all duration-300`}>
         {/* Mobile top bar */}
         <div className={`lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 ${
-          theme === 'dark' ? 'bg-[#0f1419]/90 backdrop-blur-xl border-b border-primary/20' : 'bg-white/90 backdrop-blur-xl border-b border-gray-200'
+          theme === 'dark' ? 'bg-[#0f1419]/90 backdrop-blur-xl border-b border-primary/20' : 'bg-white/90 backdrop-blur-xl border-b border-blue-100'
         }`}>
           <button
             onClick={() => setSidebarOpen(true)}
@@ -969,7 +969,7 @@ export default function AdminPage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
+              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50/60 to-indigo-50/40'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
                 <div className="relative p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -983,7 +983,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
+              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50/60 to-indigo-50/40'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-secondary/0 to-secondary/0 group-hover:from-secondary/5 group-hover:to-secondary/10 transition-all duration-500"></div>
                 <div className="relative p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -997,7 +997,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
+              <div className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? 'bg-gradient-to-br from-[#1a1f2e] to-[#151a27]' : 'bg-gradient-to-br from-blue-50/60 to-indigo-50/40'} border ${theme === 'dark' ? 'border-primary/20 hover:border-primary/50' : 'border-blue-200 hover:border-blue-300'} transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 transition-all duration-500"></div>
                 <div className="relative p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -1014,23 +1014,23 @@ export default function AdminPage() {
 
             {/* Extra dashboard info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-blue-200/60'} shadow-xl`}>
                 <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Empresas</p>
                 <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{companies.length}</p>
               </div>
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-blue-200/60'} shadow-xl`}>
                 <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Recomendaciones</p>
                 <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{testimonials.length}</p>
               </div>
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-blue-200/60'} shadow-xl`}>
                 <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Experiencia</p>
                 <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{timelineEvents.length}</p>
               </div>
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-gray-300'} shadow-xl`}>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-primary/30' : 'border-blue-200/60'} shadow-xl`}>
                 <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Proyectos Destacados</p>
                 <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{projects.filter(p => p.featured).length}</p>
               </div>
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-red-500/30' : 'border-red-300'} shadow-xl`}>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-5 rounded-2xl border ${theme === 'dark' ? 'border-red-500/30' : 'border-red-300'} shadow-xl`}>
                 <p className={`text-xs font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>Intrusiones</p>
                 <p className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{intrusionLogs.length}</p>
               </div>
@@ -1068,7 +1068,7 @@ export default function AdminPage() {
                   }
                 }}
               >
-                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}
+                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Close button */}
@@ -1327,7 +1327,7 @@ export default function AdminPage() {
               {projects.map((project) => {
                 const isExpanded = expandedCards.has(project.id);
                 return (
-                <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-4 sm:p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-4 sm:p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                   <div className="flex items-center justify-between mb-2 sm:mb-4">
                     <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                       <h3 className={`text-base sm:text-xl font-bold truncate ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
@@ -1414,7 +1414,7 @@ export default function AdminPage() {
         {activeTab === 'contacts' && (
           <div className="space-y-6">
             {contacts.map((contact) => (
-              <div key={contact.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+              <div key={contact.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{contact.name}</h3>
                   <button
@@ -1436,7 +1436,7 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
             {/* Form */}
             <div className="lg:col-span-2 order-2 lg:order-1">
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl lg:sticky lg:top-32`}>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl lg:sticky lg:top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingSkillId ? (
                     <>
@@ -1521,7 +1521,7 @@ export default function AdminPage() {
             {/* Skills List */}
             <div className="lg:col-span-3 order-1 lg:order-2 space-y-6">
               {skills.map((skill) => (
-                <div key={skill.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                <div key={skill.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{skill.name}</h3>
                     <div className="flex items-center gap-3">
@@ -1568,7 +1568,7 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
             {/* Form */}
             <div className="lg:col-span-2 order-2 lg:order-1">
-              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl lg:sticky lg:top-32`}>
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-4 sm:p-6 lg:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl lg:sticky lg:top-32`}>
                 <div className="flex items-center gap-3 mb-6">
                   {editingHeroId ? (
                     <>
@@ -1661,7 +1661,7 @@ export default function AdminPage() {
             {/* Hero Images List */}
             <div className="lg:col-span-3 order-1 lg:order-2 space-y-6">
               {heroImages.map((heroImage) => (
-                <div key={heroImage.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                <div key={heroImage.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{heroImage.title || 'Sin Título'}</h3>
                     <div className="flex items-center gap-3">
@@ -1692,7 +1692,7 @@ export default function AdminPage() {
           <div className="space-y-6">
             {editingId && (
               <div className="mb-8">
-                <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
                       <Edit2 size={20} className="text-white" />
@@ -1701,11 +1701,11 @@ export default function AdminPage() {
                   </div>
 
                   {/* Editable Page Preview */}
-                  <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-gray-50 text-gray-900'}`}>
+                  <div className={`min-h-screen ${theme === 'dark' ? 'bg-accent text-customWhite' : 'bg-blue-50/30 text-gray-900'}`}>
                     <Navbar />
 
                     {/* Header */}
-                    <div className={`border-b ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-gray-200 bg-white'} mt-24 pt-10 pb-16`}>
+                    <div className={`border-b ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-blue-100 bg-white'} mt-24 pt-10 pb-16`}>
                       <div className="max-w-7xl mx-auto px-4">
                         <div className="text-center">
                           <div className="mb-6">
@@ -1766,7 +1766,7 @@ export default function AdminPage() {
                     {/* Sections */}
                     <div className="py-16">
                       {/* Sección de Introducción */}
-                      <section className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-gray-100'}`}>
+                      <section className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-blue-50/30'}`}>
                         <div className="max-w-7xl mx-auto">
                           <div className="grid lg:grid-cols-2 gap-12 items-center">
                             <div>
@@ -1872,14 +1872,14 @@ export default function AdminPage() {
                       </section>
 
                       {/* Sección de Equipo */}
-                      <section className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-gray-100'}`}>
+                      <section className={`py-20 px-4 ${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-blue-50/30'}`}>
                         <div className="max-w-7xl mx-auto">
                           <div className="text-center mb-16">
                             <h2 className={`text-4xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Sección de Equipo</h2>
                           </div>
                           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {roles.map((role, roleIndex) => (
-                              <div key={roleIndex} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-gray-200 bg-white'} shadow-lg hover:shadow-xl transition-all duration-300 relative group`}>
+                              <div key={roleIndex} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]' : 'border-blue-100 bg-white'} shadow-lg hover:shadow-xl transition-all duration-300 relative group`}>
                                 <div className="flex items-center gap-4 mb-4">
                                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                                     <Users size={24} className="text-primary" />
@@ -1974,7 +1974,7 @@ export default function AdminPage() {
                                 </button>
                               </div>
                             ))}
-                            <div className={`p-6 rounded-2xl border-2 border-dashed ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]/50' : 'border-gray-300 bg-gray-50'} flex items-center justify-center cursor-pointer hover:border-primary/50 transition-all duration-300`} onClick={() => {
+                            <div className={`p-6 rounded-2xl border-2 border-dashed ${theme === 'dark' ? 'border-primary/20 bg-[#0f1419]/50' : 'border-blue-200/60 bg-blue-50'} flex items-center justify-center cursor-pointer hover:border-primary/50 transition-all duration-300`} onClick={() => {
                               setRoles([...roles, { name: '', description: '', images: [] }]);
                               setRolesNewImageUrls([...rolesNewImageUrls, '']);
                               setRolesSelectedFiles([...rolesSelectedFiles, []]);
@@ -2103,7 +2103,7 @@ export default function AdminPage() {
 
             {/* Projects List */}
             {projects.filter(p => p.is_full_page).map((project) => (
-              <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+              <div key={project.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{project.title}</h3>
                   <div className="flex items-center gap-3">
@@ -2139,7 +2139,7 @@ export default function AdminPage() {
         {/* Companies Tab */}
         {activeTab === 'companies' && (
           <div className="space-y-6">
-            <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+            <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                   <Users size={20} className="text-white" />
@@ -2190,7 +2190,7 @@ export default function AdminPage() {
                   </p>
                 ) : (
                   companies.map((company) => (
-                    <div key={company.id} className={`flex items-center justify-between p-4 rounded-xl ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border ${theme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                    <div key={company.id} className={`flex items-center justify-between p-4 rounded-xl ${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-white'} border ${theme === 'dark' ? 'border-white/10' : 'border-blue-100'}`}>
                       <span className={`font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{company.name}</span>
                       <button
                         onClick={async () => {
@@ -2235,7 +2235,7 @@ export default function AdminPage() {
                   }
                 }}
               >
-                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}
+                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -2340,7 +2340,7 @@ export default function AdminPage() {
                 </div>
               ) : (
                 testimonials.map((t) => (
-                  <div key={t.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                  <div key={t.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-4">
                         {t.image ? (
@@ -2413,7 +2413,7 @@ export default function AdminPage() {
                   }
                 }}
               >
-                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}
+                <div className={`relative w-full max-w-2xl my-8 ${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-6 sm:p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -2513,7 +2513,7 @@ export default function AdminPage() {
                 </div>
               ) : (
                 timelineEvents.map((event) => (
-                  <div key={event.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-gray-100'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+                  <div key={event.id} className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-white to-blue-50/20'} p-6 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${event.type === 'work' ? 'bg-cyan-500/20' : 'bg-purple-500/20'}`}>
@@ -2586,7 +2586,7 @@ export default function AdminPage() {
               <div className="overflow-x-auto">
                 <table className={`w-full text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   <thead>
-                    <tr className={`${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-gray-100'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-gray-300'}`}>
+                    <tr className={`${theme === 'dark' ? 'bg-[#1e2432]' : 'bg-blue-50/30'} border-b ${theme === 'dark' ? 'border-primary/20' : 'border-blue-200/60'}`}>
                       <th className="px-4 py-3 text-left font-semibold">IP</th>
                       <th className="px-4 py-3 text-left font-semibold">Ubicación</th>
                       <th className="px-4 py-3 text-left font-semibold hidden md:table-cell">Path</th>
@@ -2599,7 +2599,7 @@ export default function AdminPage() {
                     {intrusionLogs.map((log) => (
                       <React.Fragment key={log.id}>
                       <tr
-                        className={`border-b ${theme === 'dark' ? 'border-primary/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'} transition-colors ${expandedIntrusion === log.id ? theme === 'dark' ? 'bg-white/5' : 'bg-gray-50' : ''}`}
+                        className={`border-b ${theme === 'dark' ? 'border-primary/10 hover:bg-white/5' : 'border-blue-100 hover:bg-blue-50'} transition-colors ${expandedIntrusion === log.id ? theme === 'dark' ? 'bg-white/5' : 'bg-blue-50/30' : ''}`}
                       >
                         <td className="px-4 py-3 font-mono text-xs">{log.ip}</td>
                         <td className="px-4 py-3 text-xs">
@@ -2642,7 +2642,7 @@ export default function AdminPage() {
                         </td>
                       </tr>
                       {expandedIntrusion === log.id && (
-                        <tr className={`${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-gray-50'} border-b ${theme === 'dark' ? 'border-primary/10' : 'border-gray-200'}`}>
+                        <tr className={`${theme === 'dark' ? 'bg-[#0f1419]' : 'bg-blue-50/30'} border-b ${theme === 'dark' ? 'border-primary/10' : 'border-blue-100'}`}>
                           <td colSpan={6} className="px-4 py-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                               <div>
@@ -2713,7 +2713,7 @@ export default function AdminPage() {
         {/* CV Tab */}
         {activeTab === 'cv' && (
           <div className="max-w-2xl mx-auto space-y-6">
-            <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-gray-50 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-gray-300'} shadow-2xl`}>
+            <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-[#1e2432] to-[#252b3d]' : 'bg-gradient-to-br from-blue-50/30 to-white'} p-8 rounded-2xl ${theme === 'dark' ? 'border border-primary/30' : 'border border-blue-200/60'} shadow-2xl`}>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
                   <FileText size={24} className="text-white" />
@@ -2774,12 +2774,24 @@ export default function AdminPage() {
 
                     setCvUploading(true);
                     try {
-                      const formData = new FormData();
-                      formData.append('file', cvFile);
+                      const fileName = `cv-${Date.now()}.pdf`;
+                      const { error: uploadError } = await supabase.storage
+                        .from('portfolio-images')
+                        .upload(fileName, cvFile, {
+                          contentType: 'application/pdf',
+                          cacheControl: '3600'
+                        });
+
+                      if (uploadError) throw new Error(uploadError.message);
+
+                      const { data: { publicUrl } } = supabase.storage
+                        .from('portfolio-images')
+                        .getPublicUrl(fileName);
 
                       const res = await fetch('/api/cv', {
                         method: 'POST',
-                        body: formData
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: publicUrl })
                       });
 
                       if (res.ok) {
@@ -2793,7 +2805,7 @@ export default function AdminPage() {
                         alert('❌ Error: ' + (err.error || 'No se pudo actualizar el CV'));
                       }
                     } catch (e) {
-                      alert('❌ Error de red al actualizar el CV');
+                      alert('❌ Error: ' + (e instanceof Error ? e.message : 'Error al actualizar el CV'));
                     } finally {
                       setCvUploading(false);
                     }
