@@ -4,6 +4,7 @@ import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
 import ParticleBackground from "@/components/ParticleBackground";
 import LockoutGuard from "@/components/LockoutGuard";
+import RouteLoadingBar from "@/components/RouteLoadingBar";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -36,6 +37,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased relative overflow-x-hidden bg-background">
         <ClientProviders>
+          <RouteLoadingBar />
           <LockoutGuard>
             {children}
           </LockoutGuard>

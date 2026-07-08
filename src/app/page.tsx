@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Github, Download } from 'lucide-react';
+import { ExternalLink, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ParticleBackground from '@/components/ParticleBackground';
+import ProjectLoadingOverlay from '@/components/ProjectLoadingOverlay';
 
 interface HeroImage {
   id: number;
@@ -147,13 +148,7 @@ export default function HeroSection({ t, currentSlide, heroImages, isImageOnLeft
               <Download size={16} />
             </a>
             
-            <Link
-              href="/proyectos"
-              className="inline-flex items-center justify-center gap-2 bg-transparent border border-border-color text-text-secondary px-5 py-2.5 rounded-full hover:border-cyan-500/50 hover:bg-hover-bg transition-all duration-300 hover:-translate-y-1 text-sm md:text-base shrink-0"
-            >
-              {t?.hero?.viewProjects || 'Ver Proyectos'}
-              <Github size={16} />
-            </Link>
+            <ProjectLoadingOverlay t={t} />
           </motion.div>
         </motion.div>
 
