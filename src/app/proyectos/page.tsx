@@ -209,39 +209,168 @@ export default function Proyectos() {
           variants={containerVariants}
         >
           <motion.div className="flex-1 z-10" variants={itemVariants}>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold tracking-widest uppercase mb-8 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
-              <Rocket size={14} /> Portafolio
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold tracking-[0.15em] uppercase mb-8 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
+              <Rocket size={12} /> Portafolio
             </div>
-            <h1 className="text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter mb-8 leading-tight">
-              <span className="gradient-title drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] font-black tracking-tighter mb-6 leading-[0.9] font-heading">
+              <span className="bg-gradient-to-br from-cyan-200 via-cyan-400 to-blue-600 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,211,238,0.4)]">
                 {t.projects.title}<br/>Destacados
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-text-muted leading-relaxed font-light max-w-xl">
+            <p className="text-lg md:text-xl text-text-muted leading-relaxed font-light max-w-xl">
               {t.projects.subtitle}
             </p>
+            <div className="flex items-center gap-4 mt-8">
+              <div className="flex items-center gap-2 text-sm text-text-muted">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{projects.length} proyectos</span>
+              </div>
+              <div className="w-px h-4 bg-border-color" />
+              <div className="flex items-center gap-2 text-sm text-text-muted">
+                <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                <span>{personalProjects.length + companyProjects.length} publicados</span>
+              </div>
+            </div>
           </motion.div>
 
           <motion.div
             variants={itemVariants}
             className="flex-1 w-full relative group"
           >
-            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-cyan-500/20 shadow-[0_0_40px_rgba(34,211,238,0.1)]">
-              <img
-                src="/setupweb.webp"
-                alt="Mi entorno de desarrollo"
-                className="w-full h-full object-cover transition-transform duration-[3s] ease-out group-hover:scale-105 opacity-80"
-              />
-              <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(10,15,24,1)] pointer-events-none"></div>
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-border-color/50 bg-card-bg/30 backdrop-blur-sm flex flex-col">
+              {/* Terminal top bar */}
+              <div className="flex items-center gap-1.5 px-4 py-3 border-b border-border-color/50">
+                <div className="w-3 h-3 rounded-full bg-red-400/80" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
+                <div className="w-3 h-3 rounded-full bg-emerald-400/80" />
+                <span className="ml-3 text-[11px] text-text-muted font-mono">terminal — proyectos — bash</span>
+              </div>
+              {/* Terminal content */}
+              <div className="flex-1 p-5 font-mono text-xs leading-relaxed space-y-1.5 overflow-hidden">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-text-muted/60"
+                >
+                  <span className="text-emerald-400/60">~$</span>{' '}
+                  <span className="text-cyan-400/60">npm</span>{' '}
+                  <span className="text-emerald-400/60">run</span>{' '}
+                  dev
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="text-text-muted/50"
+                >
+                  <span className="text-cyan-400/50">▲</span> Next.js 16.0.7
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9 }}
+                  className="text-text-muted/50"
+                >
+                  <span className="text-emerald-400/50">✓</span> Ready in 2.3s
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2 }}
+                  className="text-text-muted/50"
+                >
+                  <span className="text-cyan-400/50">λ</span> Compiling /proyectos...
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.5 }}
+                  className="text-text-muted/50"
+                >
+                  <span className="text-emerald-400/50">✓</span>{' '}
+                  Compiled <span className="text-cyan-400/60">/proyectos</span> in 487ms
+                </motion.div>
+                <div className="pt-2 border-t border-border-color/20 mt-2" />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.8 }}
+                >
+                  <span className="text-emerald-400/70">~$</span>{' '}
+                  <span className="text-cyan-400/70">ls</span>{' '}
+                  <span className="text-text-muted/50">proyectos/</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 2.1 }}
+                  className="flex gap-3 text-text-muted/50"
+                >
+                  <span className="text-cyan-400/60">personal/</span>
+                  <span className="text-emerald-400/60">company/</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 2.4 }}
+                >
+                  <span className="text-emerald-400/70">~$</span>{' '}
+                  <span className="text-cyan-400/70">cat</span>{' '}
+                  <span className="text-text-muted/50">total.txt</span>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 2.7 }}
+                  className="text-text-muted/60 font-semibold"
+                >
+                  <span className="text-cyan-400">{projects.length}</span> projects available
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 3 }}
+                  className="inline-flex items-center gap-0.5"
+                >
+                  <span className="text-emerald-400/70">~$</span>{' '}
+                  <span className="w-2 h-4 bg-cyan-400/70 animate-cursor-blink" />
+                </motion.div>
+              </div>
+              <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.2)] pointer-events-none rounded-2xl" />
+              <div className="absolute -bottom-4 -left-4 w-12 h-12 border border-cyan-500/30 rounded-full animate-[spin_8s_linear_infinite] pointer-events-none" />
+              <div className="absolute top-[10%] -right-2 w-3 h-3 bg-cyan-400 rounded-full shadow-[0_0_15px_rgba(34,211,238,1)] animate-pulse pointer-events-none" />
             </div>
-            <div className="absolute -bottom-4 -left-4 w-12 h-12 border border-cyan-500/30 rounded-full animate-[spin_8s_linear_infinite] pointer-events-none"></div>
-            <div className="absolute top-[10%] -right-2 w-3 h-3 bg-cyan-400 rounded-full shadow-[0_0_15px_rgba(34,211,238,1)] animate-pulse"></div>
           </motion.div>
         </motion.div>
 
         {isLoading && (
-          <div className="flex justify-center items-center py-20">
-            <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(400px,auto)]">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="animate-shimmer rounded-[1.5rem] bg-card-bg border border-border-subtle p-8 flex flex-col justify-end">
+                <div className="mb-auto pb-8">
+                  <div className="flex gap-2 mb-4">
+                    <div className="h-5 w-20 rounded-full bg-border-color/40" />
+                    <div className="h-5 w-16 rounded-full bg-border-color/30" />
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <div className="h-8 w-8 rounded-full bg-border-color/30" />
+                    <div className="h-8 w-8 rounded-full bg-border-color/30" />
+                  </div>
+                </div>
+                <div className="h-8 w-3/4 rounded-lg bg-border-color/40 mb-3" />
+                <div className="space-y-2 mb-6">
+                  <div className="h-4 w-full rounded bg-border-color/30" />
+                  <div className="h-4 w-2/3 rounded bg-border-color/30" />
+                  <div className="h-4 w-1/2 rounded bg-border-color/20" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-6 w-16 rounded bg-border-color/30" />
+                  <div className="h-6 w-20 rounded bg-border-color/30" />
+                  <div className="h-6 w-14 rounded bg-border-color/20" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -261,7 +390,7 @@ export default function Proyectos() {
                   onClick={() => setActiveTab('personal')}
                   className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
                 >
-                  <User size={22} className="hidden sm:block" />
+                  <User size={24} className="hidden sm:block" />
                   <span className={activeTab === 'personal' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}>
                     {t.projects.personal}
                   </span>
@@ -275,7 +404,7 @@ export default function Proyectos() {
                   onClick={() => setActiveTab('company')}
                   className="relative z-10 flex-1 flex items-center justify-center gap-2 px-3 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-colors duration-300"
                 >
-                  <Briefcase size={22} className="hidden sm:block" />
+                  <Briefcase size={24} className="hidden sm:block" />
                   <span className={activeTab === 'company' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}>
                     {t.projects.company}
                   </span>

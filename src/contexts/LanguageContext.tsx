@@ -183,8 +183,8 @@ const translations: Record<Language, Translations> = {
     projects: {
       title: 'Proyectos',
       subtitle: 'Soluciones innovadoras construidas con las últimas tecnologías',
-      personal: 'Proyectos Personales',
-      company: 'Proyectos de Empresa',
+      personal: 'Personales',
+      company: 'Empresa',
       completed: 'COMPLETADO',
       inProgress: 'EN DESARROLLO',
       techStack: 'Stack Tecnológico',
@@ -322,8 +322,8 @@ const translations: Record<Language, Translations> = {
     projects: {
       title: 'Projects',
       subtitle: 'Innovative solutions built with the latest technologies',
-      personal: 'Personal Projects',
-      company: 'Company Projects',
+      personal: 'Personal',
+      company: 'Company',
       completed: 'COMPLETED',
       inProgress: 'IN PROGRESS',
       techStack: 'Tech Stack',

@@ -388,3 +388,25 @@ span[class*="bg-green"] {
   background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
 }
+
+/* =========================================
+   7. SKELETON SHIMMER
+   ========================================= */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+.light .animate-shimmer::after {
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.04), transparent);
+}
