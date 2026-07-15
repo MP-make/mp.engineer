@@ -6,6 +6,7 @@ import { ExternalLink, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ParticleBackground from '@/components/ParticleBackground';
 import ProjectLoadingOverlay from '@/components/ProjectLoadingOverlay';
+import { supabase } from '@/lib/supabase';
 
 interface HeroImage {
   id: number;
@@ -26,6 +27,22 @@ export default function HeroSection({ t, currentSlide, heroImages, isImageOnLeft
   const [text, setText] = useState('');
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [cvUrl, setCvUrl] = useState('/cv-marlon-pecho.pdf');
+
+  useEffect(() => {
+    const fetchCv = async () => {
+      const { data, error } = await supabase
+        .from('portfolio_cv')
+        .select('url')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (!error && data) {
+        setCvUrl(data.url);
+      }
+    };
+    fetchCv();
+  }, []);
 
   useEffect(() => {
     const currentPhrase = phrases[phraseIndex];
@@ -140,7 +157,7 @@ export default function HeroSection({ t, currentSlide, heroImages, isImageOnLeft
             </Link>
             
             <a
-              href="/cv-marlon-pecho.pdf"
+              href={cvUrl}
               download
               className="inline-flex items-center justify-center gap-2 bg-tag-bg backdrop-blur-sm border border-border-color text-text-secondary px-5 py-2.5 rounded-full hover:border-cyan-500/50 hover:bg-hover-bg transition-all duration-300 hover:-translate-y-1 text-sm md:text-base shrink-0"
             >

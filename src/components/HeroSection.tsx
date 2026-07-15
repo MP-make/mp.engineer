@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ExternalLink, Github, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
 
 interface HeroImage {
   id: number;
@@ -20,6 +22,23 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ t, theme, currentSlide, heroImages, isImageOnLeft }: HeroSectionProps) {
+  const [cvUrl, setCvUrl] = useState('/cv-marlon-pecho.pdf');
+
+  useEffect(() => {
+    const fetchCv = async () => {
+      const { data, error } = await supabase
+        .from('portfolio_cv')
+        .select('url')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (!error && data) {
+        setCvUrl(data.url);
+      }
+    };
+    fetchCv();
+  }, []);
+
   return (
     <section id="home" className="relative flex items-center justify-center mx-auto z-10 px-6 py-20 lg:py-32 w-full max-w-7xl">
       
@@ -140,7 +159,7 @@ export default function HeroSection({ t, theme, currentSlide, heroImages, isImag
             </Link>
             
             <a
-              href="/cv-marlon-pecho.pdf"
+              href={cvUrl}
               download
               className="w-full sm:w-auto bg-white/5 backdrop-blur-sm border border-white/10 text-slate-300 px-8 py-3.5 rounded-full hover:border-cyan-500/50 hover:bg-slate-800 transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-1"
             >
